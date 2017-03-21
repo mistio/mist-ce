@@ -44,7 +44,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_tornado import EsClient
 
 import mist.io.users.models
-from mist.io.auth.models import ApiToken, datetime_to_str
+from mist.io.auth.models import ApiToken, SessionToken, datetime_to_str
 
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import RequiredParameterMissingError
@@ -775,20 +775,59 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             event['email'] = mist.io.users.models.User.objects.get(
                 id=user_id).email
         for key in ('cloud_id', 'machine_id', 'script_id', 'rule_id',
-                    'job_id', 'shell_id', 'session_id', 'incident_id'):
+                    'job_id', 'shell_id', 'session_id', 'incident_id',
+                    'fingerprint', 'experiment', 'choice'):
             if key in kwargs:
                 event[key] = kwargs.pop(key)
+        session_id = event.get('session_id')
+        fingerprint = event.get('fingerprint')
+        experiment = event.get('experiment')
+        choice = event.get('choice')
+
+        session = None
+        # Cross populate session data to facilitate funnel analysis
+        if session_id:
+            try:
+                session = SessionToken.objects.get(id=session_id)
+            except Exception as exc:
+                log.warn('Invalid session id %s - %s' % (session_id, exc))
+        if session:
+            if fingerprint: # store fingerprint in session
+                session.fingerprint = fingerprint
+            elif session.fingerprint: # add fingerprint in log entry
+                event['fingerprint'] = session.fingerprint
+            if experiment: # store experiment in session
+                session.experiment = experiment
+            elif session.experiment:
+                event['experiment'] = session.experiment
+            if choice:
+                session.choice = choice
+            elif session.choice:
+                event['choice'] = session.choice
+            # Remove experiment values for disabled experiments
+            if session.experiment not in config.ENABLED_EXPERIMENTS:
+                if 'experiment' in event:
+                    event.pop('experiment')
+                if 'choice' in event:
+                    event.pop('choice')
+                session.experiment = ''
+                session.choice = ''
+            session.save()
+
         event['_id'] = str(coll.save(event.copy()))
-        try:
-            stories = log_story(event, _mongo_conn=conn)
-            if config.LOGS_FROM_ELASTIC:
-                from mist.io.logs.methods import log_story as log_story_to_elastic
-                event.update({'log_id': uuid.uuid4().hex})
-                log_story_to_elastic(event, tornado_async=tornado_async)
-        except Exception as exc:
-            log.error("failed to log story: %s %s %s %s %s Error %r",
-                      owner_id, event_type, error, action, kwargs, exc)
-            stories = []
+        if event['type'] == 'ui':
+            stories = [] # ui logs have no stories
+        else:
+            try:
+                stories = log_story(event, _mongo_conn=conn)
+                if config.LOGS_FROM_ELASTIC:
+                    from mist.io.logs.methods import log_story as log_story_to_elastic
+                    event.update({'log_id': uuid.uuid4().hex})
+                    log_story_to_elastic(event, tornado_async=tornado_async)
+            except Exception as exc:
+                log.error("failed to log story: %s %s %s %s %s Error %r",
+                        owner_id, event_type, error, action, kwargs, exc)
+                stories = []
     except Exception as exc:
         log.error("failed to log event: %s %s %s %s %s Error %r",
                   owner_id, event_type, error, action, kwargs, exc)
@@ -1132,7 +1171,6 @@ def logging_view_decorator(func):
                                         'enable_insights', 'register'):
             # don't log these views no matter what
             return response
-
         # log request #
         log_dict = {
             'event_type': 'request',
@@ -1157,10 +1195,22 @@ def logging_view_decorator(func):
             log_dict['_exc_type'] = type(context)
             log_dict['_traceback'] = traceback.format_exc()
 
-        # log user
+        # log session
         session = request.environ['session']
+        if session:
+            log_dict['session_id'] = str(session.id)
+            try:
+                if session.fingerprint:
+                    log_dict['fingerprint'] = session.fingerprint
+                if session.experiment:
+                    log_dict['experiment'] = session.experiment
+                if session.choice:
+                    log_dict['choice'] = session.choice
+            except AttributeError: # in case of ApiToken
+                pass
+
+        # log user
         user = session.get_user(effective=False)
-        #    swagIt(request,response,func)
         if user is not None:
             log_dict['user_id'] = user.id
             sudoer = session.get_user()

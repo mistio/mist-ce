@@ -42,10 +42,17 @@ def get_events(auth_context=None, owner_id='', user_id='',
     provided. Also, extra filtering may be applied in order to perform RBAC
     on the fly given the permissions granted to the requesting User.
 
-    All Elasticsearch indices are in the form of <owner_id>-logs-<date>.
+    All Elasticsearch indices are in the form of <app|ui>-logs-<date>.
 
     """
-    index = "%s-logs-*" % (owner_id or "*")
+    # Restrict access to UI logs to Admins only.
+    is_admin = auth_context and auth_context.user.role == 'Admin'
+    # Attempt to enforce owner_id in case of non-Admins.
+    if not (is_admin and owner_id):
+        owner_id = auth_context.owner.id if auth_context else None
+
+    # Construct base Elasticsearch query.
+    index = "%s-logs-*" % ("*" if is_admin else "app")
     query = {
         "query": {
             "bool": {
@@ -72,17 +79,23 @@ def get_events(auth_context=None, owner_id='', user_id='',
                     "order": ("desc" if newest else "asc")
                 }
             }
-        ]
+        ],
+        "size": (limit or 50)
     }
     # Match action.
     if action:
         query["query"]["bool"]["filter"]["bool"]["must"].append(
             {"term": {'action': action}}
         )
+    # Fetch logs corresponding to the current Organization.
+    if owner_id:
+        query["query"]["bool"]["filter"]["bool"]["must"].append(
+            {"term": {"owner_id": owner_id}}
+        )
     # Match the user's ID, if provided.
     if user_id:
         query["query"]["bool"]["filter"]["bool"]["must"].append(
-            {"term": {'user_id': user_id}}
+            {"term": {"user_id": user_id}}
         )
     # Specify whether to fetch stories that ended with an error.
     if error:
@@ -93,9 +106,6 @@ def get_events(auth_context=None, owner_id='', user_id='',
         query["query"]["bool"]["filter"]["bool"]["must"].append(
             {"term": {"error": False}}
         )
-    # Limit the document count returned.
-    if limit:
-        query["size"] = limit
     # Extend query with additional kwargs.
     for key, value in kwargs.iteritems():
         query["query"]["bool"]["filter"]["bool"]["must"].append(
@@ -105,15 +115,6 @@ def get_events(auth_context=None, owner_id='', user_id='',
     # Apply RBAC for non-Owners.
     if auth_context and not auth_context.is_owner():
         filter_logs(auth_context, query)
-
-    # Do not propagate UI logs for non-Admins.
-    if not auth_context or not auth_context.user.role == 'Admin':
-        if not event_type:
-            query["query"]["bool"]["filter"]["bool"]["must_not"].append(
-                {"term": {"type": "ui"}}
-            )
-        elif event_type == 'ui':
-            raise NotFoundError('Unknown event type: "ui"')
 
     # Query Elasticsearch.
     result = es().search(index=index, doc_type=event_type, body=query)
@@ -159,7 +160,7 @@ def log_story(event, tornado_async=False):
     additional key-value pairs to be explicitly present in a story, one must
     append them to `FIELDS`.
 
-    All Elasticsearch indices are in the form of <owner_id>-stories-<date>.
+    All Elasticsearch indices are in the form of stories-<date>.
 
     Arguments:
         - event: The event that triggers the creation/update of a story.
@@ -245,9 +246,7 @@ def _on_new_story_callback(event, story, tornado_async=False):
                       '%s: %s', story['story_id'], exc)
 
     # Save to Elasticsearch. Refresh the index immediately.
-    index = '%s-stories-%s' % (
-            event['owner_id'],
-            datetime.datetime.utcnow().strftime('%Y.%m'))
+    index = 'stories-%s' % datetime.datetime.utcnow().strftime('%Y.%m')
     if not tornado_async:
         es().index(
             index=index, doc_type=story['type'], body=story, refresh='true'
@@ -399,7 +398,7 @@ def get_stories(story_type='', owner_id='', user_id='',
 
     """
     # Prepare query to fetch stories.
-    index = '%s-stories-*' % (owner_id or '*')
+    index = 'stories-*'
     query = {
         "query": {
             "bool": {
@@ -420,6 +419,11 @@ def get_stories(story_type='', owner_id='', user_id='',
         ],
         "size": (limit or 20)
     }
+    # Fetch logs corresponding to the current Organization.
+    if owner_id:
+        query["query"]["bool"]["filter"]["bool"]["must"].append(
+            {"term": {"owner_id": owner_id}}
+        )
     # Fetch documents corresponding to the current user, if provided.
     if user_id:
         query["query"]["bool"]["filter"]["bool"]["must"].append(
@@ -471,15 +475,21 @@ def get_stories(story_type='', owner_id='', user_id='',
         assert not tornado_async
 
         # Prepare query to fetch relevant logs.
-        index = '%s-logs-*' % (owner_id or '*')
+        index = "app-logs-*"
         query = {
             "query": {
                 "bool": {
                     "filter": {
-                        "terms": {
-                            "log_id": [
-                                log_id for story in stories for
-                                log_id in story['log_ids']
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "log_id": [
+                                            log_id for story in stories for
+                                            log_id in story['log_ids']
+                                        ]
+                                    }
+                                }
                             ]
                         }
                     }
@@ -487,6 +497,11 @@ def get_stories(story_type='', owner_id='', user_id='',
             },
             "size": 20
         }
+        # Fetch logs of the current Organization, if provided.
+        if owner_id:
+            query["query"]["bool"]["filter"]["bool"]["must"].append(
+                {"term": {"owner_id": owner_id}}
+            )
 
         # Fetch corresponding events.
         # NOTE: Avoid specifying the `doc_type`, since log and story types
@@ -543,7 +558,7 @@ def get_story(owner_id, story_id, story_type=None, expand=True):
 
 def close_story(story_id):
     """Close an open story."""
-    story = get_simple_story(owner_id='*', story_id=story_id)  # TODO: owner_id
+    story = get_simple_story(owner_id='', story_id=story_id)  # TODO: owner_id
     if not story:
         log.error('Failed to find story %s', story_id)
     elif story['_source']['finished_at']:
@@ -557,7 +572,7 @@ def close_story(story_id):
 
 def delete_story(story_id):
     """Delete a story."""
-    story = get_simple_story(owner_id='*', story_id=story_id)  # TODO: owner_id
+    story = get_simple_story(owner_id='', story_id=story_id)  # TODO: owner_id
     if story:
         es().delete(
             index=story['_index'], doc_type=story['_type'], id=story['_id']

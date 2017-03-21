@@ -110,16 +110,6 @@ def add_cloud(request):
     title = params.get('title', '')
     provider = params.get('provider', '')
 
-    if config.NEW_UI_EXPERIMENT_ENABLE:
-        # TODO check how to handle this for open source!
-        from mist.core.experiments import NewUIExperiment
-        from mist.io.auth.methods import session_from_request
-
-        session = session_from_request(request)
-        experiment = NewUIExperiment(userid=session.user_id)
-        experiment.log_event('add_cloud', {'title': title,
-                                           'provider': provider})
-
     if not provider:
         raise RequiredParameterMissingError('provider')
 

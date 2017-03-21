@@ -63,9 +63,6 @@ MAILER_SETTINGS = {
     'mail.password': "",
 }
 
-# PLAN OUT experiments
-NEW_UI_EXPERIMENT_ENABLE = False
-
 GITHUB_BOT_TOKEN = ""
 
 NO_VERIFY_HOSTS = []
