@@ -51,6 +51,12 @@ from mist.io.exceptions import RequiredParameterMissingError
 
 from mist.io import config
 
+try:
+    from mist.core.experiments.helpers import cross_populate_session_data
+except ImportError:
+    from mist.io.dummy.methods import cross_populate_session_data
+
+
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -810,44 +816,11 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             event['email'] = mist.io.users.models.User.objects.get(
                 id=user_id).email
         for key in ('cloud_id', 'machine_id', 'script_id', 'rule_id',
-                    'job_id', 'shell_id', 'session_id', 'incident_id',
-                    'fingerprint', 'experiment', 'choice'):
+                    'job_id', 'shell_id', 'session_id', 'incident_id'):
             if key in kwargs:
                 event[key] = kwargs.pop(key)
-        session_id = event.get('session_id')
-        fingerprint = event.get('fingerprint')
-        experiment = event.get('experiment')
-        choice = event.get('choice')
 
-        session = None
-        # Cross populate session data to facilitate funnel analysis
-        if session_id:
-            try:
-                session = SessionToken.objects.get(id=session_id)
-            except Exception as exc:
-                log.warn('Invalid session id %s - %s' % (session_id, exc))
-        if session:
-            if fingerprint: # store fingerprint in session
-                session.fingerprint = fingerprint
-            elif session.fingerprint: # add fingerprint in log entry
-                event['fingerprint'] = session.fingerprint
-            if experiment: # store experiment in session
-                session.experiment = experiment
-            elif session.experiment:
-                event['experiment'] = session.experiment
-            if choice:
-                session.choice = choice
-            elif session.choice:
-                event['choice'] = session.choice
-            # Remove experiment values for disabled experiments
-            if session.experiment not in config.ENABLED_EXPERIMENTS:
-                if 'experiment' in event:
-                    event.pop('experiment')
-                if 'choice' in event:
-                    event.pop('choice')
-                session.experiment = ''
-                session.choice = ''
-            session.save()
+        event = cross_populate_session_data(event, kwargs)
 
         event['_id'] = str(coll.save(event.copy()))
         if event['type'] == 'ui':

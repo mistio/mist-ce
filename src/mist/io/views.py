@@ -28,6 +28,7 @@ from mist.io.dns.models import Zone, Record
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
 from mist.io.users.models import Avatar, Owner, User, Organization
+from mist.io.users.models import MemberInvitation
 from mist.io.auth.models import SessionToken, ApiToken
 
 from mist.io.users.methods import register_user
@@ -35,7 +36,7 @@ from mist.io.users.methods import register_user
 from mist.io import methods
 
 from mist.io.exceptions import RequiredParameterMissingError
-from mist.io.exceptions import NotFoundError, BadRequestError
+from mist.io.exceptions import NotFoundError, BadRequestError, ForbiddenError
 from mist.io.exceptions import SSLError, ServiceUnavailableError
 from mist.io.exceptions import KeyParameterMissingError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
@@ -131,25 +132,11 @@ def home(request):
                                     backend=external_auth)
             raise RedirectError(url)
 
-        #check for first entry in landing cookie, if not add first entry ui log
-        if "first_entry" not in request.cookies:
-            log_event(owner_id="", user_id="",
-                               event_type='ui',
-                               action='first entry at home',
-                               ip=ip_from_request(request))
-
         return render_to_response('templates/landing.pt', template_inputs)
 
     if not user.last_active or datetime.now() - user.last_active > timedelta(0, 300):
         user.last_active = datetime.now()
         user.save()
-
-    #check for first entry in app cookie, if not add first entry ui log
-    if "first_entry" not in request.cookies or request.cookies['first_entry'] != "app":
-        log_event(owner_id="", user_id="",
-                           event_type='ui',
-                           action='first entry at app',
-                           ip=ip_from_request(request))
 
     auth_context = auth_context_from_request(request)
     if not auth_context.owner.last_active or \
@@ -550,7 +537,7 @@ def confirm(request):
         try:
             MemberInvitation.objects.get(token=invitoken)
             url += '&invitoken=' + invitoken
-        except DoesNotExist:
+        except me.DoesNotExist:
             pass
 
     return HTTPFound(url)
@@ -572,7 +559,7 @@ def forgot_password(request):
 
     try:
         user = User.objects.get(email=email)
-    except (UserNotFoundError, DoesNotExist):
+    except (UserNotFoundError, me.DoesNotExist):
         # still return OK so that there's no leak on valid email
         return OK
 
@@ -638,7 +625,7 @@ def reset_password(request):
 
     try:
         user = User.objects.get(email=email)
-    except (UserNotFoundError, DoesNotExist):
+    except (UserNotFoundError, me.DoesNotExist):
         raise UserUnauthorizedError()
 
     # SEC check status, token, expiration
@@ -652,16 +639,9 @@ def reset_password(request):
         build_path = ''
         if config.BUILD_TAG and not params.get('debug'):
             build_path = '/build/%s/bundled/' % config.BUILD_TAG
-
-        template_inputs = {
-            'build_path': build_path,
-            'token': params.get('p', ''), # promo token
-            'csrf_token': json.dumps(get_csrf_token(request)),
-            'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-            'mixpanel_id': config.MIXPANEL_ID,
-            'fb_id': config.FB_ID,
-            'olark_id': config.OLARK_ID,
-        }
+        template_inputs = config.HOMEPAGE_INPUTS
+        template_inputs['build_path'] = build_path
+        template_inputs['csrf_token'] = json.dumps(get_csrf_token(request))
 
         return render_to_response('templates/landing.pt', template_inputs)
     elif request.method == 'POST':
@@ -708,7 +688,7 @@ def set_password(request):
 
     try:
         user = User.objects.get(email=email)
-    except (UserNotFoundError, DoesNotExist):
+    except (UserNotFoundError, me.DoesNotExist):
         raise UserUnauthorizedError()
 
     if user.status != 'pending':
@@ -723,16 +703,9 @@ def set_password(request):
         build_path = ''
         if config.BUILD_TAG and not params.get('debug'):
             build_path = '/build/%s/bundled/' % config.BUILD_TAG
-
-        template_inputs = {
-            'build_path': build_path,
-            'token': params.get('p', ''), # promo token
-            'csrf_token': json.dumps(get_csrf_token(request)),
-            'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-            'mixpanel_id': config.MIXPANEL_ID,
-            'fb_id': config.FB_ID,
-            'olark_id': config.OLARK_ID,
-        }
+        template_inputs = config.HOMEPAGE_INPUTS
+        template_inputs['build_path'] = build_path
+        template_inputs['csrf_token'] = json.dumps(get_csrf_token(request))
 
         return render_to_response('templates/landing.pt', template_inputs)
     elif request.method == 'POST':
@@ -748,22 +721,7 @@ def set_password(request):
         user.selected_plan = ''
         user.last_login = time()
 
-        # activate trial
-        # plan = Plan()
-        # plan.title = 'Startup'
-        # plan.machine_limit = 20
-        # plan.started = time()
-        # plan.expiration = time() + 60 * 60 * 24 * 15
-        # plan.isTrial = True
-        # user.plans = []
-        # user.plans.append(plan)
-
         user.save()
-
-        body = "one step closer to world domination!\n%s/%s confirmed" \
-            % (get_users_count(confirmed=True), get_users_count())
-        subject = '[mist.io] new user: %s' % user.email,
-        send_email(subject, body, 'we@mist.io')
 
         # log in user
         reissue_cookie_session(request, user)
@@ -779,12 +737,92 @@ def set_password(request):
             try:
                 MemberInvitation.objects.get(token=invitoken)
                 confirm_invitation(request)
-            except DoesNotExist:
+            except me.DoesNotExist:
                 pass
 
         return render_to_response('json', ret, request)
     else:
         raise BadRequestError("Invalid HTTP method")
+
+
+@view_config(route_name='confirm_invitation', request_method='GET')
+def confirm_invitation(request):
+    """
+    Confirm that a user want to participate in team
+    If user has status pending then he/she will be redirected to confirm
+    to finalize registration and only after the process has finished
+    successfully will he/she be added to the team.
+    ---
+    invitoken:
+      description: member's invitation token
+      type: string
+      required: true
+
+    """
+    try:
+        auth_context = auth_context_from_request(request)
+    except UserUnauthorizedError:
+        auth_context = None
+    params = params_from_request(request)
+    invitoken = params.get('invitoken', '')
+    if not invitoken:
+        raise RequiredParameterMissingError('invitoken')
+    try:
+        invitation = MemberInvitation.objects.get(token=invitoken)
+    except DoesNotExist:
+        raise NotFoundError('Invalid invitation token')
+
+    user = invitation.user
+    # if user registration is pending redirect to confirm registration
+    if user.status == 'pending':
+        key = params.get('key')
+        if not key:
+            key = user.activation_key
+        uri = request.route_url('confirm',
+                                _query={'key': key, 'invitoken': invitoken})
+        raise RedirectError(uri)
+
+    # if user is confirmed but not logged in then redirect to log in page
+    if not auth_context:
+        uri = request.route_url('login', _query={'invitoken': invitoken})
+        raise RedirectError(uri)
+
+    # if user is logged in then make sure it's his invitation that he is
+    # confirming. if it's not redirect to home but don't confirm invitation.
+    if invitation.user != auth_context.user:
+        return HTTPFound('/')
+
+    org = invitation.org
+    for team_id in invitation.teams:
+        try:
+            org.add_member_to_team_by_id(team_id, user)
+        except:
+            pass
+
+    try:
+        org.save()
+    except:
+        raise TeamOperationError()
+
+    try:
+        invitation.delete()
+    except:
+        pass
+
+    args = {
+        'request': request,
+        'user_id': auth_context.user,
+        'org': org
+    }
+    if session_from_request(request).context.get('social_auth_backend'):
+        args.update({
+            'social_auth_backend': session_from_request(request).context.get('social_auth_backend')
+        })
+    reissue_cookie_session(**args)
+
+    trigger_session_update(auth_context.owner, ['org'])
+
+    return HTTPFound('/')
 
 
 @view_config(route_name='api_v1_images', request_method='POST', renderer='json')
