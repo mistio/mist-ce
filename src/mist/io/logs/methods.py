@@ -48,7 +48,7 @@ def get_events(auth_context=None, owner_id='', user_id='',
     # Restrict access to UI logs to Admins only.
     is_admin = auth_context and auth_context.user.role == 'Admin'
     # Attempt to enforce owner_id in case of non-Admins.
-    if not (is_admin and owner_id):
+    if not is_admin and not owner_id:
         owner_id = auth_context.owner.id if auth_context else None
 
     # Construct base Elasticsearch query.
