@@ -782,9 +782,14 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
         experiment = event.get('experiment')
         choice = event.get('choice')
 
+        session = None
         # Cross populate session data to facilitate funnel analysis
         if session_id:
-            session = SessionToken.objects.get(id=session_id)
+            try:
+                session = SessionToken.objects.get(id=session_id)
+            except Exception as exc:
+                log.warn('Invalid session id %s - %s' % (session_id, exc))
+        if session:
             if fingerprint: # store fingerprint in session
                 session.fingerprint = fingerprint
             elif session.fingerprint: # add fingerprint in log entry
