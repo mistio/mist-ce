@@ -20,7 +20,7 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
-from mist.io.exceptions import MistError, NotFoundError
+from mist.io.exceptions import MistError, NotFoundError, CloudNotFoundError
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
 
@@ -54,10 +54,8 @@ app.conf.update(**config.CELERY_SETTINGS)
 @app.task
 def ssh_command(owner, cloud_id, machine_id, host, command,
                       key_id=None, username=None, password=None, port=22):
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+
+    owner = Owner.objects.get(id=owner)
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(owner, cloud_id, machine_id,
                                            key_id, username, password, port)
@@ -85,10 +83,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
         from mist.io.dummy.methods import enable_monitoring
 
     job_id = job_id or uuid.uuid4().hex
-    if owner.find("@") != -1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+    owner = Owner.objects.get(id=owner)
     tmp_log = lambda msg, *args: log.error('Post deploy: %s' % msg, *args)
     tmp_log('Entering post deploy steps for %s %s %s',
             owner.id, cloud_id, machine_id)
@@ -303,10 +298,8 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                                 networks=[], schedule={}):
 
     from mist.io.methods import connect_provider
-    if owner.find("@")!=-1:
-        owner = Owner.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+
+    owner = Owner.objects.get(id=owner)
 
     try:
         cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
@@ -392,11 +385,8 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                             hostname='', plugins=None, post_script_id='',
                             post_script_params='', schedule={}):
     from mist.io.methods import connect_provider
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
 
+    owner = Owner.objects.get(id=owner)
     try:
         # find the node we're looking for and get its hostname
         cloud = Cloud.objects.get(id=cloud_id, deleted=None)
@@ -471,10 +461,8 @@ def rackspace_first_gen_post_create_steps(
     job_id=None, hostname='', plugins=None, post_script_id='',
     post_script_params='', schedule={}):
     from mist.io.methods import connect_provider
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+
+    owner = Owner.objects.get(id=owner)
     try:
         # find the node we're looking for and get its hostname
         cloud = Cloud.objects.get(id=cloud_id, deleted=None)
@@ -977,11 +965,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
     log.warn('MULTICREATE ASYNC %d' % quantity)
 
     job_id = job_id or uuid.uuid4().hex
-
-    if owner.find("@") != -1:
-        owner = Owner.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+    owner = Owner.objects.get(id=owner)
 
     names = []
     if quantity == 1:
@@ -1260,14 +1244,15 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
 
 
 @app.task(soft_time_limit=3600, time_limit=3630)
-def run_script(owner_id, script_id, cloud_id, machine_id, params='', host='',
+def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
                key_id='', username='', password='', port=22, job_id='',
                action_prefix='', su=False, env=""):
     import mist.io.shell
     from mist.io.methods import notify_admin, notify_user
     from mist.io.machines.methods import list_machines
 
-    owner = Owner.objects.get(id=owner_id)
+    if not isinstance(owner, Owner):
+        owner = Owner.objects.get(id=owner)
 
     ret = {
         'owner_id': owner.id,
