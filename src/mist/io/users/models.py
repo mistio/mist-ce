@@ -199,15 +199,6 @@ class Owner(me.Document):
 
     last_active = me.DateTimeField()
 
-    # billing related fields
-    # TODO remove this after merge core_billing
-    customerId = me.StringField()
-    card = me.StringField()
-
-    plans = me.EmbeddedDocumentListField(
-        Plan
-    )
-
     meta = {
         'allow_inheritance': True,
         'ordering': ['-activation_date'],
