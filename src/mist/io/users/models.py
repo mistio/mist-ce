@@ -6,7 +6,6 @@ import re
 import datetime
 import mongoengine as me
 
-from time import time
 from uuid import uuid4
 
 from passlib.context import CryptContext
