@@ -105,6 +105,8 @@ CELERY_SETTINGS = {
     'CELERY_MONGODB_SCHEDULER_URL': MONGO_URI,
 }
 
+LANDING_CATEGORIES = \
+[{'href': '/', 'name': 'home', 'template': 'home', 'title': 'Home'}]
 
 ###############################################################################
 # App constants
@@ -746,4 +748,5 @@ HOMEPAGE_INPUTS = {
     'mixpanel_id': MIXPANEL_ID,
     'fb_id': FB_ID,
     'olark_id': OLARK_ID,
+    'categories': LANDING_CATEGORIES
 }
