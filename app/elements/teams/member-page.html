@@ -1,0 +1,375 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<!-- <link rel="import" href="add-team.html"> -->
+
+<dom-module id="member-page">
+    <template>
+        <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            background: #fafafa;
+        }
+
+        paper-material {
+            display: block;
+            padding: 8px;
+        }
+
+        paper-material.no-pad {
+            padding: 0;
+        }
+
+        paper-menu-button paper-button {
+            display: block;
+        }
+
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+            align-content: stretch;
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        #container {
+            background: #fafafa;
+        }
+
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+
+        .paper-header {
+            @apply(--layout-horizontal);
+        }
+
+        .paper-header {
+            height: 60px;
+            font-size: 24px;
+            line-height: 60px;
+            padding: 0 10px;
+            color: white;
+            transition: height 0.2s;
+            transition: font-size 0.2s;
+        }
+
+        .paper-header.tall {
+            height: 320px;
+            font-size: 16px;
+        }
+
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
+
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
+
+        #content {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 10px;
+        }
+
+        paper-icon-button {
+            transition: all 200ms;
+        }
+
+        paper-icon-button.active-sort {
+            transform: rotate(180deg);
+        }
+
+        paper-icon-button.active-sort::content iron-icon {
+            color: #D48900 !important;
+        }
+
+        app-bar .menu-icon {
+            margin-right: 15px;
+        }
+
+        [size=xs] > * {
+            display: none;
+        }
+
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
+
+        paper-icon-bottom.bottom {
+            padding-right: 8px;
+        }
+        .subhead {
+            box-sizing: border-box;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            height: 57px;
+            bottom: -57px;
+            right: 0;
+            z-index: 9;
+            color: rgba(0,0,0,0.87);
+            font-size: 15px;
+            line-height: 24px;
+        }
+        .content {
+            margin-top: 57px;
+            padding-bottom: 80px
+        }
+        paper-header-panel ::content #dropShadow {
+            top: 56px;
+        }
+        paper-toolbar ::content #bottomBar .right-actions{
+            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+        }
+        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+            margin-right: 70px;
+        }
+
+        .section {
+            padding-top: 16px;
+        }
+        .red {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+        .required {
+            font-size: 0.9em;
+        }
+        .resource-head {
+            font-weight: 500;
+            padding: 8px 16px;
+            opacity: 0.87;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 0;
+        }
+        .title .up {
+            text-transform: uppercase;
+        }
+        .width100 {
+            width: 100%;
+        }
+        </style>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
+            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+            <paper-header-panel id="container" mode="waterfall-tall" main>
+                <paper-toolbar class="tall" style$="[[color]]">
+                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
+                    <span class="title"></span>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
+                    <span class="bottom title"><span class="up">[[member.name]]</span></span>
+
+                    <span class="bottom right-actions">
+                        <paper-tooltip for="editTeam" position="top">Edit Member</paper-tooltip>
+                        <paper-icon-button id="editTeam" icon="icons:create" on-tap="_editTeam"></paper-icon-button>
+                        <paper-tooltip for="deleteTeam" position="top">Delete Member</paper-tooltip>
+                        <paper-icon-button id="deleteTeam" icon="icons:delete" on-tap="_deleteTeam"></paper-icon-button>
+                    </span>
+
+                    <div class="subhead bottom">
+                        <div>
+                            <span class="pad-right micon-wrap"><iron-icon icon="communication:email" class="micon"></iron-icon></span>
+                            <span>[[member.email]]</span>
+                        </div>
+                        <div class="fab-top-right">
+                            <paper-fab icon="add" on-tap="_addMemberToTeam" id="addMemberTeamFab"></paper-fab>
+                            <paper-tooltip for="runTeamFab" position="bottom">Add Member to a Team</paper-tooltip>
+                        </div>
+                    </div>
+                </paper-toolbar>
+
+                <div class="content">
+                    <div class="page section">
+                        <div class="flex-horizontal-with-ratios section">
+                            <div class="page-block">
+                                <h3 class="smallcaps">Description</h3>
+                                <p>[[member.name]], [[member.email]]</p>
+                            </div>
+                            <div class="page-block">
+                                <h3 class="smallcaps">Signed up at</h3>
+                                <p>[[timestamp]] </p>
+                            </div>
+                        </div>
+                        <div class="flex-horizontal-with-ratios section">
+                            <div class="width100">
+                                <template is="dom-if" if="[[hasTeams]]">
+                                    <paper-material class="no-pad">
+                                        <h3 class="smallcaps resource-head">[[member.name]] is member in teams</h3>
+                                        <template is="dom-repeat" items="[[teams]]">
+                                            <paper-item>
+                                                <a href="/teams/[[item.id]]" class="flex-horizontal-with-ratios width100">
+                                                    <span class="flexchild">[[item.name]] </span>
+                                                    <span class="flexchild">[[item.email]]</span>
+                                                </a>
+                                            </paper-item>
+                                        </template>
+                                    </paper-material>
+                                </template>
+
+                                <template is="dom-if" if="[[!hasMembers]]">
+                                    <h3 class="smallcaps">Members</h3>
+                                    <p>
+                                        You have not yet added this member in any team.
+                                    </p>
+                                    <paper-button class="blue pad-left2 pad-right2" on-tap="_addMemberToTeam"> Add Member to team </paper-button>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="flex-horizontal-with-ratios section">
+                            <div class="width100">
+                                <paper-material class="no-pad">
+                                    <h3 class="smallcaps resource-head">Member Logs (log-list filtered by email)</h3>
+                                    <paper-item>Add cloud</paper-item>
+                                    <paper-item>Create machine</paper-item>
+                                    <paper-item>Reboot machine</paper-item>
+                                    <paper-item>Monitor machine</paper-item>
+                                </paper-material>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
+        <team-edit team="[[team]]"></team-edit>
+        <dialog-element></dialog-element>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'member-page',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                color: {
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
+                },
+                params: {
+                    type: Object
+                },
+                model: {
+                    type: Object
+                },
+                member: {
+                    type: Object,
+                    computed: '_computeMember(params)'
+                },
+                hasTeams: {
+                    type: Boolean,
+                    value: false,
+                    computed: '_hasTeams(member)'
+                },
+                teams: {
+                    type: Array,
+                    computed: '_computeTeams(member)'
+                },
+                memberid: {
+                    type: String,
+                    computed: '_computeMemberId(params)'
+                },
+                timestamp: {
+                    type: String,
+                    computed: '_getFormattedTimestamp(member)'
+                },
+                vpHeight: String
+            },
+            listeners: {
+                'confirmation': '_deleteMemberResponse',
+                'updateSelectedMember': '_updateMember'
+            },
+            ready: function() {
+                var wh = window.innerHeight;
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
+            },
+            _getFormattedTimestamp: function (member) {
+                // var timestamp = parseInt(team.created_at);
+                return new Date(member.signed_in).toLocaleString('en-US', {timeZoneName: 'short'});
+            },
+            _getHeaderStyle: function(section) {
+                return 'background-color: ' + section.color + '; color: #fff;';
+            },
+            _hasTeams: function(member){
+                if (member.teams)
+                    return member.teams.length > 0 ? true : false;
+            },
+            _computeId: function(params) {
+                return params.id;
+            },
+            _computeMember: function(params) {
+                return this.model.membersArray.find(function(member) {
+                    return member.id == params.id;
+                }, this);
+            },
+            _computeMemberId: function(params) {
+                return params.id;
+            },
+            _computeTeams: function(member){
+                return member.teams;
+            },
+            _addMemberToTeam: function(e) {
+                page.show('/add-member-to-a-team/' + this.member.id);
+            },
+            _editMember: function(e) {
+                var el = this.querySelector('member-edit');
+                el._openEditTeamModal();
+            },
+            _updateMember: function(e) {
+                var team = e.detail.team;
+                this.set('member.name', team.name);
+                this.set('member.description', team.description);
+            },
+            _deleteMember: function(e) {
+                this._showDialog({
+                    title: 'Delete member?',
+                    body: "Deleting members cannot be undone. You are about to delete member: " + this.member.name ,
+                    danger: true,
+                    reason: "delete_member"
+                });
+            },
+            _deleteMemberResponse: function(e) {
+                var reason = e.detail.reason,
+                    response = e.detail.response;
+
+                if (response.confirmed && reason == "delete_member") {
+                    console.log('i ll delete the member');
+                    page.show('/members');
+                }
+            },
+            _showDialog: function(info) {
+                var dialog = this.querySelector('dialog-element'),
+                    i;
+                for (i in info) {
+                    dialog[i] = info[i];
+                }
+                dialog._openDialog();
+            },
+            _goBack: function(){
+                history.back();
+            }
+        });
+    })();
+    </script>
+</dom-module>

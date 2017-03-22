@@ -1,0 +1,102 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="policy-item-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-item:hover {
+                cursor: pointer;
+            }
+        </style>
+        <paper-item on-tap="_viewPolicy" class$="info-item [[indexClass]]">
+            <div class="flexchild">
+                <paper-checkbox checked="{{selected}}" on-tap="_selectPolicy"></paper-checkbox> [[descriptionText]]
+            </div>
+            <content></content>
+        </paper-item>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'policy-item-element',
+
+                properties: {
+                    policy: {
+                        type: Object
+                    },
+                    descriptionText: {
+                        type: String,
+                        computed: '_computeDescriptionText(policy)'
+                    },
+                    selected: {
+                        type: Boolean,
+                        value: false,
+                        notify: true
+                    },
+                    index: {
+                        type: Number
+                    },
+                    count: {
+                        type: Number
+                    },
+                    indexClass: {
+                        type: String,
+                        computed: '_computeIsIndexClass(index, count)'
+                    }
+                },
+                listeners: {
+                    'selected-changed': '_selectPolicyChanged'
+                },
+                _computeDescriptionText: function(policy) {
+                    return [
+                        policy.permission.toUpperCase(),
+                        this._formatAction(policy.action),
+                        "on",
+                        this._formatEntity(policy.source),
+                        policy.tags.length > 0 ? "with " + this._formatTags(policy.tags) : null
+                    ].join(" ");
+                },
+                _formatAction: function(action) {
+                    return action == "*" ? "every other action" : action;
+                },
+                _formatEntity: function(source) {
+                    return source == "*" ? "any other source" : source;
+                },
+                _formatTags: function(tags) {
+                    return tags
+                        .map(function(tag) {
+                            return tag.key + ":" + tag.value;
+                        })
+                        .join(", ");
+                },
+                _computeIsIndexClass: function(index, count) {
+                    var classes = [];
+                    classes.push(
+                        (index + 1) % 2 == 0 ? 'even' : 'odd',
+                        index + 1 == count ? 'last' : null
+                    );
+                    return classes.join(' ');
+                },
+                _selectPolicyChanged: function(e) {
+                    var selected = e.detail.value;
+                    this.fire('toggleSelectedPolicy', {
+                        policy: this.policy,
+                        selected: selected
+                    });
+                },
+                _viewPolicy: function(e) {
+                    page.show('/policies/' + this.policy.id);
+                },
+                _selectPolicy: function(e) {
+                    // This is used to prevent event bubbling
+                    e.stopPropagation();
+                }
+            });
+        })();
+    </script>
+</dom-module>

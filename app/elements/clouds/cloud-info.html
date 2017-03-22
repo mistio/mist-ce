@@ -1,0 +1,139 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="cloud-info">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+        </style>
+
+        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>[[cloud.title]]</h2>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input label="Title" value="{{newCloud.title}}"></paper-input>
+                    <paper-button raised disabled$="[[!formReady]]" on-tap="_changeTitle">Save</paper-button>
+                </p>
+                <p>
+                    <iron-label>State</iron-label>
+                    <paper-toggle-button checked$="[[isEnabled]]" on-tap="_changeState">[[cloud.state]]</paper-toggle-button>
+                </p>
+                <p>
+                    <paper-input id="cloudId" label="ID" value="[[cloud.id]]"></paper-input>
+                    <paper-button raised on-tap="_copyId">Copy Id</paper-button>
+                </p>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
+        <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
+        <paper-toast></paper-toast>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'cloud-info',
+
+                properties: {
+                    cloud: Object,
+                    newCloud: {
+                        type: Object,
+                        computed: '_computeNewCloud(cloud)'
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(cloud.title, newCloud.title, sendingData)'
+                    },
+                    isEnabled: {
+                        type: Boolean,
+                        computed: '_computeIsEnabled(cloud.enabled)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _computeNewCloud: function(cloud) {
+                    return {
+                        title: cloud.title
+                    }
+                },
+                _computeIsEnabled: function(enabled) {
+                    return enabled;
+                },
+                _computeFormReady: function(title, newTitle, sendingData) {
+                    var formReady = false;
+
+                    if (newTitle && newTitle != title) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openDialog: function(e) {
+                    this.querySelector('paper-dialog').open();
+                },
+                _closeDialog: function(e) {
+                    this.querySelector('paper-dialog').close();
+                },
+                _changeTitle: function() {
+                    this.$.cloudEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudEditAjaxRequest.body = {
+                        new_name: this.newCloud.title
+                    };
+                    this.$.cloudEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleCloudEditAjaxResponse: function() {
+                    this.set('cloud.title', this.newCloud.title);
+                    this.set('sendingData', false);
+                },
+                _changeState: function(e) {
+                    this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudStateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudStateAjaxRequest.body = {
+                        new_state: this.cloud.enabled ? '0' : '1'
+                    };
+                    this.$.cloudStateAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleCloudStateAjaxResponse: function(e) {
+                    this.set('cloud.enabled', !this.cloud.enabled);
+                    this.set('cloud.state', this.cloud.enabled ? 'online' : 'offline');
+                    this.set('sendingData', false);
+                    console.log(this.cloud);
+                    var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
+                    'Cloud ' + this.cloud.title + ' was disabled!';
+                    this._showToast(msg);
+                },
+                _copyId: function() {
+                    this.querySelector('#cloudId input').select();
+                    document.execCommand('copy');
+                    this._showToast('Cloud\'s ID was copied to clipboard!');
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
+                }
+            });
+        })();
+    </script>
+</dom-module>

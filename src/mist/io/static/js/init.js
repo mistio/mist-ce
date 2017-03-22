@@ -38,6 +38,15 @@ var loadApp = function(
     ScriptRunController,
     ScriptsController,
     ProjectsController,
+    TeamsController,
+    TeamEditController,
+    TeamAddController,
+    OrganizationsController,
+    OrganizationAddController,
+    MemberAddController,
+    PolicyRuleEditController,
+    PolicyOperatorEditController,
+    PolicyController,
     HomeView) {
 
     // Hide error boxes on page unload
@@ -56,6 +65,9 @@ var loadApp = function(
     App.set('authenticated', AUTH || IS_CORE);
     App.set('email', EMAIL);
     App.set('password', '');
+    App.set('organization', ORGANIZATION);
+    App.set('can_create_org', CAN_CREATE_ORG);
+    App.set('orgs', ORGS);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
@@ -83,6 +95,10 @@ var loadApp = function(
         this.route('scripts');
         this.route('script', {
             path: '/scripts/:script_id'
+        });
+        this.route('teams');
+        this.route('team', {
+            path: '/teams/:team_id'
         });
         this.route('logs');
         this.route('missing', {
@@ -128,6 +144,15 @@ var loadApp = function(
     App.set('projectsController', ProjectsController.create());
     App.set('machineRunScriptController', MachineRunScriptController.create());
     App.set('machineImageCreateController', MachineImageCreateController.create());
+    App.set('teamsController', TeamsController.create());
+    App.set('teamEditController', TeamEditController.create());
+    App.set('teamAddController', TeamAddController.create());
+    App.set('organizationsController', OrganizationsController.create());
+    App.set('organizationAddController', OrganizationAddController.create());
+    App.set('memberAddController', MemberAddController.create());
+    App.set('policyRuleEditController', PolicyRuleEditController.create());
+    App.set('policyOperatorEditController', PolicyOperatorEditController.create());
+    App.set('policyController', PolicyController.create());
 
 
     // Ember custom widgets
@@ -302,9 +327,9 @@ var setupLogChannel = function(socket, callback) {
     }).on('open_sessions', function(openSessions) {
         info('received open_sessions: ', openSessions);
     }).emit('ready');
-    if (! Mist.isCore) {
+    if (!Mist.isCore) {
         Mist.set('openIncidents', []);
-    }    
+    }
     Mist.set('closedIncidents', [])
 
     if (callback)
@@ -335,10 +360,34 @@ var setupMainChannel = function(socket, callback) {
         //  TODO: This is a temporary ajax-request to get the scripts.
         //  It should be converted into a "list_scripts" socket handler
         //  as soon as the cloud supports it
-        Mist.ajax.GET('/scripts').success(function(scripts) {
-            Mist.scriptsController.setModel(scripts);
+        Mist.ajax.GET('/api/v1/scripts').success(function(scripts) {
+            Mist.scriptsController.setModel(scripts, true);
         });
     }
+
+    // Fast implementation for teams modelling
+    var organization = Mist.organization, teams = [];
+    if (Object.keys(organization).length) {
+        organization.teams.forEach(function(team) {
+            team.organization = {
+                id: organization.id,
+                name: organization.name
+            };
+            var members = organization.members.filter(function(member) {
+                return team.members.indexOf(member.id) > -1;
+            });
+            team.members = members;
+            teams.pushObject(team);
+        });
+
+        Mist.organizationsController.load({
+            id: organization.id,
+            name: organization.name
+        });
+    }
+
+    Mist.teamsController.setModel(teams, true);
+    // Fast implementation for teams modelling
 
     socket
         .on('list_keys', function(keys) {
@@ -380,7 +429,9 @@ var setupMainChannel = function(socket, callback) {
             var cloud = Mist.cloudsController.getCloud(data.cloud_id);
             if (cloud) {
                 var networks = [];
-                networks.pushObjects(data.networks.public, data.networks.private);
+                networks
+                    .pushObjects(data.networks.public)
+                    .pushObjects(data.networks.private);
                 cloud.networks.setModel(networks);
             }
         })

@@ -1,3 +1,11 @@
+try:
+    from mist.core.user.models import User
+    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.core.keypair.models import Keypair
+    from mist.core import config
+except ImportError:
+    from mist.io import config, model
+
 import mist.io.methods
 
 
@@ -13,10 +21,9 @@ class MistInventory(object):
         self.hosts = {}
         self.keys = {}
         if not machines:
-            machines = [(bid, m['id'])
-                        for bid in self.user.clouds
-                        for m in self._list_machines(bid)]
-
+            clouds = Cloud.objects(owner=self.user)
+            machines = [(machine.cloud.id, machine.machine_id)
+                        for machine in Machine.objects(cloud__in=clouds)]
         for bid, mid in machines:
             try:
                 name, ip_addr = self.find_machine_details(bid, mid)
@@ -25,7 +32,8 @@ class MistInventory(object):
                 print exc
                 continue
             if key_id not in self.keys:
-                self.keys[key_id] = self.user.keypairs[key_id].private
+                keypair = Keypair.objects.get(owner=self.user, name=key_id)
+                self.keys[key_id] = keypair.private
 
             if name in self.hosts:
                 num = 2
@@ -77,17 +85,9 @@ class MistInventory(object):
         raise Exception('Machine not found in list_machines')
 
     def find_ssh_settings(self, cloud_id, machine_id):
-        assocs = []
-        for key_id, keypair in self.user.keypairs.items():
-            for assoc in keypair.machines:
-                if [cloud_id, machine_id] == assoc[:2]:
-                    assocs.append({
-                        'key_id': key_id,
-                        'last': assoc[2] if len(assoc) > 2 else 0,
-                        'user': assoc[3] if len(assoc) > 3 else '',
-                        'port': assoc[5] if len(assoc) > 5 else 22,
-                    })
-        if not assocs:
+        cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
+        machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+        if not machine.key_associations:
             raise Exception("Machine doesn't have SSH association")
-        assoc = sorted(assocs, key=lambda a: a['last'])[-1]
-        return assoc['key_id'], assoc['user'] or 'root', assoc['port']
+        assoc = sorted(machine.key_associations, key=lambda a: a.last_used)[-1]
+        return assoc.keypair.name, assoc.ssh_user or 'root', assoc.port

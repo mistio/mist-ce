@@ -1,6 +1,7 @@
 import mist.io.tests.config as config
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import logging
@@ -21,8 +22,11 @@ def choose_driver(flavor=None):
             driver = webdriver.Firefox()
         elif flavor == "chrome":
             service_args = ['--verbose']
-            driver = webdriver.Chrome(executable_path=config.WEBDRIVER_PATH,
-                                      service_args=service_args,
+            chrome_options = Options()
+            chrome_options.add_argument('--dns-prefetch-disable')
+            driver = webdriver.Chrome(service_args=service_args,
+                                      chrome_options=chrome_options,
+                                      executable_path=config.WEBDRIVER_PATH,
                                       service_log_path=config.WEBDRIVER_LOG)
 
         elif flavor == "phantomjs":

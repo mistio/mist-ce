@@ -6,6 +6,7 @@ Also, the configuration from settings.py is exposed through this module.
 
 """
 
+import os
 import logging
 
 
@@ -22,7 +23,7 @@ except IOError:
     log.warning("No settings.py file found.")
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
-CORE_URI = settings.get("CORE_URI", "https://mist.io")
+CORE_URI = settings.get("CORE_URI", os.environ.get("CORE_URI", "https://mist.io"))
 AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
 MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
 BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
@@ -479,6 +480,7 @@ EC2_IMAGES = {
         'ami-8b8c57f8': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
         'ami-f95ef58a': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
         'ami-be5cf7cd': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-4f4acd3c': 'CoreOS-beta-991.2.0',
     },
     'ap-southeast-1': {
         'ami-0103cd62': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',

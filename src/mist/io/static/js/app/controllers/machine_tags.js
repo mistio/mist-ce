@@ -55,7 +55,7 @@ define('app/controllers/machine_tags', ['ember'],
                 if (this.formReady) {
                     var that = this,
                     machine = this.machine,
-                    tags = [], payload = [];
+                    tags = [], payload = {};
 
                     // create the final array with non-empty key-value pairs
                     this.newTags.forEach(function(tag) {
@@ -63,14 +63,12 @@ define('app/controllers/machine_tags', ['ember'],
                             tags.push(tag);
 
                             // change format for API
-                            var newTag = {};
-                            newTag[tag.key] = tag.value;
-                            payload.push(newTag);
+                            payload[tag.key] = tag.value
                         }
                     });
 
                     that.set('addingTag', true);
-                    Mist.ajax.POST('clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags', {
+                    Mist.ajax.POST('/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags', {
                         'tags': payload
                     })
                     .success(function () {
@@ -99,7 +97,11 @@ define('app/controllers/machine_tags', ['ember'],
 
                 if (this._containsKey(this.machine.tags, tag.key)) {
                     this.set('deletingTag', true);
-                    Mist.ajax.DELETE('clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags/' + tag.key)
+                    payload = {}
+                    if (tag.value){
+                        payload["value"] = tag.value
+                    }
+                    Mist.ajax.DELETE('/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags/' + tag.key, payload)
                     .success(function () {
                         that._removeDeletedTag(tag);
                     })

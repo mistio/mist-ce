@@ -1,0 +1,44 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="member-add-element">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+        </style>
+
+        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Add Member</h2>
+            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p class="text-center">
+                    Add a new member here!
+                </p>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'member-add-element',
+
+                properties: {
+                    member: {
+                        type: Object,
+                        value: {}
+                    }
+                },
+                ready: function() {
+
+                },
+                _openAddMemberModal: function(e) {
+                    this.querySelector('paper-dialog').open();
+                }
+            });
+        })();
+    </script>
+</dom-module>

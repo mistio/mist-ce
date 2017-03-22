@@ -1,0 +1,263 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../app-form/app-form.html">
+<dom-module id="template-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            #content {
+                max-width: 900px;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 85px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+
+            :host >::content paper-input-container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+        </style>
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Template
+                    </h2>
+                    <div class="subtitle">
+                        Only TOSCA based templates are currently supported.
+                    </div>
+                </div>
+            </paper-material>
+            <app-form fields="[[fields]]" method="POST" form="[[template]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse" on-error="_addTemplateAjaxError"></app-form>
+        </div>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'template-add',
+
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    template: {
+                        type: Object,
+                        value: function() {
+                            return {
+                                name: '',
+                                description: '',
+                                exec_type: '',
+                                location_type: '',
+                                template: '',
+                                entrypoint: ''
+                            }
+                        }
+                    },
+                    typedName: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+                    fields: {
+                        type: Array,
+                        value: [{
+                            name: "name",
+                            label: "Template Name *",
+                            type: "text",
+                            value: "",
+                            isLead: true,
+                            defaultValue: "",
+                            placeholder: "",
+                            errorMessage: "Please enter template's name",
+                            show: true,
+                            required: true
+                        }, {
+                            name: "description",
+                            label: "Template Description",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            errorMessage: "Please enter template's description",
+                            helptext: "Please enter template's description",
+                            show: true,
+                            required: false
+                        }, {
+                            name: "exec_type",
+                            label: "Type *",
+                            type: "dropdown",
+                            value: "cloudify",
+                            defaultValue: "cloudify",
+                            errorMessage: "Please enter template's exec_type",
+                            helptext: "Please enter template's exec_type",
+                            show: true,
+                            required: true,
+                            options: [{
+                                title: "Cloudify Blueprint",
+                                val: "cloudify"
+                            }]
+                        }, {
+                            name: "location_type",
+                            label: "Source *",
+                            type: "radio",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please enter template's source",
+                            helptext: "Please enter template's location_type",
+                            show: true,
+                            required: true,
+                            options: [{
+                                title: "Github",
+                                val: "github"
+                            }, {
+                                title: "URL",
+                                val: "url"
+                            }, {
+                                title: "Inline",
+                                val: "inline"
+                            }]
+                        }, {
+                            name: "template",
+                            label: "Url *",
+                            type: "text",
+                            value: "http://",
+                            defaultValue: "http://",
+                            placeholder: "",
+                            show: false,
+                            required: true,
+                            showIf: {
+                                fieldName: "location_type",
+                                fieldValues: ["url"]
+                            },
+                            errorMessage: "Please enter a url",
+                            helptext: "Please enter a url",
+                        }, {
+                            name: "template",
+                            label: "Github Repo *",
+                            type: "text",
+                            value: "https://github.com/owner/repo",
+                            defaultValue: "https://github.com/owner/repo",
+                            placeholder: "",
+                            show: false,
+                            required: true,
+                            showIf: {
+                                fieldName: "location_type",
+                                fieldValues: ["github"]
+                            },
+                            errorMessage: "Please enter a github repo",
+                            helptext: "Please enter a github repo"
+                        }, {
+                            name: "template",
+                            label: "Template *",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            show: false,
+                            required: true,
+                            errorMessage: "Please enter inline template",
+                            helptext: "Please enter inline template",
+                            showIf: {
+                                fieldName: "location_type",
+                                fieldValues: ["inline"]
+                            }
+                        }, {
+                            name: "entrypoint",
+                            label: "Entry point *",
+                            type: "text",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            show: false,
+                            required: true,
+                            showIf: {
+                                fieldName: "location_type",
+                                fieldValues: ["github", "url"]
+                            },
+                            errorMessage: "Please enter entry point",
+                            helptext: "Please enter entry point"
+                        }],
+                        notify: true
+                    }
+                },
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _addTemplateAjaxRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _addTemplateAjaxResponse: function(e) {
+                    this.fire('addTemplate', {
+                        template: {
+                            name: this.template.name,
+                            description: this.template.description
+                        }
+                    });
+
+                    page.show('/templates/' + e.detail.response.template.id);
+
+                    this.debounce('resetForm', function() {
+                        this._resetForm();
+                    }, 500);
+                },
+                _resetForm: function(e) {
+                    // Reset template
+                    this.set('template.name', '');
+                    this.set('template.source', '');
+                    this.set('template.url', '');
+                    this.set('template.inline', '');
+
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                    this.typedName = "";
+                },
+                _resetField: function(el, index) {
+                    this.set('fields.' + index + '.value', el.defaultValue);
+
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                },
+                _goBack: function() {
+                    history.back();
+                }
+            });
+        })();
+    </script>
+</dom-module>

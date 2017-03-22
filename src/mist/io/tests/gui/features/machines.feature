@@ -6,6 +6,7 @@ Feature: Machines
     Then I wait for the mist.io splash page to load
     Given "EC2" cloud has been added
 
+    # Test the sorting of the machines list
     When I visit the Machines page after the Images counter has loaded
     When I click the button by "select-machines-btn" id_name
     Then I expect for "select-machines-popup-popup" popup to appear within max 5 seconds
@@ -29,6 +30,8 @@ Feature: Machines
     And I check the sorting by "cloud"
     Then I click the button "Home"
 
+    # Go to Images and create a machine from there and wait to see the machine
+    # in the list
     When I visit the Images page after the counter has loaded
     Then there should be starred Images
     When I search for the "ubuntu" Image
@@ -62,6 +65,8 @@ Feature: Machines
     Then I should see the "second" machine added within 30 seconds
     When I clear the machines search bar
 
+    # Create another machine in the machines page and wait for it to appear in
+    # the list
     And I click the button "Create Machine"
     Then I expect for "create-machine" panel to appear within max 4 seconds
     When I fill in a "random first" machine name
@@ -87,10 +92,13 @@ Feature: Machines
     Then I search for the "first" Machine
     Then I should see the "first" machine added within 30 seconds
 
+    # Wait for the machine created from Images to be running
     When I clear the machines search bar
     Then I search for the "second" Machine
     And I wait for 1 seconds
     Then "second" machine state should be "running" within 200 seconds
+
+    # Reboot machine created from Images
     When I choose the "second" machine
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
@@ -99,11 +107,18 @@ Feature: Machines
     When I click the button "Yes"
     Then I expect for "dialog-popup" modal to disappear within max 4 seconds
 
+    # Wait for the machine create from Machines to be running
     When I clear the machines search bar
     Then I search for the "first" Machine
     And I wait for 1 seconds
     Then "first" machine state should be "running" within 200 seconds
 
+    # Wait for the deployment script success message to appear
+    Then I expect for "dialog-popup" modal to appear within max 300 seconds
+    And I click the "_x_" button inside the "Success" modal
+    Then I expect for "dialog-popup" modal to disappear within max 10 seconds
+
+    # Test tag functionality for machine created from Machines page
     And I click the button "first"
     Then I expect for "single-machine-page" page to appear within max 5 seconds
     When I click the button "Tags"
@@ -123,7 +138,6 @@ Feature: Machines
     Then I expect for "machine-tags-popup-popup" popup to disappear within max 20 seconds
     And I wait for 1 seconds
     When I wait for max 20 seconds until tag with key "secTestKey" and value "secTestValue" is available
-#    When I check if the "secTestKey" key and "secTestValue" value appear for the machine
     And I click the button "Tags"
     Then I expect for "machine-tags-popup-popup" popup to appear within max 10 seconds
     And I close the tag with key "secTestKey"
@@ -138,6 +152,7 @@ Feature: Machines
     And I wait for 1 seconds
     Then the "first" machine in the list should have a tag with key "testKey" and value "testValue"
 
+    # Destroy machine created from Machines
     When I choose the "first" machine
     And I click the button "Actions"
     Then I expect for "machine-power-popup-popup" popup to appear within max 4 seconds
@@ -148,6 +163,7 @@ Feature: Machines
     And I wait for 1 seconds
     When I choose the "first" machine
 
+    # Destroy machine created from Images
     When I clear the machines search bar
     Then I search for the "second" Machine
     And I wait for 1 seconds
@@ -161,6 +177,7 @@ Feature: Machines
     And I wait for 1 seconds
     When I choose the "second" machine
 
+    # Wait for both machines to be terminated
     When I clear the machines search bar
     Then I search for the "first" Machine
     And I wait for 1 seconds
@@ -170,6 +187,7 @@ Feature: Machines
     Then I search for the "second" Machine
     And "second" machine state should be "terminated" within 200 seconds
 
+    # Delete leftover keys
     When I click the button "Home"
     Then I expect for "home-page" page to appear within max 4 seconds
     When I visit the Keys page after the counter has loaded

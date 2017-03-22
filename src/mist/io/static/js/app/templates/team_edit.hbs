@@ -1,0 +1,58 @@
+<!-- Popup Wrapper -->
+<div id="team-edit-popup"
+    data-role="popup"
+    data-overlay-theme="b"
+    data-transition="slideup">
+
+    <!-- Popup -->
+
+    <div id="team-edit"
+         class="mid-popup
+            ui-popup
+            ui-body-a
+            ui-overlay-shadow
+            ui-corner-all"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+         <!-- Header -->
+
+        <div class="ui-header ui-bar-b ui-caps">
+            <h1 class="ui-title">Edit team</h1>
+
+            <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
+        </div>
+
+        <!-- Body -->
+
+        <div role="main" class="ui-content" data-theme="a">
+
+            <!-- New cloud name text field -->
+            <form {{action "saveClicked" on="submit" target=view}}>
+                <div class="form-field {{if Mist.teamEditController.newName 'filled' 'empty'}} required">
+                    <label for="team-edit-new-name">Name</label>
+                    {{view Mist.TextField
+                        id="team-edit-new-name"
+                        value=Mist.teamEditController.newName}}
+                </div>
+
+                <div class="form-field">
+                    <label for="team-edit-new-description">Description (optional)</label>
+                    {{view Mist.TextArea
+                        id="team-edit-new-description"
+                        value=Mist.teamEditController.newDescription}}
+                </div>
+
+                {{#if Mist.teamsController.renamingTeam}}
+                    <div class="ajax-loader"></div>
+                {{/if}}
+
+                <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" >
+                    <button type="submit" id="team-edit-ok"
+                        class="ui-btn ui-btn-d ui-caps">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

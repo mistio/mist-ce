@@ -70,7 +70,7 @@ define('app/views/key_list', ['app/views/page'],
 
 
                 renameClicked: function () {
-                    Mist.keyEditController.open(Mist.keysController.selectedKeys[0].id);
+                    Mist.keyEditController.open(Mist.keysController.selectedKeys[0]);
                 },
 
 
@@ -96,7 +96,7 @@ define('app/views/key_list', ['app/views/page'],
 
 
                 deleteClicked: function () {
-                    var keyNames = Mist.keysController.selectedKeys.toStringByProperty('id');
+                    var keyNames = Mist.keysController.selectedKeys.toStringByProperty('name');
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
                         head: 'Delete key',
@@ -104,7 +104,7 @@ define('app/views/key_list', ['app/views/page'],
                             {
                                 paragraph: 'Are you sure you want to delete ' +
                                 (Mist.keysController.selectedKeys.length > 1 ? 'these keys: ' : 'this key: ') +
-                                    keyNames + ' ?'
+                                    keyNames + '?'
                             }
                         ],
                         callback: function (didConfirm) {

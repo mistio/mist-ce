@@ -1,0 +1,109 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<!-- needed for the forms' inputs -->
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-behavior.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-addon-behavior.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<dom-module id="app-forms">
+    <template>
+        <style is="custom-style" include="shared-styles"></style>
+        <style>
+        :host {
+            padding: 16px;
+            display: block;
+            --mist-blue: #0099cc;
+        }
+
+        :host paper-material {
+            padding: 16px;
+        }
+
+        :host::content iron-dropdown paper-material {
+            width: 191px;
+            top: 57px !important;
+        }
+
+        :host::content .focused-line.paper-input-container {
+            background-color: var(--mist-blue);
+        }
+
+        :host::content .input-content.label-is-floating.paper-input-container label {
+            color: var(--mist-blue);
+        }
+
+        :host::content form paper-button {
+            background-color: #0099cc;
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex);
+        }
+        ::content paper-button {
+            font-weight: 500;
+            padding: 0.8em 1.57em 0.7em 1.57em;
+        }
+        ::content form paper-menu > paper-button {
+            margin: 8px;
+        }
+
+        ::content form paper-button > * {
+            color: #fff;
+        }
+
+        ::content hr {
+            height: 0;
+            margin: 8px -16px;
+            border-bottom: 1px solid #eee;
+            background: transparent;
+            border-width: 0 0 1px 0;
+        }
+
+        paper-material > h3 {
+            margin: 0;
+        }
+
+        #close-this-form {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        ::content paper-item {
+            font-size: 13px;
+        }
+
+        ::content paper-item:last-of-type {
+            border-bottom: 1px solid #ddd;
+        }
+        </style>
+        <paper-material>
+            <!-- form title -->
+            <h3>{{formtitle}}</h3>
+            <paper-icon-button id="close-this-form" suffix icon="clear"></paper-icon-button>
+            <!-- in <content> comes what <app-forms> tag has inside when called -->
+            <content></content>
+        </paper-material>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'app-forms',
+    properties: {
+        formtitle: {
+            String,
+            value: "My Form"
+        }, //default value of form
+    },
+    behaviors: [Polymer.PaperInputBehavior, Polymer.PaperInputAddonBehavior]
+});
+
+function submitForm() {
+    // document.getElementById('form').submit();
+}
+</script>

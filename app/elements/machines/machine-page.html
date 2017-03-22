@@ -1,0 +1,474 @@
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../app-rules/app-rules.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="machine-edit.html">
+<dom-module id="machine-page">
+    <template>
+        <style is="custom-style" include="tags-and-labels"></style>
+        <style is="custom-style" include="info-table-style"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+            .columns {
+                @apply(--layout-horizontal);
+                flex: 1 100%;
+            }
+            .left, .right {
+                @apply(--layout-vertical);
+                align-items: flex-start;
+                flex-direction: column;
+                flex: 1 100%;
+            }
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+                align-content: stretch;
+                flex: 100%;
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+
+            .paper-header h2 {
+                @apply(--layout-flex-none);
+            }
+
+            .machine-ip {
+                margin: 0;
+            }
+
+            paper-material {
+                padding: 24px;
+                box-sizing: border-box;
+                width: 100%;
+            }
+            paper-material.info-card {
+                padding: 0;
+            }
+            paper-material > h2 {
+                line-height: initial !important;
+                margin-bottom: 0;
+                cursor: pointer;
+            }
+
+            .subhead {
+                box-sizing: border-box;
+                position: absolute;
+                width: 100%;
+                left: 0;
+                height: 57px;
+                bottom: -57px;
+                right: 0;
+                z-index: 9;
+                color: rgba(0, 0, 0, 0.87);
+            }
+
+            paper-header-panel::content #dropShadow {
+                top: 56px;
+            }
+
+            paper-toolbar::content #bottomBar .right-actions {
+                transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+            }
+
+            paper-toolbar:not(.tall)::content #bottomBar .right-actions {
+                margin-right: 70px;
+            }
+
+            .label {
+                padding: 2px !important;
+            }
+
+            #machine_actions paper-button {
+                text-align: left !important;
+            }
+            .machine-state-icon {
+                background-color: #fff !important;
+            }
+            .machine-state-icon.running {
+                color: var(--green-color) !important;
+            }
+
+            .machine-state-icon.terminated {
+                color: var(--mist-dark-color) !important;;
+            }
+
+            .machine-state-icon.stopped {
+                color: var(--orange-color) !important;;
+            }
+
+            .machine-state-icon.error {
+                color: var(--red-color) !important;;
+            }
+            paper-material > .smallcaps {
+                margin-top: 0;
+            }
+            .tag {
+                padding: 4px;
+                margin: 4px;
+            }
+            polyana-dashboard ::content h3 {
+                text-transform: uppercase;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 36px;
+                margin: 0 24px 0 0;
+            }
+            polyana-dashboard ::content timerange-picker {
+                position: absolute;
+                right: 0;
+                top: 12px;
+            }
+            polyana-dashboard ::content paper-button {
+                margin: 0;
+                min-width: 1px;
+            }
+            polyana-dashboard ::content paper-spinner {
+                display: block;
+                margin: 0 auto;
+            }
+            .item-actions > * {
+                vertical-align: middle;
+            }
+        </style>
+       
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                <span class="icon"><iron-icon class$=" machine-state-icon [[machine.state]]" icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        [[machine.name]]
+                    </h2>
+                    <div class="subtitle">
+                        [[machine.state]] <span class="desc" hidden$="[[isState(machine)]]">[[machine.extra.status]]</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                <!-- can_destroy:true
+                    can_start:false
+                    can_stop:true
+                    can_suspend:false
+                    can_reboot:true
+                    can_rename:true
+                    can_resume:false
+                    can_tag:true
+                    can_undefine:false -->                    
+                    <paper-button on-tap="restart" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
+                    <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
+                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="tag" class="simple" hidden$="[[!machine.can_tag]]">tag</paper-button>                    
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
+                            <paper-button on-tap="destroy" class="simple" hidden$="[[!machine.can_destroy]]">destroy</paper-button>
+                            <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>                            
+                            <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+                    <paper-button on-tap="ssh" class="simple white" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
+                    <paper-button on-tap="monitor" class="simple white" style$="color: [[section.color]]" hidden$="[[isMonitored]]">monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
+                </div>
+            </paper-material>
+            <div class="columns">
+                <paper-material id="leftcolumn" class="left">
+                    <h3 class="smallcaps">Info:</h3>
+                    <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
+                    <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
+                </paper-material>
+                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
+                    <h3 class="smallcaps">TAGS:</h3>
+                    <template is="dom-repeat" items="[[machine.tags]]">
+                        <span class="tag">[[item.key]] <span hidden$="[[!item.value]]">=</span> [[item.value]]</span>
+                    </template>
+                </paper-material>
+            </div>
+            <div hidden$="{{!isMonitored}}">
+                <h3 class="smallcaps">Monitoring Graphs</h3>
+                <paper-material>demo graph data</paper-material>
+                <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> -->
+            </div>
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
+                <div class="card-content">
+                    <table class="info-table">
+                        <template is="dom-if" if="[[machine.public_ips]]">
+                            <tr>
+                                <td>Machine ID</td>
+                                <td>[[machine.id]]</td>
+                            </tr>
+                            <tr>
+                                <td>UUID</td>
+                                <td>[[machine.uuid]]</td>
+                            </tr>
+                            <tr><td>Public IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.public_ips]]">
+                                        [[item]]
+                                    </template>
+                                </td>
+                            </tr>
+                            <tr><td>Private IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                                        [[item]]
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </table>
+                </div>
+            </paper-material>
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">More Info</h2>
+                <div class="card-content">
+                    <element-for-in content="[[machine.extra]]"></element-for-in>
+                </div>
+            </paper-material>
+        </div>
+        <div class="absolute-bottom-right">
+            <app-fab></app-fab>
+        </div>
+        <dialog-element></dialog-element>
+        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        <machine-edit machine="[[machine]]"></machine-edit>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'machine-page',
+
+        properties: {
+            model: {
+                type: Object,
+                notify: true
+            },
+            router: Object,
+            params: {
+                type: Object,
+                notify: true
+            },
+            machine: {
+                type: Object,
+                computed: '_computeMachine(params, model.machinesArray.*)'
+            },
+            sections: {
+                type: Array,
+                notify: true
+            },
+            section: {
+                type: Object
+            },
+            tag: {
+                type: String,
+                value: ""
+            },
+            isMonitored: {
+                type: Boolean,
+                value: true,
+                notify: true
+            },
+            machineImage: {
+                type: String,
+                computed: "_machineImage(machine.imageId)"
+            },
+            dashboard: {
+                type: Object
+            },
+            replaceTargets: {
+                type: Object,
+                computed: '_computeReplaceTargets(machine)'
+            }
+        },
+        observers: [
+            '_isMonitored(machine, model.monitoring.machines.*)'
+        ],
+        listeners: {
+            'confirmation': '_deleteMachineEventResponse'
+        },    
+        attached: function(){
+            this.datasources = [
+              {
+              "id": 1,
+              "orgId": 1,
+              "name": "mistphite",
+              "type": "graphite",
+              "access": "proxy",
+              "uri": "/graphite/",
+              "password": "",
+              "user": "",
+              "database": "",
+              "basicAuth": false,
+              "basicAuthUser": "",
+              "basicAuthPassword": "",
+              "withCredentials": false,
+              "isDefault": false,
+              "jsonData": null
+              }
+            ];
+            this.dashboard = {
+              "id": 1,
+              "refresh": "10s",
+              "rows": [{
+                "panels": [{
+                  "aliasColors": {},
+                  "datasource": "mistphite",
+                  "id": 2,
+                  "span": 12,
+                  "stack": false,
+                  "targets": [
+                    {
+                    "refId": "A",
+                    "target": "bucky.*.load.shortterm"
+                    },
+                  ],
+                  "timeFrom": null,
+                  "timeShift": null,
+                  "title": "Load",
+                  "type": "graph",
+                  "x-axis": true,
+                  "y-axis": true
+                }],
+              }],
+              "time": {
+                "from": "now-10m",
+                "to": "now"
+              },
+              "timepicker": {
+                "now": true,
+                "refresh_intervals": [],
+                "time_options": [
+                  "5m",
+                  "15m",
+                  "1h",
+                  "6h",
+                  "12h",
+                  "24h",
+                  "2d",
+                  "7d",
+                  "30d"
+                ]
+              },
+              "timezone": "browser"
+            };
+
+            var that = this;
+            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+                if (that.querySelector('dashboard-panel'))
+                    that.querySelector('dashboard-panel').resize();
+
+            }, 5000); 
+
+        },
+        _computeMachine: function(params, machines) {
+            return machines.base.find(function(machine) {
+                return machine.uuid == params.uuid;
+            }, this);
+        },
+        _isEqual: function(a, b) {
+            return a === b;
+        },
+        _isMonitored: function(machine, machines){
+            if (machines){
+                var mach =  machines.base.find(function(m){
+                    return m[1] == machine.id ;
+                }, this);
+            }
+            if (mach){
+                this.isMonitored = true;
+            }
+            else{
+                this.isMonitored = false;
+            }
+        },
+        _getColor: function() {
+            return this.section && this.section.color ? this.section.color : '';
+        },
+        addKey: function(_, params) {
+            console.log("clicked addKey");
+        },
+        rename: function(_, params) {
+            console.log("clicked rename");
+        },
+        restart: function(_, params) {
+            console.log("clicked restart");
+        },
+        shutdown: function(_, params) {
+            console.log("clicked shutdown");
+        },
+        destroy: function(_, params) {
+            console.log("clicked destroy");
+        },
+        _getHeaderStyle: function(color) {
+            return 'background-color: ' + color + '; color: #fff;';
+        },
+        toggle: function() {
+            this.$.collapse.toggle();
+        },
+        togglefull: function() {
+            this.$.collapsefull.toggle();
+        },
+        _machineImage: function(id) {
+            var image = this.model.imagesArray.find(function(image) {
+                return image.id == id;
+            }, this);
+            if (image)
+                return image.name;
+            else
+                return "";
+        },
+        _editMachineTags: function() {
+            var url = '/machines/' + this.machine.uuid + '/tags';
+            page.show(url);
+        },
+        _editMachine: function(e) {
+            var el = this.querySelector('machine-edit');
+            el._openEditMachineModal();
+        },
+        _deleteMachine: function(e) {
+            this._showDialog({
+                title: 'Delete Machine?',
+                body: "Deleting a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                danger: true,
+                reason: "machine.delete"
+            });
+        },
+        _deleteMachineEventResponse: function(e) {
+            var reason = e.detail.reason,
+                response = e.detail.response;
+
+            if (response.confirmed && reason == "machine.delete") {
+                this.$.machineDeleteAjaxRequest.body = {};
+                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.machineDeleteAjaxRequest.generateRequest();
+            }
+        },
+        _handleMachineDeleteAjaxResponse: function(e) {
+            page.show('/machines');
+        },
+        _computeReplaceTargets: function(machine) {
+            var ret = {'bucky.': ''};
+            var m = this.machine;
+            var mId = this.machine.id;
+            var m = this.machine.name;
+            ret[mId] = m ? m.name : 'unknown';
+            // Object {bucky.: "", 3e3a36a5a2694f859a2dc2ccbc192619: "unknown", a203e912f9e744df8ac10179403b8248: "monitor-docker"}
+            this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
+            return ret;
+        },
+        _showDialog: function(info) {
+            var dialog = this.querySelector('dialog-element');
+            for (var i in info) {
+                dialog[i] = info[i];
+            }
+            dialog._openDialog();
+        },
+        _goBack: function() {
+            history.back();
+        },
+        isState: function(machine){
+            return machine.state == machine.extra.status ;
+        },
+    });
+</script>

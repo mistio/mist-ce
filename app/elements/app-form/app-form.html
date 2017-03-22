@@ -1,0 +1,458 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="app-form">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 82px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+
+            :host >::content paper-input-container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+
+            .grid-row > * {
+                margin-top: 8px;
+                margin-bottom: 8px;
+            }
+
+            h2.title {
+                line-height: 20px;
+            }
+
+            paper-toggle-button[disabled]::content {
+                color: rgba(0, 0, 0, 0.32);
+            }
+
+            paper-toggle-button::content paper-input-container input {
+                color: color: rgba(0, 0, 0, 0.54);
+            }
+
+            *:not(paper-button)[disabled] {
+                display: none;
+            }
+        </style>
+
+        <paper-material>
+            <div class="grid-row">
+                <template is="dom-repeat" items="{{fields}}" as="field">
+                    <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                        <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
+                            <template is="dom-repeat" items="[[field.options]]" as="option">
+                                <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
+                            </template>
+                        </paper-radio-group>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
+                            <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                    <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                </template>
+                            </paper-menu>
+                        </paper-dropdown-menu>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
+                        <div class="xs12 m6">
+                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
+                        </div>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[field.isLead]]">
+                        <hr class="xs12" />
+                    </template>
+
+                </template>
+
+                <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                <hr class="xs12" />
+                <!-- <div class="notifications xs12">
+                <div class="red">
+                    <iron-icon icon="icons:error-outline"></iron-icon> Error message from server
+                    <div class="info-code">
+                        <code>test code</code>
+                    </div>
+                </div>
+                <div class="green">
+                    <iron-icon icon="check"></iron-icon> Success message from server
+                </div>
+                <div class="blue">
+                    Info message from server
+                </div>
+            </div> -->
+                <div class="clearfix bottom-actions xs12">
+                    <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">
+                        <template is="dom-if" if="[[btncontent.length]]">
+                            [[btncontent]]
+                        </template>
+                        <template is="dom-if" if="[[!btncontent]]">
+                            Add
+                        </template>
+                    </paper-button>
+                    <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                </div>
+            </div>
+        </paper-material>
+
+        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'app-form',
+                /**
+                 * Fired when a response is received.
+                 *
+                 * @event response
+                 */
+                /**
+                 * Fired when a request is made.
+                 *
+                 * @event request
+                 */
+                /**
+                 * Fired when the leadValue is changed.
+                 *
+                 * @event leadchange
+                 */
+                properties: {
+                    model: {
+                        type: Object
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    btncontent: {
+                        type: String,
+                        value: false
+                    },
+                    templateid: {
+                        type: String
+                    },
+                    form: {
+                        type: Object,
+                        value: function() {
+                            var uniqueFields = {};
+                            for (var field in this.fields) {
+                                if (this.fields[field].defaultValue) {
+                                    uniqueFields[this.fields[field].name] = this.fields[field].defaultValue
+                                } else {
+                                    uniqueFields[this.fields[field].name] = ''
+                                }
+
+                            }
+                            return uniqueFields
+                        },
+                        // computed: '_computePayload(fields)'
+                    },
+                    fields: {
+                        type: Array,
+                        value: [],
+                        notify: true
+                    },
+                    method: {
+                        type: String,
+                        value: 'POST'
+                    },
+                    url: {
+                        type: String,
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    alterrequest: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        value: false,
+                        // computed: '_computeShowProgress(sendingData)'
+                    },
+                    workflow: {
+                        type: String
+                    }
+                },
+                observers: [
+                    '_fieldsChanged(fields.*, sendingData)',
+                ],
+                _computeShowProgress: function(sendingData) {
+                    return sendingData;
+                },
+                _computeFieldType: function(field, value, show) {
+                    var inputModel = this.model;
+
+                    if (!field.helptext && field.description) {
+                        field.helptext = field.description
+                    }
+                    if (!field.label && field.name) {
+                        field.label = field.name
+                    }
+                    if (!(field.showIf && !field.show)) {
+                        if (field.type == "dropdown" && field.query) {
+
+                            for (var prop in field.query) {
+                                var p = field.query[prop];
+
+                                if (p.startsWith("$.")) {
+                                    p = this.form[p.slice(2)];
+                                }
+
+                                if (inputModel.hasOwnProperty(p)) {
+                                    inputModel = inputModel[p];
+                                }
+                            }
+
+                            var updatedOptions = [];
+
+                            for (var prop in inputModel) {
+                                var dropdownItem = {};
+                                if (inputModel[prop].hasOwnProperty("title")) {
+                                    dropdownItem.title = inputModel[prop].title;
+                                } else if (inputModel[prop].hasOwnProperty("name")) {
+                                    dropdownItem.title = inputModel[prop].name;
+                                } else if (inputModel[prop].hasOwnProperty("id")) {
+                                    dropdownItem.title = inputModel[prop].id;
+                                }
+                                dropdownItem.val = inputModel[prop].id;
+                                updatedOptions.push(dropdownItem);
+
+                            }
+                            for (var index in this.fields) {
+                                var existingField = this.fields[index];
+                                if (existingField.name == field.name) {
+                                    this.set("fields." + index + ".options", updatedOptions);
+                                }
+                            }
+                        }
+                        return field.type == value;
+                    }
+
+                },
+                _handleRequest: function(e) {
+                    this.fire("request", e.detail)
+                },
+                _handleResponse: function(e) {
+                    this.fire("response", e.detail);
+                    this.set('sendingData', false);
+                },
+                _handleError: function(e) {
+                    this.set('sendingData', false);
+                },
+                _fieldsChanged: function(fields, sendingData) {
+                    this.async(function() {
+                        var form = this.form,
+                            show = true,
+                            dependency, reset = true;
+                        var isLead = this.get(fields.path.replace("value", "isLead"))
+                        if (isLead == true) {
+                            this.fire("leadchange", {
+                                leadValue: this.get(fields.path)
+                            });
+                        }
+                        fields.base.forEach(function(el, index) {
+                            if (el.showIf) {
+                                if (el.showIf.fieldExists) {
+                                    dependency = form[el.showIf.fieldName],
+                                        show = dependency;
+                                    this.set('fields.' + index + '.show', show);
+                                } else {
+                                    dependency = form[el.showIf.fieldName],
+                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                    this.set('fields.' + index + '.show', show);
+
+                                    // console.log('>>>');
+                                    // if (el.showIf.fieldName == "yaml_or_form" && el.value != el.defaultValue) {
+                                    //     reset = false;
+                                    //     var yamlFields = fields.base
+                                    //         .filter(function(ele) {
+                                    //             return ele.showIf && ele.showIf.fieldName == 'yaml_or_form';
+                                    //         });
+                                    //     if (el.type == 'text') {
+                                    //         var yamlField = yamlFields
+                                    //             .find(function(ele) {
+                                    //                 return ele.type == 'textarea';
+                                    //             }),
+                                    //             newYamlText = yamlFields
+                                    //             .filter(function(ele) {
+                                    //                 return ele.type == 'text';
+                                    //             })
+                                    //             .map(function(ele) {
+                                    //                 return ele.name + ': ' + ele.value;
+                                    //             })
+                                    //             .join('\n');
+                                    //
+                                    //         this.set('fields.' + this.fields.indexOf(yamlField) + '.value', newYamlText);
+                                    //     } else {
+                                    //         var formFieldsArray = yamlFields
+                                    //             .filter(function(ele) {
+                                    //                 return ele.type == 'text';
+                                    //             })
+                                    //             .map(function(ele) {
+                                    //                 return ele.name;
+                                    //             }),
+                                    //             formFieldsPairs = el.value
+                                    //             .split('\n')
+                                    //             .filter(function(ele) {
+                                    //                 return ele != '';
+                                    //             })
+                                    //             .map(function(ele) {
+                                    //                 var obj = {};
+                                    //                 obj[ele.split(':')[0].trim()] = ele.split(':')[1].trim();
+                                    //                 return obj;
+                                    //             })
+                                    //             .reduce(function(acc, x) {
+                                    //                 for (var key in x) {
+                                    //                     acc[key] = x[key];
+                                    //                 }
+                                    //                 return acc;
+                                    //             }, {});
+                                    //
+                                    //         fields.base
+                                    //             .forEach(function(ele, index) {
+                                    //                 if (formFieldsArray.indexOf(ele.name) > -1) {
+                                    //                     this.set('fields.' + index + '.value', formFieldsPairs[ele.name]);
+                                    //                 }
+                                    //             }, this);
+                                    //     }
+                                    // }
+                                    // console.log('<<<');
+                                }
+
+
+                                if (!show && reset) {
+                                    this._resetField(el, index);
+                                } else {
+                                    this.set('form.' + el.name, el.value);
+                                }
+                            } else {
+                                this.set('form.' + el.name, el.value);
+                            }
+
+                            if (el.placeholderIf) {
+                                dependency = form[el.placeholderIf.fieldName];
+                                this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                            }
+                        }, this);
+
+                        var valid = fields.base.every(function(el, index) {
+                            return el.show && el.required ? el.value : true;
+                        }, this);
+
+                        this.set('form', form);
+                        this.set('formReady', valid && !sendingData);
+                    });
+                },
+                _submitForm: function() {
+                    var payload;
+
+                    if (this.workflow) {
+                        payload = {
+                            deploy: this.form.deploy,
+                            name: this.form.name,
+                            template_id: this.templateid,
+                            description: this.form.description,
+                            workflow: this.workflow,
+                            inputs: YAML.parse(this.form.stackinputs)
+                        }
+                    } else {
+                        payload = this.form;
+                    }
+
+                    this.$.formAjax.headers["Content-Type"] = 'application/json';
+                    this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.formAjax.body = payload;
+                    this.$.formAjax.generateRequest();
+
+                    this.set('showProgress', true);
+                    this.async(function(){
+                        this.set('showProgress', false);
+                    }, 2000);
+                    this.set('sendingData', true);
+                },
+                _resetForm: function(e) {
+                    // Reset script
+                    for (var attr in this.form) {
+                        this.set('form.' + attr, '');
+                    }
+
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                    this.typedName = "";
+                },
+                _resetField: function(el, index) {
+                    this.set('fields.' + index + '.value', el.defaultValue);
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                },
+                _assertShowIfQuery: function(name) {
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf && el.showIf.fieldName == name) {
+                            if (this._query(el.showIf.query) in el.showIf.queryResult) {
+                                this.set('fields.' + index + '.options', []);
+                                this._computeFieldType(el, el.type, el.show)
+
+                            }
+                        }
+                    })
+                },
+                _recomputeDependentFields: function(name) {
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf && el.showIf.fieldName == name) {
+                            this.set('fields.' + index + '.options', []);
+                            this._computeFieldType(el, el.type, el.show)
+                        }
+                    }, this);
+                },
+            });
+        })();
+    </script>
+</dom-module>

@@ -1,0 +1,182 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="key-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                padding: 24px;
+            }
+
+            #content {
+                max-width: 900px;
+            }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Key
+                    </h2>
+                    <div class="subtitle">
+                        You can generate or upload a key.
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
+
+                <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+
+                <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
+                <div class="clearfix btn-group">
+                    <hr class="xs12" />
+                    <div class="clearfix bottom-actions xs12">
+                        <paper-button class="purple" raised on-tap="_generateKey">Generate</paper-button>
+                        <paper-button class="purple" raised on-tap="_uploadKey">Upload</paper-button>
+                        <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
+                        <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                    </div>
+                </div>
+            </paper-material>
+        </div>
+
+        <iron-ajax id="keyGenerateAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyGenerateAjaxResponse" on-error="_handleKeyGenerateAjaxError"></iron-ajax>
+        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'key-add',
+
+                properties: {
+                    key: {
+                        type: Object,
+                        value: function() {
+                            return {
+                                name: '',
+                                publicKey: '',
+                                privateKey: ''
+                            }
+                        },
+                        notify: true
+                    },
+                    section: {
+                        type: Object
+                    },
+                    showPublicKey: {
+                        type: Boolean,
+                        value: false
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(key.name, key.privateKey, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                ready: function() {
+
+                },
+                _computeFormReady: function(name, privateKey, sendingData) {
+                    var formReady = false;
+
+                    if (name && privateKey) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openAddKeyModal: function(e) {
+                    this.$.addKeyModal.open();
+                },
+                _closeAddKeyModal: function(e) {
+                    this.$.addKeyModal.close();
+                },
+                _uploadKey: function(e) {
+                    this.$.keyUpload.click();
+                },
+                _uploadFile: function(e) {
+                    var that = this,
+                    reader = new FileReader(),
+                    file = e.currentTarget.files[0];
+
+                    reader.onloadend = function (e) {
+                        var success;
+                        if (e.target.readyState == FileReader.DONE) {
+                            that.set('key.privateKey', e.target.result);
+                            success = true;
+                        } else {
+                            success = false
+                        }
+                    };
+
+                    reader.readAsText(file, 'UTF-8');
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function() {
+                    this.$.keyAddAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyAddAjaxRequest.body = {
+                        name: this.key.name,
+                        priv: this.key.privateKey
+                    };
+                    this.$.keyAddAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleKeyAddAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    this._formReset();
+                },
+                _formReset: function() {
+                    this.set('key.name', '');
+                    this.set('key.publicKey', '');
+                    this.set('key.privateKey', '');
+                    this.set('showPublicKey', false);
+                },
+                _generateKey: function(e) {
+                    this.$.keyGenerateAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyGenerateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyGenerateAjaxRequest.body = {};
+                    this.$.keyGenerateAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _generateKeyAjaxRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _handleKeyGenerateAjaxResponse: function(e) {
+                    console.log(e);
+                    this.set('sendingData', false);
+                    var response = e.detail.response;
+                    this.set('key.publicKey', response.public);
+                    this.set('key.privateKey', response.priv);
+                    this.set('sendingData', false);
+                    this.set('showPublicKey', true);
+                }
+            });
+        })();
+    </script>
+</dom-module>

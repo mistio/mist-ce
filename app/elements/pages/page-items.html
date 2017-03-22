@@ -1,0 +1,346 @@
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+
+<link rel="import" href="../app-sidebar/app-sidebar.html">
+<link rel="import" href="../item-list/item-list.html">
+<link rel="import" href="../item-cards/item-cards.html">
+<dom-module id="page-items">
+    <template>
+        <style>
+        :host {
+            background: #fafafa;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        #container {
+            background: #fafafa;
+        }
+
+        paper-toolbar {
+            --paper-toolbar-height: 60px;
+        }
+
+        :host paper-toolbar #topBar {
+            padding: 0px;
+        }
+
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+
+        .paper-header {
+            @apply(--layout-horizontal);
+            @apply(--layout-center);
+            margin-right: 0;
+            padding-right: 0;
+            color: #fff;
+        }
+
+        .paper-header h2 {
+            margin-left: 16px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+
+        .toggleViewButton {
+            position: absolute;
+            right: 24px;
+            top: 8px;
+            --paper-icon-button-ink-color: transparent;
+        }
+
+        #content {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0px;
+        }
+
+        app-bar .menu-icon {
+            margin-right: 15px;
+        }
+
+        .items-title h2 {
+            @apply(--paper-font-title);
+            color: #424242;
+        }
+
+        .items-title iron-icon {
+            cursor: pointer;
+            margin-left: 16px;
+        }
+
+        .items-title > [paper-drawer-toggle] {
+            margin: 0 16px 0 0;
+        }
+
+        #section-heading .description {
+            font-size: 16px;
+            color: var(--paper-grey-600);
+        }
+
+        #item-cards,
+        item-list,
+        .items-title,
+        #section-heading {
+            max-width: 1500px;
+            margin: 0px auto;
+        }
+
+        #section-heading {
+            margin: 0px auto 0px;
+        }
+
+        [size=xs] > * {
+            display: none;
+        }
+
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
+
+        #search {
+            height: 48px;
+            line-height: 48px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        #search iron-icon {
+            margin-left: 16px;
+            margin-right: 8px;
+            position: absolute;
+            top: 12px;
+            left: 2px;
+        }
+
+        #search input {
+            height: 46px;
+            -webkit-appearance: none;
+            line-height: 46px;
+            border: 0;
+            margin: 0;
+            padding-left: 50px;
+            border-bottom: 1px solid #e5e5e5;
+            border-top: 1px solid #e5e5e5;
+            @apply(--paper-font-body1);
+        }
+
+        #search input:focus {
+            outline: 0;
+            background-color: #eceff1;
+            border-color: #cfd8dc;
+        }
+
+        #search input::-webkit-search-cancel-button {
+            position: relative;
+            right: 15px;
+        }
+
+        [view=cards] item-list {
+            display: none;
+        }
+
+        [view=table] #item-cards {
+            display: none;
+        }
+        </style>
+
+        <div id="content">
+            <div id="section-heading" hidden$="[[!section]]">
+                <div class="description">[[section.description]]</div>
+            </div>
+            <template is="dom-if" if="[[_stampCards(view)]]">
+                <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
+            </template>
+            <template is="dom-if" if="[[_stampTable(view)]]">
+                <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
+            </template>
+        </div>
+
+        <div class="absolute-bottom-right">
+            <paper-fab icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
+        </div>
+    </template>
+</dom-module>
+<script>
+(function() {
+    var _lastNavigated = null;
+    Polymer({
+        is: 'page-items',
+
+        enableCustomStyleProperties: true,
+
+        properties: {
+            model: Object,
+            sections: Object,
+            section: Object,
+            pageTitle: String,
+
+            view: {
+                type: String, // list or cards
+                value: 'table'
+            },
+            viewIcon: {
+                type: String,
+                computed: 'computeViewIcon(view)'
+            },
+
+            items: Array,
+            sortBy: {
+                type: String
+            },
+            sortOrder: {
+                type: Number,
+                value: 1 // Descending order
+            },
+            sortedItems: {
+                type: Array,
+            },
+            filteredItems: {
+                type: Array
+            },
+            q: { // search query
+                type: String,
+                value: '',
+                observer: '_qChanged'
+            }
+        },
+
+        observers: [
+            'sortingObserver(items.*, sortBy, sortOrder, q)',
+        ],
+
+        ready: function() {
+
+        },
+
+        attached: function() {
+            if (this.section.id == 'machines')
+                this.set('sortBy', 'state');
+            else if (this.section.id == 'images')
+                this.set('sortBy', 'cloud');
+            else if (this.section.id == 'scripts')
+                this.set('sortBy', 'name');
+            else if (this.section.id == 'teams')
+                this.set('sortBy', 'name');
+            else if (this.section.id == 'incidents')
+                this.set('sortBy', 'started_at');
+            else
+                this.set('sortBy', 'id');
+        },
+
+        updateMeta: function(section) {
+            if (this.q && this.q.length) {
+                var t = "'" + this.q + "' ";
+                t += (section && section.id) ? section.id : "";
+                this.pageTitle = t;
+            } else if (section && section.id) {
+                this.pageTitle = section.id;
+            } else {
+                this.pageTitle = "All";
+            }
+        },
+
+        toggleView: function() {
+            if (this.view === 'table') {
+                this.view = 'cards';
+            } else {
+                this.view = 'table';
+            }
+        },
+
+        computeViewIcon: function(view) {
+            if (view === 'table') {
+                return 'view-module';
+            } else {
+                return 'view-list';
+            }
+        },
+
+        toggleSearch: function (e) {
+            this.querySelector('app-bar').toggleSearch(e);
+        },
+
+        filterItems: function(items, q) {
+            return this.sortedItems.filter(this.filterItem.bind(this));
+        },
+
+        filterItem: function(item, index) {
+            var q = this.q, queryTerms = this.q.split(' ');
+
+            // Check if all terms exist in stringified item
+            for (var i=0; i<queryTerms.length; i++) {
+                if (queryTerms[i] && queryTerms[i].length &&
+                    JSON.stringify(item).indexOf(queryTerms[i]) < 0) {
+                        return false;
+                    }
+            }
+            return true;
+        },
+
+        sortingObserver: function(items, sortBy, sortOrder, q) {
+            var that = this;
+            this.debounce('sortItems', function () {
+                console.debug('sortItems');
+                that.set('sortedItems', items.base.sort(that._computeSort(this.sortBy, this.sortOrder)));
+                if (that.sortedItems.length != that.items.length)
+                    that.set('sortedItems', that.items);
+                that.set('filteredItems', that.filterItems());
+            }, 300);
+        },
+
+        _fabAction: function(e) {
+            console.debug('fabAction', e, this.section.add);
+            page(this.section.add);
+        },
+
+        _computeSort: function(property, order) {
+            return function(a, b) {
+                if (a[property] === b[property]) {
+                    return 0;
+                }
+                return (order * (a[property] > b[property] ? 1 : -1));
+            };
+        },
+
+        _sectionLink: function(name) {
+            return '/' + name;
+        },
+
+        _qChanged: function(q) {
+            this.async(function() {
+              this.updateMeta(this.section);
+            });
+        },
+
+        _stampCards: function(view) {
+            return view === 'cards';
+        },
+
+        _stampTable: function(view) {
+            return view === 'table';
+        },
+
+        _actualView: function(view, force) {
+            return force ? 'cards' : view;
+        },
+
+        _isEqual: function(a, b) {
+            return a === b;
+        },
+
+        _getColor: function() {
+            return this.section && this.section.color ? this.section.color : '';
+        },
+
+        _getMode: function(narrow) {
+            return narrow ? 'waterfall' : 'scroll';
+        }
+    });
+})();
+</script>

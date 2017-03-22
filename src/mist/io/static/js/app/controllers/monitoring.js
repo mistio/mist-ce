@@ -37,7 +37,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 var that = this;
                 machine.set('enablingMonitoring', true);
 
-                var url = '/clouds/' + machine.cloud.id +
+                var url = '/api/v1/clouds/' + machine.cloud.id +
                     '/machines/' + machine.id + '/monitoring';
 
                 Mist.ajax.POST(url, {
@@ -66,7 +66,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 machine.set('disablingMonitoring', true);
                 machine.set('hasMonitoring', false);
 
-                var url = '/clouds/' + machine.cloud.id +
+                var url = '/api/v1/clouds/' + machine.cloud.id +
                     '/machines/' + machine.id + '/monitoring';
 
                 Mist.ajax.POST(url, {
@@ -134,7 +134,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
             },
 
             getMonitoringCommand: function (machine, callback) {
-                var url = '/clouds/' + machine.cloud.id +
+                var url = '/api/v1/clouds/' + machine.cloud.id +
                     '/machines/' + machine.id + '/monitoring';
 
                 var that = this;

@@ -194,7 +194,9 @@ def assert_list_not_empty(_list, msg=None):
 
 
 def assert_list_empty(_list, msg=None):
-    assert type(_list) == list, "Object provided is not a list"
+    assert type(_list) == list, "Object provided is not a list: %s" % repr(_list)
+    if not msg:
+        msg = repr(_list)
     assert len(_list) == 0, msg
 
 

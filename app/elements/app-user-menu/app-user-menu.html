@@ -1,0 +1,202 @@
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<dom-module id="app-user-menu">
+    <template>
+        <style>
+        :host ::content paper-material {
+            width: 300px !important;
+        }
+        :host paper-item {
+            --paper-menu-focused-item {
+                background-color: #fff;
+            }
+        }
+        :host paper-item {
+            border-bottom: 0 none;
+            padding: 8px 16px;
+            min-height: 36px;
+        }
+        :host paper-item:last-child, :host paper-item.noborder {
+            border-bottom: 0 none;
+        }
+        :host paper-icon-button.gravatar {
+            border-radius: 50%;
+            border: 2px solid #212121;
+            overflow: hidden;
+        }
+        :host iron-icon {
+            margin-right: 26px;
+        }
+        .add-org {
+            opacity: 0.54;
+            margin-top: 8px;
+            /*flex-flow: row-reverse wrap;*/
+            border-top: 1px solid #ddd;
+        }
+        .add-org a {
+            font-weight: 400;
+        }
+        :host .add-org iron-icon {
+            /*margin-right: 0;*/
+        }
+        .grid-row {
+            padding: 0;
+            margin: 0;
+        }
+        paper-item:not(.context) {
+            padding: 8px 16px 8px 24px;
+        }
+        .context iron-icon {
+            background-color: #f2f2f2;
+            border-radius: 50%;
+            margin-right: 22px;
+            width: 36px;
+            height: 36px;
+        }
+        .current.context {
+            border-bottom: 1px solid #ddd;
+            color: rgba(0,0,0,0.87);
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+        .current iron-icon {
+            width: 60px;
+            height: 60px;
+        }
+        .current .org {
+            align-self: center;
+        }
+        .teams {
+            display: block;
+            color: rgba(0,0,0,0.54);
+            font-weight: 400;
+        }
+        :host paper-icon-button {
+            padding: 0;
+        }
+        h4 {
+            background-color: none !important;
+            padding: 0;
+            margin: 0;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        hr {
+            margin: 0 !important;
+            border: 1px solid #ddd !important;
+        }
+        </style>
+        <paper-menu-button horizontal-align="right">
+            <paper-icon-button src="[[gravatar]]" class="gravatar dropdown-trigger"></paper-icon-button>
+            <div class="dropdown-content">
+                <div class="grid-row current context">
+                    <div class="logo xs4">
+                        <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                    </div>
+                    <div class="org xs8">
+                        <h4>Organisation X</h4>
+                        <span>Dev, QA</span>
+                    </div>
+                </div>
+                <paper-menu>
+                    <paper-item class="context">
+                        <a href="/" class="grid-row">
+                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                            <div>Mist.io
+                                <span class="teams">Dev</span>
+                            </div>
+                        </a>
+                    </paper-item>
+                    <paper-item class="context">
+                        <a href="/" class="grid-row">
+                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                            <div>Organisation
+                            <span class="teams">QA, Dev</span>
+                            </div>
+                        </a>
+                    </paper-item>
+                    <paper-item class="context">
+                        <a href="/" class="grid-row">
+                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                            <div>[[email]]
+                            <span class="teams">Personal account</span>
+                            </div>
+                        </a>
+                    </paper-item>
+                    <paper-item class="noborder add-org">
+                        <a href="/" class="grid-row">
+                            <iron-icon icon="icons:add-circle-outline"></iron-icon>Add Organisation
+                        </a>
+                    </paper-item>
+                    <hr/>
+                    <paper-item>
+                        <a href="http://docs.mist.io/contact" target="_blank" class="flex">
+                            <iron-icon class="user-menu-icon" icon="question-answer"></iron-icon>Support
+                        </a>
+                    </paper-item>
+                    <paper-item>
+                        <a href="http://docs.mist.io/" target="_blank" class="flex">
+                            <iron-icon class="user-menu-icon" icon="description"></iron-icon>Docs
+                        </a>
+                    </paper-item>
+                    <paper-item>
+                        <a href="/account" class="flex">
+                            <iron-icon class="user-menu-icon" icon="account-circle"></iron-icon>Account
+                        </a>
+                    </paper-item>
+                    <paper-item>
+                        <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">
+                            <iron-icon class="user-menu-icon" icon="hardware:laptop-mac"></iron-icon>Legacy UI
+                        </a>
+                    </paper-item>
+                    <hr/>
+                    <paper-item>
+                        <a href="javascript:void(0)" on-tap="_logout" class="flex">
+                            <iron-icon class="user-menu-icon" icon="power-settings-new"></iron-icon> Logout
+                        </a>
+                    </paper-item>
+                </paper-menu>
+            </div>
+        </paper-menu-button>
+    </template>
+</dom-module>
+<script type="text/javascript" src="../../bower_components/md5/build/md5.min.js"></script>
+<script>
+Polymer({
+    is: 'app-user-menu',
+    properties: {
+        email: {
+            type: String
+        },
+        size: {
+            type: Number,
+            value: function() {
+                return window.devicePixelRatio > 1.5 ? 80 : 40;
+            }
+        },
+        placeholder: {
+            type: String,
+            value: 'http://findicons.com/files/icons/1072/face_avatars/300/i04.png'
+        },
+        gravatar: {
+            type: String,
+            computed: '_computeGravatar(email, size, placeholder)'
+        }
+    },
+    _computeGravatar: function(email, size, placeholder) {
+        var avatarString = md5(email),
+            url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
+
+        return url;
+    },
+    _toggleUI: function() {
+        window.location.href = '/toggle-ui/legacy';
+    },
+    _logout: function(e) {
+        window.location.href = '/logout';
+    }
+});
+</script>

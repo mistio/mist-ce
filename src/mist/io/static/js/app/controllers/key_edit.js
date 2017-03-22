@@ -11,8 +11,8 @@ define('app/controllers/key_edit', ['ember'],
              *  Properties
              */
 
-            keyId: null,
-            newKeyId: null,
+            key: null,
+            newKeyName: null,
             callback: null,
             formReady: null,
 
@@ -23,11 +23,11 @@ define('app/controllers/key_edit', ['ember'],
              *
              */
 
-            open: function (keyId, callback) {
+            open: function (key, callback) {
                 this._clear();
                 this.setProperties({
-                    keyId: keyId,
-                    newKeyId: keyId,
+                    key: key,
+                    newKeyName: key.name,
                     callback: callback,
                 });
                 this._updateFormReady();
@@ -44,16 +44,16 @@ define('app/controllers/key_edit', ['ember'],
 
             save: function () {
                 if (this.formReady) {
-                    if (Mist.keysController.keyExists(this.newKeyId)) {
-                        Mist.notificationController.notify('Key name exists already');
+                    if (Mist.keysController.keyNameExists(this.newKeyName)) {
+                        Mist.notificationController.notify('Key name exists: ' + this.newKeyName);
                         this._giveCallback(false);
                         return;
                     }
 
                     var that = this;
-                    Mist.keysController.renameKey(this.keyId, this.newKeyId,
-                        function (success, newKeyId) {
-                            that._giveCallback(success, newKeyId);
+                    Mist.keysController.renameKey(this.key.id, this.newKeyName,
+                        function (success, newKeyName) {
+                            that._giveCallback(success, newKeyName);
                             if (success)
                                 that.close();
                         });
@@ -69,8 +69,8 @@ define('app/controllers/key_edit', ['ember'],
 
             _clear: function () {
                 this.setProperties({
-                    keyId: null,
-                    newKeyId: null,
+                    key: null,
+                    newKeyName: null,
                     callback: null,
                 });
             },
@@ -78,10 +78,10 @@ define('app/controllers/key_edit', ['ember'],
 
             _updateFormReady: function () {
                 var formReady = false;
-                if (this.newKeyId && this.newKeyId != this.keyId) {
+                if (this.newKeyName && this.newKeyName != this.key.name) {
                     formReady = true;
                     // Remove non alphanumeric chars from key id
-                    this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
+                    this.set('newKeyName', this.newKeyName.replace(/\W/g, ''));
 
                     if (formReady && Mist.keysController.renamingKey) {
                         formReady = false;
@@ -91,8 +91,8 @@ define('app/controllers/key_edit', ['ember'],
             },
 
 
-            _giveCallback: function (success, newKeyId) {
-                if (this.callback) this.callback(success, newKeyId);
+            _giveCallback: function (success, newKeyName) {
+                if (this.callback) this.callback(success, newKeyName);
             },
 
 
@@ -104,7 +104,7 @@ define('app/controllers/key_edit', ['ember'],
 
             formObserver: function () {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newKeyId')
+            }.observes('newKeyName')
         });
     }
 );

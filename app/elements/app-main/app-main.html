@@ -1,0 +1,527 @@
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/device-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-routes/iron-routes.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../../bower_components/sc-timeago/sc-timeago.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
+
+
+<link rel="import" href="../app-bar/app-bar.html">
+<link rel="import" href="../app-socket/app-socket.html">
+<link rel="import" href="../app-styles/app-styles.html">
+<link rel="import" href="../app-logo/app-logo.html">
+<link rel="import" href="../app-user-menu/app-user-menu.html">
+<link rel="import" href="../app-icons/app-icons.html">
+<link rel="import" href="../app-image-icons/app-image-icons.html">
+<link rel="import" href="../app-check/app-check.html">
+<link rel="import" href="../pages/page-dashboard.html">
+<link rel="import" href="../pages/page-items.html">
+<link rel="import" href="../notifications-element/notifications-element.html">
+<link rel="import" href="../pages/page-account.html">
+<link rel="import" href="../details-page/details-page.html">
+<link rel="import" href="../password-page/password-page.html">
+<link rel="import" href="../feedback-page/feedback-page.html">
+
+
+
+<link rel="import" href="../pages/page-not-found.html">
+
+<link rel="import" href="../templates/template-add.html">
+
+<dom-module id="app-main">
+    <template>
+    <style>
+      paper-toast {
+          z-index: 5;
+      }
+      paper-header-panel {
+        background-color: #eee;
+      }
+      iron-pages {
+        padding: 24px;
+        margin-left: 210px;
+        overflow: hidden;
+        transition: margin-left 350ms ease-in-out;
+      }
+      iron-pages[smallscreen],
+      iron-pages.center {
+        margin-left: 0;
+      }
+      iron-pages[smallscreen] ::content #content {
+        padding: 0;
+      }
+    </style>
+        <app-socket model="{{model}}"></app-socket>
+        <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
+        <iron-routes for="app-main" selected="[[section]]">
+            <!-- dashboard -->
+            <iron-route path="/" title="dashboard" current="dashboard"></iron-route>
+            <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html" current="dashboard"></iron-route>
+            <iron-route path="/incidents" title="incidents" href="../pages/page-items.html" current="incidents"></iron-route>
+
+            <!-- machines -->
+            <iron-route path="/machines" title="machines" current="machines" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/machines/:uuid" title="machine" current="machines" href="../machines/machine-page.html"></iron-route>
+            <iron-route path="/machines/:uuid/tags" title="machine" current="machines" href="../machines/machine-tags.html"></iron-route>
+
+            <!-- images -->
+            <iron-route path="/images" title="images" current="images" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/images/:id" title="image" current="images" href="../images/image-page.html"></iron-route>
+
+            <!-- keys -->
+            <iron-route path="/keys" title="keys" current="keys" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/keys/:id" title="keys" current="keys" href="../keys/key-page.html"></iron-route>
+            <iron-route path="/add-key" title="add key" current="keys" href="../keys/key-add.html"></iron-route>
+
+            <!-- networks -->
+            <iron-route path="/networks" title="networks" current="networks" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/networks/:name" title="network" current="networks" href="../networks/network-page.html"></iron-route>
+            <iron-route path="/add-network" title="add network" current="networks" href="../networks/network-add.html"></iron-route>
+
+            <!-- templates -->
+            <iron-route path="/templates" title="templates" current="templates" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/templates/:id" title="template" current="templates" href="../templates/template-page.html"></iron-route>
+            <iron-route path="/add-template" title="add template" current="templates" href="../templates/template-add.html"></iron-route>
+            <!-- stacks -->
+            <iron-route path="/create-stack/:id" title="create stack" current="stacks" href="../stacks/stack-create.html"></iron-route>
+            <iron-route path="/stacks" title="stacks" current="stacks" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/stacks/:id" title="stack" current="stacks" href="../stacks/stack-page.html"></iron-route>
+            <!-- teams -->
+            <iron-route path="/teams" title="teams" current="teams" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/teams/:id" title="team" current="teams" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/members/:id" title="member" current="teams" href="../teams/member-page.html"></iron-route>
+            <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
+            <!-- scripts -->
+            <iron-route path="/scripts" title="scripts" current="scripts" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/scripts/:id" title="script" current="scripts" href="../scripts/script-page.html"></iron-route>
+            <iron-route path="/add-script" title="add script" current="scripts" href="../scripts/script-add.html"></iron-route>
+            <!-- other -->
+            <iron-route path="/elements" title="elements" current="dashboard" href="../pages/page-elements.html"></iron-route>
+            <iron-route path="/account" title="account" current="account" href="../pages/page-account.html"></iron-route>
+            <iron-route path="*"></iron-route>
+        </iron-routes>
+
+      <paper-header-panel mode="standard" class="fit">
+        <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
+        <app-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
+
+        <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
+            <!-- dashboard -->
+            <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]"><title>Dashboard</title></page-dashboard>
+            <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
+            <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
+            <!-- machines -->
+            <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
+            <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
+            <machine-tags params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-tags>
+            <!-- images -->
+            <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
+            <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
+            <!-- keys -->
+            <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
+            <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
+            <key-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]"></key-add>
+            <!-- networks -->
+            <!--networks-list class="networks" model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list-->
+            <page-items class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
+            <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
+            <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
+            <!-- templates -->
+            <page-items class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
+            <!--templates-list model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" templates="[[model.templatesArray]]"></templates-list-->
+            <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
+            <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
+            <!-- stackss -->
+            <stack-create model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" params="[[params]]" restamp="true"></stack-create>
+            <page-items class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
+            <!--stacks-list model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" stacks="[[model.stacksArray]]"></stacks-list-->
+            <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
+            <!-- teams -->
+            <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
+            <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
+            <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
+            <!-- scripts - leave scipts last due to editors highlighting problem -->
+            <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
+            <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
+            <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
+            <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
+            <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
+            <page-elements></page-elements>
+            <page-account></page-account>
+            <page-not-found></page-not-found>
+        </iron-pages>
+      </paper-header-panel>
+    </template>
+</dom-module>
+
+<script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
+
+<script>
+var app = Polymer({
+    is: 'app-main',
+
+    properties: {
+        model: {
+            type: Object,
+            notify: true
+        },
+        sections: {
+            type: Object
+        },
+        sectionsArray: {
+            type: Array,
+            notify: true
+        },
+        title : {
+            type: String,
+            value: "",
+            notify: true
+        },
+        current : {
+            type: String,
+            value: "",
+            observer: '_currentChanged',
+            notify: true
+        },
+        style: {
+          computed: "_style(current)",
+          value: "background-color: #424242;",
+          notify: true
+        },
+        tag: String
+    },
+    observers: [
+
+    ],
+    listeners: {
+        'iron-activate': 'updateDocTitle',
+        'iron-activate': 'updateCurrent',
+        'iron-navigate': 'scrollToTop',
+        'toggle-sidebar': 'toggleSidebar',
+        'page-meta': 'updateTitle',
+        'toast': 'showToast',
+        'subscribeLogEvents': 'subscribeLogEvents',
+    },
+    _toast: null,
+    _currentChanged: function(){
+        console.log('current: ',this.current);
+    },
+    ready: function() {
+        this.model = {
+            email: EMAIL,
+            cloudsArray: [],
+            machinesArray: [],
+            imagesArray: [],
+            keysArray: [],
+            networksArray: [],
+            scriptsArray: [],
+            stacksArray:[],
+            templatesArray: [],
+            teamsArray: [{
+                name: "python dev",
+                description: "python developers team",
+                id: "123",
+                created_at: 1455132184879,
+                members: [],
+                organisation: "mist.io",
+                policy: ''
+            },{
+                name: "qa",
+                description: "testing and qa team",
+                id: "321",
+                created_at: 1455132184879,
+                members: [{
+                  name: "Debbie D. Doe",
+                  email: "debbie@x.com",
+                  id: "654"
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io",
+                policy: ''
+            },{
+                name: "front dev",
+                description: "front end developers",
+                id: "213",
+                created_at: 1455132184879,
+                members: [{
+                  name: "Xris Papakon",
+                  email: "xris@x.com",
+                  id: "456"
+                },{
+                  name: "Rik Rekveld",
+                  email: "rik@x.com",
+                  id: "789"
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io",
+                policy: ''
+            }],
+            teams: {
+                123: {
+                name: "python dev",
+                description: "python developers team",
+                id: "123",
+                created_at: 1455132184879,
+                members: [],
+                organisation: "mist.io",
+                policy: ''
+            },321: {
+                name: "qa",
+                description: "testing and qa team",
+                id: "321",
+                created_at: 1455132184879,
+                members: [{
+                  name: "Debbie D. Doe",
+                  email: "debbie@x.com",
+                  id: "654"
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io",
+                policy: ''
+            },213:{
+                name: "front dev",
+                description: "front end developers",
+                id: "213",
+                created_at: 1455132184879,
+                members: [{
+                  name: "Xris Papakon",
+                  email: "xris@x.com",
+                  id: "456"
+                },{
+                  name: "Rik Rekveld",
+                  email: "rik@x.com",
+                  id: "789"
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io",
+                policy: ''
+            }},
+            membersArray: [
+                {
+                  name: "Xris Papakon",
+                  email: "xris@x.com",
+                  id: "456",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  }]
+                },{
+                  name: "Rik Rekveld",
+                  email: "rik@x.com",
+                  id: "789",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  }]
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  },{
+                    name: "qa",
+                    id: "321",
+                  }]
+                },
+                {
+                  name: "Debbie D. Doe",
+                  email: "debbie@x.com",
+                  id: "654",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "qa",
+                    id: "321",
+                  }]
+                }
+            ],
+            pending: {
+                clouds: true,
+                monitoring: true
+            },
+        };
+
+        this.sectionsArray = [{
+            id: 'dashboard',
+            color: '#424242',
+        },{
+            id: 'incidents',
+            color: '#d96557',
+        },{
+            id: 'machines',
+            color: '#8c76d1',
+            icon: 'hardware:computer',
+            count: '0',
+            add: '/create-machine'
+        }, {
+            id: 'images',
+            color: '#0099cc',
+            icon: 'image:photo',
+            count: '0'
+        }, {
+            id: 'keys',
+            color: '#009688',
+            icon: 'communication:vpn-key',
+            count: '0',
+            add: '/add-key'
+        }, {
+            id: 'networks',
+            color: '#795548',
+            icon: 'hardware:device-hub',
+            count: '0',
+            add: '/add-network'
+        }, {
+            id: 'scripts',
+            color: '#D48900',
+            icon: 'image:movie-creation',
+            count: '0',
+            add: '/add-script'
+        }, {
+            id: 'templates',
+            color: '#0097A7',
+            icon: 'av:art-track',
+            count: '0',
+            add: '/add-template'
+        }, {
+            id: 'teams',
+            color: '#607D8B',
+            icon: 'social:people',
+            count: '0'
+        }, {
+            id: 'stacks',
+            color: '#0277BD',
+            icon: 'maps:layers',
+            count: '0'
+        }];
+
+        this.sections = _generateMap(this.sectionsArray);
+    },
+
+    attached: function() {
+        // Load neighbouring pages progressively once loaded, don't rely on lazy loading
+        /*var that = this;
+        this.importHref(['../elements/pages/page-items.html'],
+                        function() {
+                            console.debug('pages loaded');
+                        });*/
+    },
+    toggleSidebar: function(){
+        this.$.sidebar.toggleClass('close');
+        this.querySelector("#app-main").toggleClass('center');
+    },
+    subscribeLogEvents: function(searchFilter) {
+        console.log('subscribeLogEvents', searchFilter.detail);
+        var socket = this.querySelector('app-socket');
+        socket.send('sub', 'logs');
+        socket.send('msg', 'logs', 'ready');
+        socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
+    },
+
+    attributeChanged: function(attrName, oldVal, newVal) {
+        console.warn('attrChanged', attrName, oldVal, newVal);
+    },
+    updateCurrent: function(e) {
+        // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
+        var el = e.detail.item;
+        //console.log("el",e.detail);
+        if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
+            this.current = el.getAttribute("current");
+            this.title = el.title;
+        }
+
+    },
+
+    _style: function(current){
+      if (current)
+        return "background-color: "+ this.sections[current].color;
+    },
+    updateTitle: function(_, detail) {
+        if (detail.title && detail.title.length) {
+            document.title = detail.title + " - mist.io";
+        } else {
+            document.title = "mist.io";
+        }
+    },
+
+    updateDocTitle: function(e, details) {
+        if (details.item.title && details.item.title.length) {
+            document.title = details.item.title + " - mist.io";
+        } else {
+            document.title = "mist.io";
+        }
+    },
+
+    showToast: function(e, detail) {
+        if (!this._toast) {
+            this._toast = document.createElement('paper-toast');
+            Polymer.dom(this.$.router).appendChild(this._toast);
+        }
+        this._toast.text = detail.text;
+        this.async(this._toast.show.bind(this._toast), 1);
+    },
+
+    trackPageview: function(e, detail) {
+        return;
+        this.debounce('pageview', function() {
+            var loc = window.location.pathname + window.location.search;
+            ga('send', 'pageview', {
+                location: loc,
+                title: document.title
+            });
+            ga('set', 'page', loc);
+        }, 2000);
+    },
+
+    scrollToTop: function() {
+        // TODO: scroll to top on iron-navigate
+        // https://groups.google.com/forum/#!topic/polymer-dev/tDetYDnxG48
+        // https://github.com/Polymer/docs/blob/master/js/app.js#L141:L147
+        // scrollIntoViewIfNeeded
+        // document.querySelector('#mainContainer').scrollTop();
+    }
+});
+
+var COUNTRY = "Greece";
+var COMPANY_NAME = "mist.io";
+var NUMBER_OF_PEOPLE = "6-20";
+var NUMBER_OF_SERVERS = "1-5";
+var EMAIL = "fakiolasmarios@gmail.com";
+var HAS_PASS = true;
+</script>

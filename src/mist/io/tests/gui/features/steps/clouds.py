@@ -171,22 +171,44 @@ def cloud_creds(context, cloud):
         for i in range(6):
             port.send_keys(u'\ue003')
         port.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['port'])
-        advanced_button = context.browser.find_element_by_class_name("toggle-field")
-        advanced_button.click()
-        key_file = context.browser.find_element_by_id("key_file")
-        key_file.click()
-        key_upload = context.browser.find_element_by_id("file-upload-input")
-        key_upload.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['key_pem'])
-        sleep(1)
-        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
-        file_upload_ok.click()
-        sleep(2)
-        cert_upload = context.browser.find_element_by_id("file-upload-input")
-        cert_upload.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['cert_pem'])
-        sleep(1)
-        file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
-        file_upload_ok.click()
-        sleep(2)
+        if context.mist_config['CREDENTIALS']['DOCKER']['key_pem'] or \
+           context.mist_config['CREDENTIALS']['DOCKER']['cert_pem']:
+            advanced_button = context.browser.find_element_by_class_name("ui-slider-handle")
+            advanced_button.click()
+            sleep(1)
+            key_file = context.browser.find_element_by_id("key_file")
+            key_file.click()
+            key_upload = context.browser.find_element_by_id("upload-area")
+            key_upload.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['key_pem'])
+            sleep(1)
+            if context.mist_config['CREDENTIALS']['DOCKER']['key_pem']:
+                file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
+                file_upload_ok.click()
+                sleep(2)
+            else:
+                cancel = context.browser.find_element_by_class("close")
+                cancel.click()
+                sleep(1)
+            cert_file = context.browser.find_element_by_id("cert_file")
+            cert_file.click()
+            cert_upload = context.browser.find_element_by_id("upload-area")
+            cert_upload.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['cert_pem'])
+            sleep(1)
+            if context.mist_config['CREDENTIALS']['DOCKER']['cert_pem']:
+                file_upload_ok = context.browser.find_element_by_id("file-upload-ok")
+                file_upload_ok.click()
+                sleep(2)
+            else:
+                cancel = context.browser.find_element_by_class("close")
+                cancel.click()
+                sleep(1)
+        else:
+            # in case key/cert are missing
+            # and basic authentication is to be configured
+            username = context.browser.find_element_by_id("auth_user")
+            username.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['username'])
+            password = context.browser.find_element_by_id("auth_password")
+            password.send_keys(context.mist_config['CREDENTIALS']['DOCKER']['password'])
     elif "DIGITALOCEAN" in cloud:
         token_input = context.browser.find_element_by_id("token")
         token_input.send_keys(context.mist_config['CREDENTIALS']['DIGITALOCEAN']['token'])

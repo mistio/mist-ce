@@ -1,0 +1,220 @@
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../app-image-icons/app-image-icons.html">
+
+<dom-module id="list-item">
+    <template>
+        <style is="custom-style" include="tags-and-labels"></style>
+        <style>
+        :host {
+            @apply(--layout-horizontal);
+            padding: 0px 24px;
+            width: 100%;
+        }
+
+        :host(:not([narrow-viewport])) a {
+            @apply(--layout-horizontal);
+            padding: 6px 0px 6px 0;
+        }
+
+        :host([narrow-viewport]) a {
+            @apply(--layout-vertical);
+            padding: 0;
+        }
+
+        #check {
+            padding-right: 24px;
+        }
+
+        /* name id provider state tags */
+        .field.field0 {
+            width: 250px;
+            font-weight: 500;
+            text-overflow: ellipsis;
+        }
+
+        .field {
+            width: 150px;
+            font-weight: 400;
+            /*overflow: scroll;*/
+            margin-right: 24px;
+            padding: 14px 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .field.tags {
+            width: auto;
+            padding: 20px 0 0;
+            white-space: inherit;
+        }
+
+        .id {
+            /*color: #757575;*/
+        }
+
+        :host([narrow-viewport]) .name,
+        :host([narrow-viewport]) .cloud,
+        :host([narrow-viewport]) .state,
+        :host([narrow-viewport]) .tags {
+            width: auto;
+        }
+
+        :host([narrow-viewport]) .field3,
+        :host([medium-viewport]) .field4 {
+            display: none;
+        }
+        </style>
+        <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
+        <content></content>
+        <template is="dom-repeat" items="{{fields}}" as="field">
+          <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
+            <div class$="[[field]] field field[[index]] {{itemField(item, field)}}">{{itemField(item, field)}}</div>
+          </a>
+        </template>
+        <div class="field tags" hidden$="[[!item.tags.length]]">
+            <template is="dom-if" if="[[item.tags.length]]">
+                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
+                    <span class="tag">
+                        <template is="dom-if" if="[[item.key]]">[[item.key]]</template><template is="dom-if" if="[[item.value]]">=[[item.value]]</template>
+                    </span>
+                </template>
+            </template>
+        </div>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'list-item',
+    properties: {
+        // tags: {
+        //   type: Array
+        // },
+        actions: {
+            type: Array,
+        },
+        fields: {
+            type: Array,
+        },
+        selected: {
+            type: Boolean
+        },
+        allselected: {
+            type: Boolean,
+            notify: true
+        },
+        item: {
+            type: Object
+        },
+        section: {
+            type: Object
+        },
+        uri: {
+            type: String
+        },
+        narrowViewport: {
+            type: Boolean,
+            reflectToAttribute: true
+        }
+    },
+
+    itemField: function(item, field) {
+        var ret = item[field];
+
+        // return cloud title
+        if (field == 'cloud')
+            return ret.title;
+
+        if (field == 'template')
+            return document.querySelector('app-main').model.templates[ret].name;
+
+        // field could be in the 'extra' section
+        if (!ret && item.extra && item.extra[field])
+            ret = item.extra[field];
+
+        // image info stored inside extra.image_id on ec2
+        if (!ret && item.extra && item.extra[field+'_id'])
+            return item.extra[field+'_id'];
+
+        // size info could be in all sorts of places
+        //  - Azure: extra.instance_size
+        //  - EC2: extra.instance_type
+        //  - Softlayer: extra.maxCpu / extra.maxMemory
+        //  - Linode: cloud.sizes[extra.PLANID]
+        //  - Nephoscale: extra.service_type
+        //  - DigitalOcean:  item.extra.size.vcpus / item.extra.size.memory
+        // TODO: complete the above list
+        // TODO: harmonize these on the backend
+
+        if (field == 'size') {
+            if (item.extra && item.extra.size)
+                return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
+            if (item.extra && item.extra.instance_type)
+                return item.extra.instance_type;
+            if (item.extra && item.extra.instance_size)
+                return item.extra.instance_size;
+            if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
+                return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
+            if (item.extra && item.extra.PLANID) {
+                var cloud = document.querySelector('app-main').model.clouds[item.cloud.id];
+                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID] : item.extra.PLANID;
+            }
+            if (item.extra && item.extra.service_type)
+                return item.extra.service_type;
+        }
+
+        if (field == 'cloud_id') {
+            return document.querySelector('app-main').model.clouds[ret].title;
+        }
+        if (field == 'machine_id') {
+            return document.querySelector('app-main').model.clouds[item.cloud_id].machines[item.machine_id].name;
+        }
+
+        if (field == 'default') {
+            return document.querySelector('app-main').model.keys[item.id].isDefault ? 'Default' : '';
+        }
+
+        if (field == 'machines') {
+            return document.querySelector('app-main').model.keys[item.id].machines.length;
+        }
+
+        if (field == 'stack state') {
+            var status = document.querySelector('app-main').model.stacks[item.id].status;
+            if (status && status.startsWith('Error')){
+                return 'Error'
+            }
+        }
+
+        if (field == 'members') {
+
+            var num = document.querySelector('app-main').model.teams[item.id].members.length;
+            return num ;
+
+            // if (num == 0)
+            //     return "No members yet";
+            // if (num == 1)
+            //     return "1 member: "+document.querySelector('app-main').model.teams[item.id].members[0].email;
+            // if (num > 1)
+            //     return num+" members: "+document.querySelector('app-main').model.teams[item.id].members[0].email+', '+document.querySelector('app-main').model.teams[item.id].members[1].email+', ...';
+        }
+
+
+        return ret;
+    },
+
+    _itemTagsArray: function(tagsobject) {
+        var tagsArray = [];
+        if (tagsobject.length > 0) {
+            for (i = 0; i < tagsobject.length; i++) {
+                tagsArray.unshift(tagsobject[i]);
+            }
+        }
+        return tagsArray;
+    },
+
+    _firstItem: function (index) {
+        return !index;
+    }
+});
+</script>

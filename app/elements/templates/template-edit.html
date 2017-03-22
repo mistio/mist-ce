@@ -1,0 +1,114 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="template-edit">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
+
+        </style>
+
+        <paper-dialog id="editScriptModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Edit Script</h2>
+            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" error-message="Please enter template's name" value="{{template.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter template's description" value="{{template.description}}"></paper-textarea>
+                </p>
+                <div class="clearfix btn-group">
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="editScriptAjax" url="/templates/[[template._id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'template-edit',
+
+                properties: {
+                    template: {
+                        type: Object,
+                        value: {
+                            name: null,
+                            description: null
+                        },
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(template.name, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                ready: function() {
+
+                },
+                _computeFormReady: function(name, sendingData) {
+                    var formReady = false;
+
+                    if (name) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openEditScriptModal: function(e) {
+                    this.$.editScriptModal.open();
+                },
+                _closeEditScriptModal: function(e) {
+                    this.$.editScriptModal.close();
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function(e) {
+                    this.fire('updateSelectedScript', {
+                        template: this.template
+                    });
+                    this._closeEditScriptModal();
+                },
+                _formReset: function() {
+                    //   this.set('template.id', '');
+                },
+                _editScriptAjax: function(e) {
+                    //   this.$.editScriptAjax.generateRequest();
+                },
+                _editScriptRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _editScriptResponse: function(e) {
+                    this.set('sendingData', false);
+                }
+            });
+        })();
+    </script>
+</dom-module>

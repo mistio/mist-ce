@@ -63,10 +63,12 @@ MAIL_PATH = test_settings.get("MAIL_PATH",
                               os.path.join(BASE_DIR, 'var/mail/'))
 
 JS_CONSOLE_LOG = test_settings.get("JS_CONSOLE_LOG",
-                                   os.path.join(BASE_DIR, LOG_DIR, 'js_console.log'))
+                                   os.path.join(BASE_DIR, LOG_DIR,
+                                                'js_console.log'))
 
 TEST_OUTPUT_LOG = test_settings.get("TEST_OUTPUT_LOG",
-                                    os.path.join(BASE_DIR, LOG_DIR, 'chromedriver.log'))
+                                    os.path.join(BASE_DIR, LOG_DIR,
+                                                 'chromedriver.log'))
 
 SCREENSHOT_PATH = test_settings.get("SCREENSHOT_PATH",
                                     os.path.join(BASE_DIR, 'error'))
@@ -85,7 +87,8 @@ elif BROWSER_FLAVOR == 'phantomjs':
     WEBDRIVER_PATH = os.path.join(BASE_DIR, 'parts/envuiphantomjs')
 
 WEBDRIVER_LOG = test_settings.get("WEBDRIVER_LOG",
-                                  os.path.join(BASE_DIR, LOG_DIR, 'chromedriver.log'))
+                                  os.path.join(BASE_DIR, LOG_DIR,
+                                               'chromedriver.log'))
 
 # ----------CREDENTIALS-----------
 CREDENTIALS = test_settings.get("CREDENTIALS", {})
@@ -101,6 +104,13 @@ EMAIL = test_settings.get("EMAIL", "")
 PASSWORD1 = test_settings.get("PASSWORD1", "")
 PASSWORD2 = test_settings.get("PASSWORD2", "")
 
+# CREDENTIALS FOR TESTING RBAC
+RBAC_OWNER_EMAIL = test_settings.get("RBAC_OWNER_EMAIL", "owner@dr.dr")
+RBAC_OWNER_PASSWORD  = test_settings.get("RBAC_OWNER_PASSWORD ", "dr")
+
+RBAC_MEMBER_EMAIL = test_settings.get("RBAC_MEMBER_EMAIL", "user@dr.dr")
+RBAC_MEMBER_PASSWORD = test_settings.get("RBAC_MEMBER_PASSWORD", "dr")
+
 # CREDENTIALS FOR GOOGLE SSO
 GOOGLE_TEST_EMAIL = test_settings.get("GOOGLE_TEST_EMAIL", "")
 GOOGLE_TEST_PASSWORD = test_settings.get("GOOGLE_TEST_PASSWORD", "")
@@ -110,8 +120,37 @@ GITHUB_TEST_EMAIL = test_settings.get("GITHUB_TEST_EMAIL", "")
 GITHUB_TEST_PASSWORD = test_settings.get("GITHUB_TEST_PASSWORD", "")
 
 # CREDENTIALS FOR TESTING REGISTRATION THROUGH SSO
-GOOGLE_REGISTRATION_TEST_EMAIL = test_settings.get("GOOGLE_REGISTRATION_TEST_EMAIL", "")
-GOOGLE_REGISTRATION_TEST_PASSWORD = test_settings.get("GOOGLE_REGISTRATION_TEST_PASSWORD", "")
+GOOGLE_REGISTRATION_TEST_EMAIL = test_settings.get(
+    "GOOGLE_REGISTRATION_TEST_EMAIL", "")
+GOOGLE_REGISTRATION_TEST_PASSWORD = test_settings.get(
+    "GOOGLE_REGISTRATION_TEST_PASSWORD", "")
 
-GITHUB_REGISTRATION_TEST_EMAIL = test_settings.get("GITHUB_REGISTRATION_TEST_EMAIL", "")
-GITHUB_REGISTRATION_TEST_PASSWORD = test_settings.get("GITHUB_REGISTRATION_TEST_PASSWORD", "")
+GITHUB_REGISTRATION_TEST_EMAIL = test_settings.get(
+    "GITHUB_REGISTRATION_TEST_EMAIL", "")
+GITHUB_REGISTRATION_TEST_PASSWORD = test_settings.get(
+    "GITHUB_REGISTRATION_TEST_PASSWORD", "")
+
+OWNER_EMAIL = test_settings.get("OWNER_EMAIL", "")
+OWNER_PASSWORD = test_settings.get("OWNER_PASSWORD", "")
+
+MEMBER1_EMAIL = test_settings.get("MEMBER1_EMAIL", "")
+MEMBER1_PASSWORD = test_settings.get("MEMBER1_PASSWORD", "")
+
+MEMBER2_EMAIL = test_settings.get("MEMBER2_EMAIL", "")
+MEMBER2_PASSWORD = test_settings.get("MEMBER2_PASSWORD", "")
+
+API_TESTS_PRIVATE_KEY = test_settings.get("API_TESTS_PRIVATE_KEY", '')
+
+API_TESTS_PUBLIC_KEY = test_settings.get("API_TESTS_PUBLIC_KEY", '')
+
+API_TESTING_MACHINE_PRIVATE_KEY = test_settings.get(
+    "API_TESTING_MACHINE_PRIVATE_KEY", '')
+
+API_TESTING_MACHINE_PUBLIC_KEY = test_settings.get(
+    "API_TESTING_MACHINE_PUBLIC_KEY", '')
+
+API_TESTING_MACHINE_NAME = test_settings.get("API_TESTING_MACHINE_NAME", '')
+
+API_TESTING_CLOUD = test_settings.get('API_TESTING_CLOUD', '')
+
+ORG_NAME = test_settings.get('ORG_NAME', '')

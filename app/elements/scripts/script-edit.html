@@ -1,0 +1,121 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="script-edit">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
+
+        </style>
+
+        <paper-dialog id="editScriptModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Edit Script</h2>
+            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" error-message="Please enter script's name" value="{{newScript.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter script's description" value="{{newScript.description}}"></paper-textarea>
+                </p>
+                <div class="clearfix btn-group">
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="scriptEditAjaxRequest" url="/api/v1/scripts/[[script.script_id]]" method="PUT" on-response="_handleScriptEditAjaxResponse" on-error="_handleScriptEditAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'script-edit',
+
+                properties: {
+                    script: {
+                        type: Object
+                    },
+                    newScript: {
+                        type: Object,
+                        computed: '_computeNewScript(script)',
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(newScript.name, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _computeNewScript: function(script) {
+                    return {
+                        name: script.name,
+                        description: script.description
+                    };
+                },
+                _computeFormReady: function(name, sendingData) {
+                    var formReady = false;
+
+                    if (name) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openEditScriptModal: function(e) {
+                    this.$.editScriptModal.open();
+                },
+                _closeEditScriptModal: function(e) {
+                    this.$.editScriptModal.close();
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function(e) {
+                    // this.fire('updateSelectedScript', {
+                    //     script: this.script
+                    // });
+
+                    this.$.scriptEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.scriptEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.scriptEditAjaxRequest.body = {
+                        new_name: this.newScript.name,
+                        new_description: this.newScript.description
+                    };
+                    this.$.scriptEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _formReset: function() {
+                    //   this.set('script.id', '');
+                },
+                _handleScriptEditAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    this._closeEditScriptModal();
+                }
+            });
+        })();
+    </script>
+</dom-module>

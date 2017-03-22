@@ -1,0 +1,362 @@
+<link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<link rel="import" href="../section-tile/section-tile.html">
+<link rel="import" href="../app-incidents/app-incidents.html">
+<link rel="import" href="../app-forms/app-forms.html">
+<link rel="import" href="../app-fab/app-fab.html">
+<link rel="import" href="../logs/log-list.html">
+<link rel="import" href="../onb-element/onb-element.html">
+<link rel="import" href="../app-header/app-header.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
+<link rel="import" href="../clouds/cloud-info.html">
+<dom-module id="page-dashboard">
+    <template>
+        <style is="custom-style" include="headings"></style>
+        <style>
+        :host {
+            --layout-margin: 0.5em;
+        }
+        paper-material {
+            overflow: auto !important;
+        }
+        /* layout helper classes */
+        #content {
+            -webkit-overflow-scrolling: touch;
+            padding: 0 36px 80px 36px;
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+
+        .flex2child {
+            @apply(--layout-flex-2);
+        }
+
+        .search.active {
+            left: 15px;
+        }
+        .clouds {
+            min-height: 48px;
+            transition: all 200ms ease-in;
+        }
+        .clouds paper-chip {
+            cursor: pointer;
+        }
+        .clouds paper-chip ::content #chip {
+            background-color: #ddd;
+        }
+        .clouds paper-chip.online .icon {
+            background-color: var(--green-color) !important;
+        }
+
+        .clouds paper-chip.offline .icon {
+            background-color: var(--red-color) !important;
+        }
+
+        paper-button.blue {
+            line-height: 30px;
+        }
+
+        .sections {
+            align-items: flex-start;
+            flex-basis: 25%;
+            margin-bottom: 1em;
+        }
+        .incidents {
+           margin-bottom: 1em;
+           display: block;
+           width: 100%;
+        }
+        a.main-section {
+            min-width: 150px;
+            flex-basis: 25%;
+        }
+        .columns {
+            @apply(--layout-horizontal);
+            flex: 1 100%;
+        }
+        .left,
+        .right,
+        .top {
+            margin: var(--layout-margin);
+
+        }
+        .left, .right {
+            @apply(--layout-vertical);
+            min-width: 400px;
+            align-items: flex-start;
+            flex-direction: column;
+            flex: 1 50%;
+        }
+        log-list,
+        .graphs {
+            margin-bottom: 1em;
+            width: 100%;
+            overflow: hidden;
+        }
+        log-list {
+            display: block;
+        }
+
+        @media (max-width: 489px) {
+            a.main-section {
+                width: calc(100% - 1em);
+            }
+        }
+
+        @media (max-width: 639px) {
+            a.main-section:first-child {
+                min-width: calc(100% - 1em);
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .columns {
+                @apply(--layout-vertical);
+            }
+        }
+        @media (min-width: 1900px) {
+            paper-toolbar::content #topBar {
+                max-width: auto;
+            }
+            .flex-horizontal-wide {
+                @apply(--layout-horizontal);
+                flex-wrap: wrap;
+            }
+            .flexchild-wide-top {
+                flex: 1 100%;
+            }
+        }
+        polyana-dashboard {
+            position: relative;
+        }
+        log-list ::content h3,
+        polyana-dashboard ::content h3 {
+            text-transform: uppercase;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 36px;
+            margin: 0 24px 0 0;
+        }
+        polyana-dashboard ::content timerange-picker {
+            position: absolute;
+            right: 0;
+            top: 12px;
+        }
+        polyana-dashboard ::content paper-button {
+            margin: 0;
+            min-width: 1px;
+        }
+        polyana-dashboard ::content paper-spinner {
+            display: block;
+            margin: 0 auto;
+        }
+        </style>
+        <div id="content" class="flex-horizontal-wide" main>
+            <div class="clouds top flexchild-wide-top">
+                <div class="flex">
+                    <template is="dom-repeat" items="[[model.cloudsArray]]">
+                        <paper-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]" animated>
+                            <div class="icon"></div>
+                            <!-- src="[[_computeProviderLogo(item.provider)]]" -->
+                            <h1 class="cloud-title">{{item.title}}</h1>
+                        </paper-chip>
+                    </template>
+                </div>
+                <cloud-info></cloud-info>
+            </div>
+            <!-- <template is="dom-if" if="[[onbstate]]">
+                <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
+            </template> -->
+            <div class="columns">
+                <div id="leftcolumn" class="left">
+                    <template is="dom-if" if="[[model.monitoring]]">
+                        <div class="incidents">
+                            <app-incidents model="[[model]]" sections="[[sections]]">
+                            </app-incidents>
+                        </div>
+                    </template>
+                    <div class="sections layout horizontal wrap">
+                        <a href="/machines" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
+                            </section-tile>
+                        </a>
+                        <a href="/images" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
+                        </a>
+                        <a href="/keys" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
+                        </a>
+                        <a href="/networks" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
+                        </a>
+                        <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
+                            <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
+                        </a>
+                        <a href="/templates" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
+                        </a>
+                        <a href="/stacks" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
+                        </a>
+                        <a href="/teams" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
+                        </a>
+                    </div>
+                    <paper-material class="graphs">
+                        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                    </paper-material>
+                </div>
+                <paper-material id="rightcolumn" class="left logs">
+                    <log-list></log-list>
+                </paper-material>
+            </div>
+
+            <div class="absolute-bottom-right">
+                <a href="/add-cloud">
+                    <paper-fab id="addBtn" icon="cloud"></paper-fab>
+                </a>
+            </div>
+        </div>
+
+    </template>
+</dom-module>
+<script>
+
+Polymer({
+    is: 'page-dashboard',
+    enableCustomStyleProperties: true,
+    properties: {
+        sections: {
+            type: Object
+        },
+        model: {
+            type: Object,
+            notify: true
+        },
+        onbstate: {
+            type: Number
+        },
+        q: {
+            type: String,
+            notify: true
+        },
+        dashboard: {
+            type: Object
+        },
+        replaceTargets: {
+            type: Object,
+            computed: '_computeReplaceTargets(model.monitoring)'
+        }
+    },
+    ready: function() {},
+    attached: function() {
+        // reset page title since this is the default page
+        this.fire('page-meta', {
+            title: null
+        });
+        this.datasources = [
+          {
+          "id": 1,
+          "orgId": 1,
+          "name": "mistphite",
+          "type": "graphite",
+          "access": "proxy",
+          "uri": "/graphite/",
+          "password": "",
+          "user": "",
+          "database": "",
+          "basicAuth": false,
+          "basicAuthUser": "",
+          "basicAuthPassword": "",
+          "withCredentials": false,
+          "isDefault": false,
+          "jsonData": null
+          }
+        ];
+        this.dashboard = {
+          "id": 1,
+          "refresh": "10s",
+          "rows": [{
+            "panels": [{
+              "aliasColors": {},
+              "datasource": "mistphite",
+              "id": 2,
+              "span": 12,
+              "stack": false,
+              "targets": [
+                {
+                "refId": "A",
+                "target": "bucky.*.load.shortterm"
+                },
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Load on all monitored machines",
+              "type": "graph",
+              "x-axis": true,
+              "y-axis": true
+            }],
+          }],
+          "time": {
+            "from": "now-10m",
+            "to": "now"
+          },
+          "timepicker": {
+            "now": true,
+            "refresh_intervals": [],
+            "time_options": [
+              "5m",
+              "15m",
+              "1h",
+              "6h",
+              "12h",
+              "24h",
+              "2d",
+              "7d",
+              "30d"
+            ]
+          },
+          "timezone": "browser"
+        };
+
+        var that = this;
+        setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+            if (that.querySelector('dashboard-panel'))
+                that.querySelector('dashboard-panel').resize();
+
+        }, 5000);
+    },
+    isOnline: function(cloud) {
+        return cloud.state == 'online' && 'online';
+    },
+    isOffline: function(cloud) {
+        return cloud.state == 'offline' && 'offline';
+    },
+    _computeProviderLogo: function(className) {
+        return '../assets/providers/provider-' + className.split('_')[0] + '.png';
+    },
+    _computeReplaceTargets: function(monitoring) {
+        var ret = {'bucky.': ''},
+            mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
+        for (var i=0; i<mIds.length; i++) {
+            var mref = this.model.monitoring.monitored_machines[mIds[i]],
+                m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
+            ret[mIds[i]] = m ? m.name : 'unknown';
+        }
+        return ret;
+    },
+    _showCloudInfoDialog: function(e) {
+        var cloudId = e.currentTarget.getAttribute('id'),
+        dialog = this.querySelector('cloud-info'),
+        cloud = this.model.cloudsArray.find(function(cloud) {
+            return cloud.id == cloudId;
+        });
+        dialog.cloud = cloud;
+        dialog._openDialog();
+    }
+});
+</script>

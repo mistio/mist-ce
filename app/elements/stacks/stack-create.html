@@ -1,0 +1,850 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../app-form/app-form.html">
+<dom-module id="stack-create">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
+
+            #content {
+                max-width: 900px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 87px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+
+            :host >::content paper-input-container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+
+            paper-item.lead {
+                font-size: 2em;
+            }
+
+            paper-toggle-button[disabled]::content {
+                color: rgba(0, 0, 0, 0.32);
+            }
+
+            paper-toggle-button::content paper-input-container input {
+                color: color: rgba(0, 0, 0, 0.54);
+            }
+
+            .spacer {
+                display: block;
+                height: 24px;
+                width: 100%;
+            }
+
+            .bottom-actions {
+                padding-left: 20px;
+            }
+
+            *:not(paper-button)[disabled] {
+                display: none;
+            }
+
+            paper-radio-group {
+                padding: 16px 8px;
+            }
+        </style>
+
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                                Create Stack
+                            </h2>
+                    <div class="subtitle">
+                        from [[template.name]]
+                        <a href$="/templates/[[template.id]]">
+                            <iron-icon icon="icons:link"></iron-icon>
+                        </a>
+                        <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
+                    </div>
+                </div>
+            </paper-material>
+            <!--  <paper-material>
+                        <div class="grid-row">
+                        <h2 class="xs12 title"><content></content></h2>
+                        <template is="dom-repeat" items="{{fields}}" as="field">
+                                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                                    <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                 <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                                    <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
+                                        <template is="dom-repeat" items="[[field.options]]" as="option">
+                                            <paper-radio-button name="[[option.val]]">[[option.id]] [[option.title]] [[option.name]]</paper-radio-button>
+                                        </template>
+                                    </paper-radio-group>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]" disabled="[[field.disabled]]">
+                                    <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
+                                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                            <template is="dom-repeat" items="[[field.options]]" as="option">
+                                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                            </template>
+                                        </paper-menu>
+                                    </paper-dropdown-menu>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
+                                    <div class="xs12 m6">
+                                        <div class="spacer" hidden$="[[field.disabled]]"></div>
+                                        <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.label]]</paper-toggle-button>
+                                        <div class="spacer" hidden$="[[field.disabled]]"></div>
+                                    </div>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[field.isLead]]">
+                                    <hr class="xs12"/>
+                                </template>
+
+                        </template>
+
+                        <paper-progress id="satckprogress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+                        <hr class="xs12" />
+
+                         <div class="clearfix bottom-actions xs12">
+                            <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
+                                Create stack
+                            </paper-button>
+                            <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                        </div>
+                    </div>
+                    </paper-material>
+
+
+                    <iron-ajax id="formAjax" url="/api/v1/stacks" contentType="application/json" method="POST" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
+
+ -->
+
+            <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+
+        </div>
+
+
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'stack-create',
+
+                properties: {
+                    model: {
+                        type: Object
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    stack: {
+                        type: Object,
+                        value: {}
+                    },
+                    form: {
+                        type: Object,
+                        value: {}
+                    },
+                    params: {
+                        type: Object
+                    },
+                    template: {
+                        type: Object,
+                        value: {},
+                        computed: '_fromTemplate(params, model.templates.*)'
+                    },
+                    fields: {
+                        type: Array
+                    },
+                    typedName: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    },
+                    hideprogress: {
+                        type: Boolean,
+                        value: true
+                    },
+                    keys: {
+                        type: Array,
+                        computed: "_keys(model)"
+                    },
+                    clouds: {
+                        type: Array,
+                        computed: "_clouds(model)"
+                    },
+                    images: {
+                        type: Array,
+                        computed: "_images(model)"
+                    },
+                    uri: {
+                        type: String,
+                        computed: "_uri(model)"
+                    },
+                },
+
+                observers: [
+                    '_fieldsChanged(fields.*, sendingData)',
+                    '_computeFields(template, model.templates.*)',
+                ],
+
+                _fromTemplate: function(params, templates) {
+                    if (params.id && this.model.templates) {
+                        return this.model.templates[params.id]
+                    } else {
+                        return {
+                            name: "Template is missing"
+                        }
+                    }
+                    // console.log("template: ",template);
+                },
+                _uri: function(model) {
+                    return window.location.protocol + "//" + window.location.hostname + "/";
+                },
+
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
+                },
+
+                _goBack: function() {
+                    history.back();
+                },
+
+                _computeFields: function(template) {
+                    var yaml_inputs = '', yaml_array = [];
+                    if (this.template.inputs) {
+                        for (var i = 0; i < this.template.inputs.length; i++) {
+                            if (['mist_uri', 'api_token'].indexOf(this.template.inputs[i].name) == -1) {
+                                yaml_inputs += this.template.inputs[i].name + ': ';
+                                yaml_inputs += this.template.inputs[i].default+'\n';
+
+                                yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
+                            }
+                        }
+                    }
+
+                    var ret = [{
+                        name: "name",
+                        label: "Stack Name",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter a name for the stack",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "description",
+                        label: "Stack Description",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        helptext: "Choose a usefull description for your stack",
+                        errorMessage: "Please enter stacks's description",
+                        show: true,
+                        required: false
+                    }, {
+                        name: "yaml_or_form",
+                        label: "YAML or form",
+                        type: "radio",
+                        value: "yaml",
+                        defaultValue: "yaml",
+                        helptext: "Choose the way you want to insert inputs",
+                        errorMessage: "Choose an input format",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "YAML",
+                            val: "yaml"
+                        }, {
+                            title: "Form",
+                            val: "form"
+                        }]
+                    }, {
+                        name: "stackinputs",
+                        label: "Stack Inputs YAML",
+                        type: "textarea",
+                        value: yaml_inputs,
+                        defaultValue: yaml_inputs,
+                        placeholder: "",
+                        helptext: "Enter the stack inputs in yaml format",
+                        errorMessage: "Please enter stacks's inputs",
+                        show: true,
+                        required: true,
+                        showIf: {
+                            fieldName: "yaml_or_form",
+                            fieldValues: ["yaml"]
+                        }
+                    }];
+
+                    if (template && template.inputs) {
+                        template.inputs.forEach(function(inp) {
+                            inp['showIf'] = {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                            inp['value'] = yaml_array[inp.name];
+                            inp['defaultValue'] = yaml_array[inp.name];
+
+                            // make key dropdown
+                            if(inp.name == "key") {
+                                inp.type = 'dropdown';
+                                inp.query = ["keysArray"];
+                            }
+
+                            // make cloud dropdown
+                            if(inp.name == "cloud_id") {
+                                inp.type = 'dropdown';
+                                inp.query = ["cloudsArray"];
+                            }
+
+                            // make image dropdown & dependent on cloud
+                            if(inp.name == "image_id") {
+                                inp.show = false;
+                                inp.type = 'dropdown';
+                                inp.query = ["clouds","$.cloud_id", "imagesArray"],
+                                inp.andshowIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
+                        
+                            ret.push(inp);
+                        });
+                    }
+
+                    ret.push({
+                        name: "deploy",
+                        label: "Deploy Now",
+                        type: "toggle",
+                        value: true,
+                        defaultValue: true,
+                        placeholder: true,
+                        helptext: "Enable this option to deploy your stack now",
+                        errorMessage: "",
+                        show: true,
+                        required: false
+                    });
+
+                    this.set('fields', ret);
+
+                    //return ret;
+                    /*
+                        {
+
+                        },{
+                            name: "key_name",
+                            label: "SSH Key",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please choose an ssh key",
+                            helptext: "You can choose a key from your existing keys",
+                            show: true,
+                            required: true,
+                            query: ["keysArray"],
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "worker_name",
+                            label: "Worker name",
+                            type: "text",
+                            value: "",
+                            defaultValue: "GigaDemoFirstWorker",
+                            placeholder: "",
+                            helptext: "Your current mist installation URI",
+                            errorMessage: "Please enter mist URI",
+                            helptext: "The machine name of the first kubernetes worker. You can scale up workers later. Name must be unique in cloud.",
+                            show: true,
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "master_name",
+                            label: "Master name",
+                            type: "text",
+                            value: "",
+                            defaultValue: "GigaDemoMaster",
+                            placeholder: "",
+                            errorMessage: "Please enter a name for the master",
+                            helptext: "The machine name of kubernetes master. Name must be unique in cloud.",
+                            show: true,
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "cloud_id",
+                            label: "Cloud",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please choose an cloud",
+                            helptext: "Choose on which one of your clouds you want your stack deployed",
+                            show: true,
+                            required: true,
+                            query: ["cloudsArray"],
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "image_id",
+                            label: "Image",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "ami-4f4acd3c",
+                            errorMessage: "Please choose an image",
+                            helptext: "Choose an image for the machines.",
+                            show: false,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "imagesArray"],
+                            andshowIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "size_id",
+                            label: "Size",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "c1.medium",
+                            errorMessage: "Please choose a size for your machines",
+                            helptext: "Choose the size for your machines.",
+                            show: false,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "sizesArray"],
+                            andshowIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "location_id",
+                            label: "Location",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "0",
+                            helptext: "Choose a host location for your machines.",
+                            errorMessage: "Please enter a location",
+                            show: false,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "locationsArray"],
+                            andshowIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "coreos",
+                            label: "coreos",
+                            type: "toggle",
+                            value: true,
+                            defaultValue: true,
+                            placeholder: true,
+                            helptext: "",
+                            errorMessage: "",
+                            show: true,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "ssh_user",
+                            label: "SSH User",
+                            type: "text",
+                            value: "ubuntu",
+                            defaultValue: "ubuntu",
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "private_key_path",
+                            label: "Private Key Path",
+                            type: "text",
+                            value: "id-rsa",
+                            defaultValue: "id-rsa",
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "monitoring",
+                            label: "Monitoring",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "key_external_resource",
+                            label: "key_external_resource",
+                            type: "toggle",
+                            value: true,
+                            defaultValue: true,
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "worker_external_resource",
+                            label: "worker_external_resource",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "worker_external_resource_id",
+                            label: "worker_external_resource_id",
+                            type: "text",
+                            value: "i-ebb8c563",
+                            defaultValue: "i-ebb8c563",
+                            placeholder: "i-ebb8c563",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "worker_configured",
+                            label: "worker_configured",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: false,
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "master_external_resource",
+                            label: "master_external_resource",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: false,
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "master_external_resource_id",
+                            label: "master_external_resource_id",
+                            type: "text",
+                            value: "i-3fb9c4b7",
+                            defaultValue: "i-3fb9c4b7",
+                            placeholder: "i-3fb9c4b7",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "master_configured",
+                            label: "master_configured",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: false,
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },]*/
+                },
+
+                _computeFieldType: function(field, value, show) {
+                    if (!field.helptext && field.description) {
+                        field.helptext = field.description
+                    }
+                    if (!field.label && field.name) {
+                        field.label = field.name
+                    }
+
+                    if (field.type == "dropdown" && field.query) {
+
+                        var inputModel = this.model;
+                        for (var prop in field.query) {
+                            var p = field.query[prop];
+
+                            if (p.startsWith("$.")) {
+                                p = this.form[p.slice(2)];
+                            }
+
+                            if (inputModel.hasOwnProperty(p)) {
+                                inputModel = inputModel[p];
+                            }
+                        }
+
+                        var updatedOptions = [];
+
+                        for (var prop in inputModel) {
+                            var dropdownItem = {};
+                            if (inputModel[prop].hasOwnProperty("title")) {
+                                dropdownItem.title = inputModel[prop].title;
+                            } else if (inputModel[prop].hasOwnProperty("name")) {
+                                dropdownItem.title = inputModel[prop].name;
+                            } else if (inputModel[prop].hasOwnProperty("id")) {
+                                dropdownItem.title = inputModel[prop].id;
+                            }
+                            dropdownItem.val = inputModel[prop].id;
+                            updatedOptions.push(dropdownItem);
+
+                        }
+                        for (var index in this.fields) {
+                            var existingField = this.fields[index];
+                            if (existingField.name == field.name) {
+                                this.set("fields." + index + ".options", updatedOptions);
+                            }
+                        }
+                    }
+                    if (!(field.showIf && !field.show)) {
+                        return field.type == value;
+                    }
+                },
+
+                _fieldsChanged: function(fields, sendingData) {
+                    console.log('_fieldsChanged');
+                    this.async(function() {
+                        var form = this.form,
+                            show = true,
+                            dependency;
+
+                        fields.base.forEach(function(el, index) {
+                            if (el.showIf) {
+                                var showIf = false,
+                                    andshowIf = false;
+
+                                if (el.showIf.fieldExists) {
+                                    dependency = form[el.showIf.fieldName],
+                                        show = dependency;
+                                } else {
+                                    dependency = form[el.showIf.fieldName],
+                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                }
+
+                                if (show)
+                                    showIf = true;
+
+                                if (el.andshowIf) {
+                                    if (el.andshowIf.fieldExists) {
+                                        dependency = form[el.andshowIf.fieldName],
+                                            show = dependency;
+                                    } else {
+                                        dependency = form[el.andshowIf.fieldName],
+                                            show = el.andshowIf.fieldValues.indexOf(dependency) != -1;
+                                    }
+                                    if (show)
+                                        andshowIf = true;
+                                }
+
+                                var decide = showIf;
+                                if (el.andshowIf) {
+                                    decide = showIf && andshowIf;
+                                }
+
+                                this.set('fields.' + index + '.show', decide);
+
+                                if (!decide) {
+                                    this._resetField(el, index);
+                                } else {
+                                    this.set('form.' + el.name, el.value);
+                                }
+                            } else {
+                                this.set('form.' + el.name, el.value);
+                            }
+
+                            if (el.placeholderIf) {
+                                dependency = form[el.placeholderIf.fieldName];
+                                this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                            }
+                        }, this);
+
+                        var valid = fields.base.every(function(el, index) {
+                            return el.show && el.required ? el.value : true;
+                        }, this);
+
+                        this.set('form', form);
+                        this.set('formReady', valid && !sendingData);
+                    })
+                },
+
+                _submitForm: function() {
+                    // this.set('form.mist_uri',this.uri);
+
+                    var payload = this.template;
+                    var yamlField = this.fields.find(function(field) {
+                        return field.name == "yaml_or_form";
+                    });
+                    var yaml = yamlField.value == 'yaml' ? true : false;
+
+                    var inputs = {};
+                    var stackname = this.form.name,
+                        stackdescription = this.form.description,
+                        deploy = this.form.deploy;
+
+                    if (yaml) {
+                        var inputsfield = this.fields.find(function(field) {
+                            return field.name == "stackinputs";
+                        });
+                        if (inputsfield.value) {
+                            inputs = YAML.parse(inputsfield.value);
+                        } else {
+                            inputs = e.detail.payload
+                        }
+                    } else {
+                        inputs = this.form;
+                        //inputs["image_id"] = "ami-4f4acd3c";
+                        var clean = ["name", "description", "stackinputs", "yaml_or_form", "deploy"];
+                        for (var i = 0; i < clean.length; i++) {
+                            var prop = clean[i];
+                            delete inputs[prop];
+                        }
+                    }
+
+                    var body = {
+                        inputs: inputs
+                    };
+                    body["template_id"] = this.template._id;
+                    body["name"] = stackname;
+                    body["description"] = stackdescription;
+                    body["deploy"] = deploy;
+
+                    this.$.formAjax.headers["Content-Type"] = 'application/json';
+                    this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.formAjax.body = body;
+
+                    this.$.formAjax.generateRequest();
+
+                    //test progress bar
+                    this.hideprogress = false;
+                },
+
+                _handleRequest: function(e) {
+                    this.fire("request", e.detail)
+                    console.log("deploy", this.form.deploy, "request", e.detail);
+                },
+
+                _handleResponse: function(e) {
+                    var sid = e.detail.response.stack.id;
+
+                    this.async(function() {
+                        page.show('/stacks/' + sid);
+                    }, 2000);
+
+                    this.debounce('resetForm', function() {
+                        this._resetForm();
+                    }, 500);
+                },
+
+                _handleError: function(e) {
+
+                },
+
+                _resetForm: function(e) {
+                    // Reset script
+                    for (var attr in this.form) {
+                        this.set('form.' + attr, '');
+                    }
+
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                    this.typedName = "";
+                },
+
+                _resetField: function(el, index) {
+                    // this.set('fields.' + index + '.value', el.defaultValue);
+                    // console.log(11);
+                    // var input = this.querySelector('#' + el.name);
+                    // if (input) {
+                    //     input.invalid = false;
+                    // }
+                },
+
+            });
+        })();
+    </script>
+</dom-module>

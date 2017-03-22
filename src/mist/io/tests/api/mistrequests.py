@@ -21,6 +21,7 @@ class MistRequests(object):
         self.data = data
         self.params = params
         self.json = json
+        self.json_body = json
 
     def post(self):
         response = requests.post(self.uri, data=self.data, json=self.json,
@@ -33,7 +34,7 @@ class MistRequests(object):
         return response
 
     def put(self):
-        response = requests.put(self.uri, data=self.data,
+        response = requests.put(self.uri, data=self.data, json=self.json,
                                 headers=self.headers, timeout=self.timeout)
         return response
 
@@ -42,6 +43,11 @@ class MistRequests(object):
                                    json=self.json, headers=self.headers,
                                    timeout=self.timeout)
         return response
+
+    # def patch(self):
+    #     response = requests.patch(self.uri, data=self.data, json=self.json,
+    #                              headers=self.headers, timeout=self.timeout)
+    #     return response
 
     def unavailable_api_call(self, *args, **kwargs):
         raise NotImplementedError("This method call is not available")
