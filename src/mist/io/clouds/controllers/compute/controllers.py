@@ -968,11 +968,6 @@ class OnAppComputeController(BaseComputeController):
     def _suspend_machine(self, machine, machine_libcloud):
         self.connection.ex_suspend_node(machine_libcloud)
 
-    def _list_locations__fetch_locations(self):
-        # details contain info as max cpu/memory
-        locations = self.connection.list_locations(details=True)
-        return locations
-
 class OtherComputeController(BaseComputeController):
 
     def _connect(self):
