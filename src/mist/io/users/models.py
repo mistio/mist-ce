@@ -11,7 +11,12 @@ from uuid import uuid4
 
 from passlib.context import CryptContext
 
-from mist.core.rbac.models import Policy
+try:
+    from mist.core.rbac.models import Policy
+except ImportError:
+    HAS_POLICY = False
+else:
+    HAS_POLICY = True
 
 try:
     from mist.core.rbac.mappings import RBACMapping
@@ -403,9 +408,10 @@ class Team(me.EmbeddedDocument):
     description = me.StringField()
     members = me.ListField(me.ReferenceField(User))
     visible = me.BooleanField(default=True)
-    policy = me.EmbeddedDocumentField(Policy,
-                                      default=lambda: Policy(operator='DENY'),
-                                      required=True)
+    if HAS_POLICY:
+        policy = me.EmbeddedDocumentField(
+            Policy, default=lambda: Policy(operator='DENY'), required=True
+        )
 
     def clean(self):
         """Ensure RBAC Mappings are properly initialized."""
@@ -450,26 +456,31 @@ class Team(me.EmbeddedDocument):
             RBACMapping.objects(org=self._instance.id, team=self.id).delete()
 
     def as_dict(self):
-        return {
+        ret = {
             'id': self.id,
             'name': self.name,
             'description': self.description,
             'members': self.members,
-            'policy': self.policy,
             'visible': self.visible
         }
+        if HAS_POLICY:
+            ret['policy'] = self.policy
 
     def __str__(self):
         return '%s (%d members)' % (self.name, len(self.members))
 
 
 class Organization(Owner):
+    _owners_team_kwargs = {}
+    if HAS_POLICY:
+        _owners_team_kwargs['policy'] = Policy(operator='ALLOW')
+
     name = me.StringField(required=True)
     members = me.ListField(me.ReferenceField(User), required=True)
     members_count = me.IntField(default=0)
     teams = me.EmbeddedDocumentListField(
         Team,
-        default=lambda: [Team(name='Owners', policy=Policy(operator='ALLOW'))]
+        default=lambda: [Team(name='Owners', **_owners_team_kwargs)]
     )
     teams_count = me.IntField(default=0)
     # These are assigned only to organization from now on
@@ -603,13 +614,14 @@ class Organization(Owner):
         if not owners.members:
             raise me.ValidationError("Owners team can't be empty.")
 
-        # make sure owners policy allows all permissions
-        if owners.policy.operator != 'ALLOW':
-            raise me.ValidationError("Owners policy must be set to ALLOW.")
+        if HAS_POLICY:
+            # make sure owners policy allows all permissions
+            if owners.policy.operator != 'ALLOW':
+                raise me.ValidationError("Owners policy must be set to ALLOW.")
 
-        # make sure owners policy doesn't contain specific rules
-        if owners.policy.rules:
-            raise me.ValidationError("Can't set policy rules for Owners team.")
+            # make sure owners policy doesn't contain specific rules
+            if owners.policy.rules:
+                raise me.ValidationError("Can't set policy rules for Owners.")
 
         # make sure org name is unique - we can't use the unique keyword on the
         # field definition because both User and Organization subclass Owner

@@ -7,8 +7,14 @@ from functools import partial
 from datetime import datetime, timedelta
 
 from mist.io.users.models import User, Organization
-from mist.core.rbac.models import Policy
 from mist.io.exceptions import UserNotFoundError
+
+try:
+    from mist.core.rbac.models import Policy
+except ImportError:
+    HAS_POLICY = False
+else:
+    HAS_POLICY = True
 
 
 def datetime_to_str(dt):
@@ -147,7 +153,9 @@ class AuthToken(me.Document):
 
 class ApiToken(AuthToken):
     name = me.StringField(required=True)
-    policy = me.EmbeddedDocumentField(Policy)
+
+    if HAS_POLICY:
+        policy = me.EmbeddedDocumentField(Policy)
 
     def get_public_view(self):
         view = super(ApiToken, self).get_public_view()
