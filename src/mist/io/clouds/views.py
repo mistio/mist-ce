@@ -80,6 +80,7 @@ def add_cloud(request):
       - azure
       - azure_arm
       - linode
+      - onapp
       - indonesian_vcloud
       - hostvirtual
       - vultr

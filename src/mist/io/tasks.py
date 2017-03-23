@@ -976,7 +976,8 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
                          cloud_init='', associate_floating_ip=False,
                          associate_floating_ip_subnet=None, project_id=None,
                          tags=None, schedule={}, bare_metal=False, hourly=True,
-                         softlayer_backend_vlan_id=None):
+                         softlayer_backend_vlan_id=None, size_ram=256, size_cpu=1,
+                         size_disk_primary=5, size_disk_swap=1):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.machines.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -1023,7 +1024,11 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
              'project_id': project_id,
              'tags': tags,
              'schedule': schedule,
-             'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
+             'softlayer_backend_vlan_id': softlayer_backend_vlan_id,
+             'size_ram': size_ram,
+             'size_cpu': size_cpu,
+             'size_disk_primary': size_disk_primary,
+             'size_disk_swap': size_disk_swap}
         ))
 
     def create_machine_wrapper(args_kwargs):

@@ -6,7 +6,6 @@ import re
 import datetime
 import mongoengine as me
 
-from time import time
 from uuid import uuid4
 
 from passlib.context import CryptContext
@@ -77,44 +76,6 @@ class Feedback(me.EmbeddedDocument):
 
     def as_dict(self):
         return json.loads(self.to_json())
-
-
-class Plan(me.EmbeddedDocument):
-    title = me.StringField()
-    isTrial = me.BooleanField()
-    machine_limit = me.IntField(default=5)
-    monitor_limit = me.IntField(default=1)
-    started = me.FloatField()
-    expiration = me.FloatField()
-    promo_code = me.StringField()
-    price = me.IntField(default=0)
-
-    def has_expired(self):
-        return bool(self.expiration and self.expiration < time())
-
-    def extend(self, days):
-        """Push expiration date that many days in the future.
-
-        If no expiration date is set, it sets it that many days in the future
-        from now.
-
-        """
-        if not self.expiration or self.expiration < time():
-            self.expiration = time()
-        self.expiration += 60 * 60 * 24 * days
-
-    def as_dict(self):
-        return json.loads(self.to_json())
-
-    def __str__(self):
-        import mist.io.helpers
-        return "\n".join([
-            "title: %s (trial=%s, promo=%s)" % (self.title, self.isTrial,
-                                                self.promo_code),
-            "machine_limit: %s" % self.machine_limit,
-            "started: %s" % mist.io.helpers.ts_to_str(self.started),
-            "expires: %s" % mist.io.helpers.ts_to_str(self.expiration),
-        ])
 
 
 class SocialAuthUser(me.Document):
@@ -248,15 +209,6 @@ class Owner(me.Document):
     avatar = me.StringField(default='')
 
     last_active = me.DateTimeField()
-
-    # billing related fields
-    # TODO remove this after merge core_billing
-    customerId = me.StringField()
-    card = me.StringField()
-
-    plans = me.EmbeddedDocumentListField(
-        Plan
-    )
 
     meta = {
         'allow_inheritance': True,

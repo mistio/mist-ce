@@ -371,6 +371,16 @@ class LibvirtCloud(Cloud):
         return cdict
 
 
+class OnAppCloud(Cloud):
+
+    username = me.StringField(required=True)
+    apikey = me.StringField(required=True)
+    host = me.StringField(required=True)
+
+    _private_fields = ('apikey', )
+    _controller_cls = controllers.OnAppMainController
+
+
 class OtherCloud(Cloud):
 
     _controller_cls = controllers.OtherMainController
