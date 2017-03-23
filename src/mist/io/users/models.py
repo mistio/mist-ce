@@ -15,7 +15,13 @@ from social.backends.utils import get_backend
 from social.apps.pyramid_app.utils import get_helper
 
 from mist.core.rbac.models import Policy
-from mist.core.rbac.mappings import PermissionMapper, RBACMapping
+
+try:
+    from mist.core.rbac.mappings import RBACMapping
+    from mist.core.rbac.mappings import PermissionMapper
+except ImportError:
+    from mist.io.dummy.mappings import RBACMapping
+    from mist.io.dummy.mappings import PermissionMapper
 
 from mist.io import config
 
@@ -399,46 +405,48 @@ class Team(me.EmbeddedDocument):
     policy = me.EmbeddedDocumentField(Policy,
                                       default=lambda: Policy(operator='DENY'),
                                       required=True)
-    mappings = me.ListField(me.ReferenceField(RBACMapping))
-
-    def validate(self, clean=True):
-        """Pre-save validation checks to ensure RBAC Mappings are properly
-        initialized for all Teams.
-        """
-        if self.name == 'Owners':
-            if self.mappings:
-                raise me.ValidationError('RBAC Mappings are not intended for '
-                                         'Team Owners')
-        elif self.mappings:
-            if len(self.mappings) is not 2:
-                # Each Team should have RBAC Mappings
-                # for permissions: READ and READ_LOGS
-                raise me.ValidationError('RBAC Mappings not properly '
-                                         'initialized for Team %s' % self)
-        super(Team, self).validate(clean=clean)
 
     def clean(self):
-        """Ensure RBAC Mappings are initialized."""
-        if not self.name == 'Owners':
-            if not self.mappings:
+        """Ensure RBAC Mappings are properly initialized."""
+        if RBACMapping:
+            mappings = RBACMapping.objects(org=self._instance.id,
+                                           team=self.id).only('id')
+            if not mappings:
                 self.init_mappings()
+            elif self.name == 'Owners':
+                raise me.ValidationError('RBAC Mappings are not intended for '
+                                         'Team Owners')
+            elif len(mappings) is not 2:
+                raise me.ValidationError('RBAC Mappings have not been properly'
+                                         ' initialized for Team %s' % self)
 
-    def init_mappings(self, actions=['read', 'read_logs']):
-        """Initialization of the RBAC Mappings for a newly created Team."""
+    def init_mappings(self):
+        """Initialize RBAC Mappings.
+
+        RBAC Mappings always refer to a (Organization, Team) combination.
+
+        In order to reference the Organization instance of this Team, we
+        are using `self._instance`, which is a proxy object to the upper
+        level Document.
+
+        """
+        if not RBACMapping:
+            return
         if self.name == 'Owners':
             return
-        if self.mappings:
-            raise me.ValidationError('RBAC Mappings already exist for %s. '
-                                     'Cannot re-initialize' % self)
-        for action in actions:
-            rbac_mapping = RBACMapping(permission=action).save()
-            self.mappings.append(rbac_mapping)
+        if RBACMapping.objects(org=self._instance.id, team=self.id).only('id'):
+            raise me.ValidationError(
+                'RBAC Mappings already initialized for Team %s' % self
+            )
+        for perm in ('read', 'read_logs'):
+            RBACMapping(
+                org=self._instance.id, team=self.id, permission=perm
+            ).save()
 
     def drop_mappings(self):
-        """Deletes the RBAC Mappings upon a Team's removal from an Org."""
-        RBACMapping.objects(
-            id__in=[mapping.id for mapping in self.mappings]
-        ).delete()
+        """Delete the Team's RBAC Mappings."""
+        if RBACMapping:
+            RBACMapping.objects(org=self._instance.id, team=self.id).delete()
 
     def as_dict(self):
         return {
