@@ -219,7 +219,7 @@ class Owner(me.Document):
 
     def get_external_id(self, service):
         import mist.io.helpers
-        return mist.io.helpers.encrypt2(self.id, key_salt=service, no_iv=True)
+        return mist.io.helpers.encrypt(self.id, key_salt=service, no_iv=True)
 
     def as_dict(self):
         # FIXME: Now, this is just silly

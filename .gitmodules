@@ -4,3 +4,6 @@
 [submodule "ui"]
 	path = ui
 	url = ../../mistio/mist.ui.git
+[submodule "landing"]
+	path = landing
+	url = ../mist.landing

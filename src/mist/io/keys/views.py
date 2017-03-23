@@ -123,7 +123,6 @@ def delete_key(request):
 
 @view_config(route_name='api_v1_keys',
              request_method='DELETE', renderer='json')
-@view_config(route_name='keys', request_method='DELETE', renderer='json')
 def delete_keys(request):
     """
     Delete multiple keys.
@@ -301,7 +300,6 @@ def get_public_key(request):
 
 
 @view_config(route_name='api_v1_keys', request_method='POST', renderer='json')
-@view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_key(request):
     """
     Generate key
