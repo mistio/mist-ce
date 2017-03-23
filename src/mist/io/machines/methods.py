@@ -116,7 +116,9 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                    associate_floating_ip_subnet=None, project_id=None,
                    schedule={}, command=None, tags=None,
                    bare_metal=False, hourly=True,
-                   softlayer_backend_vlan_id=None):
+                   softlayer_backend_vlan_id=None,
+                   size_ram=256, size_cpu=1,
+                   size_disk_primary=5, size_disk_swap=1):
     """Creates a new virtual machine on the specified cloud.
 
     If the cloud is Rackspace it attempts to deploy the node with an ssh key
@@ -154,13 +156,13 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
         key = Key.objects.get(owner=owner, id=key_id, deleted=None)
 
     # if key_id not provided, search for default key
-    if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
+    if conn.type not in [Provider.LIBVIRT, Provider.DOCKER, Provider.ONAPP]:
         if not key_id:
             key = Key.objects.get(owner=owner, default=True, deleted=None)
             key_id = key.name
     if key:
         private_key = key.private
-        public_key = key.public
+        public_key = key.public.replace('\n', '')
     else:
         public_key = None
 
@@ -231,6 +233,13 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             machine_name, image, size,
             location, bare_metal, cloud_init,
             hourly, softlayer_backend_vlan_id
+        )
+    elif conn.type is Provider.ONAPP:
+        node = _create_machine_onapp(
+            conn, public_key,
+            machine_name, image, size_ram,
+            size_cpu, size_disk_primary, size_disk_swap,
+            location, networks
         )
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(
@@ -642,6 +651,49 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
         )
     except Exception as e:
         raise MachineCreationError("Softlayer, got exception %s" % e, e)
+
+    return node
+
+
+def _create_machine_onapp(conn, public_key,
+                          machine_name, image, size_ram,
+                          size_cpu, size_disk_primary, size_disk_swap,
+                          location, networks):
+    """Create a machine in OnApp.
+
+    """
+    # need to get hypervisor_group_id out of location
+    locations = conn.list_locations()
+    for loc in locations:
+        if loc.id == location.id:
+            hypervisor_group_id = loc.extra.get('hypervisor_group_id')
+            break
+
+    if public_key:
+        # TODO: need to get user_id, research if this API call exists
+        try:
+            server_key = conn.create_key_pair('user', public_key)
+        except:
+            pass
+
+    network = network[0] if networks else ""
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            ex_memory=size_ram,
+            ex_cpus=size_cpu,
+            ex_cpu_shares=1,
+            ex_hostname=machine_name,
+            ex_template_id=image,
+            ex_primary_disk_size=size_disk_primary,
+            ex_swap_disk_size=size_disk_swap,
+            ex_required_virtual_machine_build=1,
+            ex_required_ip_address_assignment=1,
+            hypervisor_group_id=hypervisor_group_id,
+            primary_network_group_id=network
+        )
+    except Exception as e:
+        raise MachineCreationError("OnApp, got exception %s" % e, e)
 
     return node
 
