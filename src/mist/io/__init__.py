@@ -36,7 +36,7 @@ def main(global_config, **settings):
     configurator.add_static_view('docs', path='../../../docs/build')
 
     # FIXME this should not be necessary
-    social_auth_keys = {key: getattr(ioconfig, key, '')
+    social_auth_keys = {key: getattr(config, key, '')
                         for key in ('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY',
                                     'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET',
                                     'SOCIAL_AUTH_GITHUB_KEY',
@@ -44,7 +44,7 @@ def main(global_config, **settings):
                                     'SOCIAL_AUTH_INTRALOT_OAUTH2_KEY',
                                     'SOCIAL_AUTH_INTRALOT_OAUTH2_SECRET')}
     configurator.registry.settings.update(social_auth_keys)
-    configurator.registry.settings.update(ioconfig.SOCIAL_AUTH_SETTINGS)
+    configurator.registry.settings.update(config.SOCIAL_AUTH_SETTINGS)
     # /FIXME
 
     configurator.include(add_routes)
