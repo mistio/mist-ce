@@ -20,7 +20,7 @@ from datetime import date, datetime, timedelta
 
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 import mist.io.tasks as tasks
 from mist.io.scripts.models import CollectdScript
@@ -152,8 +152,8 @@ def home(request):
     return render_to_response('templates/ui.pt', template_inputs)
 
 
-@view_config(context='pyramid.httpexceptions.HTTPNotFound')
-def not_found(self, request):
+@view_config(context=HTTPNotFound)
+def not_found(request):
     request.response.status = 404
     params = params_from_request(request)
 
