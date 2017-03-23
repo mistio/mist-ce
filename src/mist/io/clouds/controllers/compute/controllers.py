@@ -69,7 +69,7 @@ class AmazonComputeController(BaseComputeController):
 
     def _list_machines__machine_actions(self, machine, machine_libcloud):
         super(AmazonComputeController, self)._list_machines__machine_actions(
-               machine, machine_libcloud)
+            machine, machine_libcloud)
         machine.actions.rename = True
 
     def _list_machines__postparse_machine(self, machine, machine_libcloud):
@@ -186,7 +186,7 @@ class LinodeComputeController(BaseComputeController):
 
     def _list_machines__machine_actions(self, machine, machine_libcloud):
         super(LinodeComputeController, self)._list_machines__machine_actions(
-               machine, machine_libcloud)
+            machine, machine_libcloud)
         machine.actions.rename = True
         machine.actions.stop = False
         # After resize, node gets to pending mode, needs to be started.
@@ -391,7 +391,7 @@ class AzureComputeController(BaseComputeController):
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(AzureComputeController, self)._list_machines__machine_actions(
-              machine, machine_libcloud)
+            machine, machine_libcloud)
         if machine_libcloud.state is NodeState.PAUSED:
             machine.actions.start = True
 
@@ -423,7 +423,7 @@ class AzureArmComputeController(BaseComputeController):
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(AzureArmComputeController, self)._list_machines__machine_actions(
-              machine, machine_libcloud)
+            machine, machine_libcloud)
         if machine_libcloud.state is NodeState.PAUSED:
             machine.actions.start = True
 
@@ -472,7 +472,7 @@ class GoogleComputeController(BaseComputeController):
             if extra.get('boot_disk'):
                 machine.extra['boot_disk_size'] = extra['boot_disk'].size
                 machine.extra['boot_disk_type'] = extra[
-                                            'boot_disk'].extra.get('type')
+                    'boot_disk'].extra.get('type')
                 machine.extra.pop('boot_disk')
         except:
             log.exception("Couldn't parse disk for machine %s:%s for %s",
@@ -660,7 +660,7 @@ class VCloudComputeController(BaseComputeController):
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(VCloudComputeController, self)._list_machines__machine_actions(
-              machine, machine_libcloud)
+            machine, machine_libcloud)
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
             machine.actions.stop = True
@@ -869,7 +869,7 @@ class LibvirtComputeController(BaseComputeController):
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LibvirtComputeController, self)._list_machines__machine_actions(
-               machine, machine_libcloud)
+            machine, machine_libcloud)
         if machine.extra.get('tags', {}).get('type') == 'hypervisor':
             # Allow only reboot and tag actions for hypervisor.
             for action in ('start', 'stop', 'destroy', 'rename'):
@@ -898,8 +898,8 @@ class LibvirtComputeController(BaseComputeController):
             # issue an ssh command for the libvirt hypervisor
             try:
                 hostname = machine_libcloud.public_ips[0] if \
-                           machine_libcloud.public_ips else \
-                           machine_libcloud.private_ips[0]
+                    machine_libcloud.public_ips else \
+                    machine_libcloud.private_ips[0]
                 command = '$(command -v sudo) shutdown -r now'
                 # todo move it up
                 from mist.io.methods import ssh_command
@@ -929,14 +929,14 @@ class OnAppComputeController(BaseComputeController):
 
     def _connect(self):
         import libcloud.security
-        libcloud.security.VERIFY_SSL_CERT=False
+        libcloud.security.VERIFY_SSL_CERT = False
         return get_driver(Provider.ONAPP)(key=self.cloud.username,
                                           secret=self.cloud.apikey,
                                           host=self.cloud.host)
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(OnAppComputeController, self)._list_machines__machine_actions(
-               machine, machine_libcloud)
+            machine, machine_libcloud)
         if machine_libcloud.state is NodeState.RUNNING:
             machine.actions.suspend = True
         if machine_libcloud.state is NodeState.SUSPENDED:
@@ -946,15 +946,18 @@ class OnAppComputeController(BaseComputeController):
         return machine_libcloud.extra.get('created_at')
 
     def _list_machines__postparse_machine(self, machine, machine_libcloud):
-        machine.os_type = machine_libcloud.extra.get('operating_system', 'linux')
+        machine.os_type = machine_libcloud.extra.get('operating_system',
+                                                     'linux')
         # on a VM this has been freebsd and it caused list_machines to raise
         # exception due to validation of machine model
         if machine.os_type not in ('unix', 'linux', 'windows', 'coreos'):
             machine.os_type = 'linux'
 
-        machine.extra['image_id'] = machine.extra.get('template_label') or machine.extra.get('operating_system_distro')
+        machine.extra['image_id'] = machine.extra.get('template_label') \
+            or machine.extra.get('operating_system_distro')
         machine.extra.pop('template_label', None)
-        machine.extra['size'] = "%scpu, %sM ram" % (machine.extra.get('cpus'), machine.extra.get('memory'))
+        machine.extra['size'] = "%scpu, %sM ram" % \
+            (machine.extra.get('cpus'), machine.extra.get('memory'))
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # TODO: investigate how price_per_hour and price_per_hour_powered_off
@@ -967,6 +970,7 @@ class OnAppComputeController(BaseComputeController):
 
     def _suspend_machine(self, machine, machine_libcloud):
         self.connection.ex_suspend_node(machine_libcloud)
+
 
 class OtherComputeController(BaseComputeController):
 
