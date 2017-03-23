@@ -394,6 +394,7 @@ def logout(request):
     # this will revoke all the tokens sent by the provider
     sso_backend = session.context.get('social_auth_backend')
     if sso_backend:
+        from mist.core.helpers import initiate_social_auth_request
         initiate_social_auth_request(request, backend=sso_backend)
         try:
             request.backend.disconnect(user=user,

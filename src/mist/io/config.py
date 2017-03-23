@@ -105,8 +105,9 @@ CELERY_SETTINGS = {
     'CELERY_MONGODB_SCHEDULER_URL': MONGO_URI,
 }
 
-LANDING_CATEGORIES = \
-[{'href': '/', 'name': 'home', 'template': 'home', 'title': 'Home'}]
+LANDING_CATEGORIES = [
+    {'href': '/', 'name': 'home', 'template': 'home', 'title': 'Home'}
+]
 
 ###############################################################################
 # App constants
