@@ -7,3 +7,9 @@
 [submodule "landing"]
 	path = landing
 	url = ../mist.landing
+[submodule "libcloud"]
+	path = libcloud
+	url = ../../mistio/libcloud.git
+[submodule "run_script"]
+	path = run_script
+	url = ../../mistio/run_script.git
