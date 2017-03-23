@@ -670,9 +670,11 @@ def _create_machine_onapp(conn, public_key,
             break
 
     if public_key:
-        # TODO: need to get user_id, research if this API call exists
+        # get user_id, push ssh key. This will be deployed on the new server
         try:
-            server_key = conn.create_key_pair('user', public_key)
+            res = conn.connection.request('/profile.json')
+            user_id = res.object['user']['id']
+            server_key = conn.create_key_pair(user_id, public_key)
         except:
             pass
 
