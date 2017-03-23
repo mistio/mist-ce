@@ -629,6 +629,7 @@ class BaseComputeController(BaseController):
         # Format size information.
         return [{'id': location.id,
                  'name': location.name,
+                 'extra': location.extra,
                  'country': location.country} for location in locations]
 
     def _list_locations__fetch_locations(self):
