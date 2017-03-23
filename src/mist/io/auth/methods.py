@@ -285,3 +285,10 @@ def get_random_name_for_token(user):
             pass
     raise InternalServerError('Could not produce random api token name for '
                               'user %s' % user.email)
+
+def get_csrf_token(request):
+    """
+    Returns the CSRF token registered to this request's user session.
+    """
+    session = session_from_request(request)
+    return session.csrf_token if isinstance(session, SessionToken) else ''
