@@ -674,11 +674,11 @@ def _create_machine_onapp(conn, public_key,
         try:
             res = conn.connection.request('/profile.json')
             user_id = res.object['user']['id']
-            server_key = conn.create_key_pair(user_id, public_key)
+            conn.create_key_pair(user_id, public_key)
         except:
             pass
 
-    network = network[0] if networks else ""
+    network = networks[0] if networks else ""
     try:
         node = conn.create_node(
             name=machine_name,
