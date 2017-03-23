@@ -51,7 +51,7 @@ from mist.io.clouds.controllers.dns import controllers as dns_ctls
 
 try:
     from mist.core.vpn.methods import to_tunnel
-except MistError:
+except ImportError:
     from mist.io.dummy.methods import to_tunnel
 
 
