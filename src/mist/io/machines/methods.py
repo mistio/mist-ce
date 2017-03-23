@@ -682,17 +682,17 @@ def _create_machine_onapp(conn, public_key,
     try:
         node = conn.create_node(
             name=machine_name,
-            ex_memory=size_ram,
-            ex_cpus=size_cpu,
-            ex_cpu_shares=1,
+            ex_memory=str(size_ram),
+            ex_cpus=str(size_cpu),
+            ex_cpu_shares="1",
             ex_hostname=machine_name,
-            ex_template_id=image,
-            ex_primary_disk_size=size_disk_primary,
-            ex_swap_disk_size=size_disk_swap,
-            ex_required_virtual_machine_build=1,
-            ex_required_ip_address_assignment=1,
-            hypervisor_group_id=hypervisor_group_id,
-            primary_network_group_id=network
+            ex_template_id=image.id,
+            ex_primary_disk_size=str(size_disk_primary),
+            ex_swap_disk_size=str(size_disk_swap),
+            ex_required_virtual_machine_build="1",
+            ex_required_ip_address_assignment="1",
+            ex_hypervisor_group_id=hypervisor_group_id,
+            ex_primary_network_group_id=network
         )
     except Exception as e:
         raise MachineCreationError("OnApp, got exception %s" % e, e)
