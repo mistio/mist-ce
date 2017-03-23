@@ -22,7 +22,7 @@ from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound
 
-
+import mist.io.tasks as tasks
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.dns.models import Zone, Record
@@ -45,6 +45,7 @@ from mist.io.exceptions import CloudNotFoundError, ScheduleTaskNotFound
 from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
 from mist.io.exceptions import UserUnauthorizedError, RedirectError
 from mist.io.exceptions import UserNotFoundError, ConflictError
+from mist.io.exceptions import LoginThrottledError
 
 from mist.io.helpers import encrypt, decrypt
 from mist.io.helpers import get_auth_header, params_from_request
@@ -175,8 +176,6 @@ def not_found(self, request):
 
         return render_to_response('templates/landing.pt', template_inputs,
                                   request=request)
-
-    current_org = show_user_organization(request)
 
     return render_to_response('templates/ui.pt', template_inputs,
                               request=request)
