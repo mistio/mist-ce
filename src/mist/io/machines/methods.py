@@ -692,7 +692,8 @@ def _create_machine_onapp(conn, public_key,
             ex_required_virtual_machine_build="1",
             ex_required_ip_address_assignment="1",
             ex_hypervisor_group_id=hypervisor_group_id,
-            ex_primary_network_group_id=network
+            ex_primary_network_group_id=network,
+            rate_limit=0
         )
     except Exception as e:
         raise MachineCreationError("OnApp, got exception %s" % e, e)
