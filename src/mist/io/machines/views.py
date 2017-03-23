@@ -237,6 +237,12 @@ def create_machine(request):
     hourly = params.get('billing', True)
     job_id = params.get('job_id', uuid.uuid4().hex)
 
+    # these are needed for OnApp
+    size_ram = params.get('size_ram', 256)
+    size_cpu = params.get('size_cpu', 1)
+    size_disk_primary = params.get('size_disk_primary', 5)
+    size_disk_swap = params.get('size_disk_swap', 1)
+
     auth_context = auth_context_from_request(request)
 
     try:
@@ -302,7 +308,11 @@ def create_machine(request):
               'tags': tags,
               'hourly': hourly,
               'schedule': schedule,
-              'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
+              'softlayer_backend_vlan_id': softlayer_backend_vlan_id,
+              'size_ram': size_ram,
+              'size_cpu': size_cpu,
+              'size_disk_primary': size_disk_primary,
+              'size_disk_swap': size_disk_swap}
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)
     else:
