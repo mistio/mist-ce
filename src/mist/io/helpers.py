@@ -51,6 +51,7 @@ from mist.io.exceptions import RequiredParameterMissingError
 
 from mist.io import config
 
+
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -722,7 +723,7 @@ def ts_to_str(timestamp):
         return None
 
 
-def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
+def encrypt(plaintext, key=config.SECRET, key_salt='', no_iv=False):
     """Encrypt shit the right way"""
 
     # sanitize inputs
@@ -750,6 +751,41 @@ def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
     return ciphertext.encode('hex')
 
 
+def decrypt(ciphertext, key=config.SECRET, key_salt='', no_iv=False):
+    """Decrypt shit the right way"""
+
+    # sanitize inputs
+    key = SHA256.new(key + key_salt).digest()
+    if len(key) not in AES.key_size:
+        raise Exception()
+    if len(ciphertext) % AES.block_size:
+        raise Exception()
+    try:
+        ciphertext = ciphertext.decode('hex')
+    except TypeError:
+        log.warning("Ciphertext wasn't given as a hexadecimal string.")
+
+    # split initialization vector and ciphertext
+    if no_iv:
+        iv = '\0' * AES.block_size
+    else:
+        iv = ciphertext[:AES.block_size]
+        ciphertext = ciphertext[AES.block_size:]
+
+    # decrypt ciphertext using AES in CFB mode
+    plaintext = AES.new(key, AES.MODE_CFB, iv).decrypt(ciphertext)
+
+    # validate padding using PKCS7 padding scheme
+    padlen = ord(plaintext[-1])
+    if padlen < 1 or padlen > AES.block_size:
+        raise Exception()
+    if plaintext[-padlen:] != chr(padlen) * padlen:
+        raise Exception()
+    plaintext = plaintext[:-padlen]
+
+    return plaintext
+
+
 # TODO: Deprecate. Move to io/logs/methods.py once fully switched to ES.
 def log_event(owner_id, event_type, action, error=None, story_id='',
               user_id=None, _mongo_conn=None, tornado_async=False, **kwargs):
@@ -775,44 +811,15 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             event['email'] = mist.io.users.models.User.objects.get(
                 id=user_id).email
         for key in ('cloud_id', 'machine_id', 'script_id', 'rule_id',
-                    'job_id', 'shell_id', 'session_id', 'incident_id',
-                    'fingerprint', 'experiment', 'choice'):
+                    'job_id', 'shell_id', 'session_id', 'incident_id'):
             if key in kwargs:
                 event[key] = kwargs.pop(key)
-        session_id = event.get('session_id')
-        fingerprint = event.get('fingerprint')
-        experiment = event.get('experiment')
-        choice = event.get('choice')
 
-        session = None
-        # Cross populate session data to facilitate funnel analysis
-        if session_id:
-            try:
-                session = SessionToken.objects.get(id=session_id)
-            except Exception as exc:
-                log.warn('Invalid session id %s - %s' % (session_id, exc))
-        if session:
-            if fingerprint: # store fingerprint in session
-                session.fingerprint = fingerprint
-            elif session.fingerprint: # add fingerprint in log entry
-                event['fingerprint'] = session.fingerprint
-            if experiment: # store experiment in session
-                session.experiment = experiment
-            elif session.experiment:
-                event['experiment'] = session.experiment
-            if choice:
-                session.choice = choice
-            elif session.choice:
-                event['choice'] = session.choice
-            # Remove experiment values for disabled experiments
-            if session.experiment not in config.ENABLED_EXPERIMENTS:
-                if 'experiment' in event:
-                    event.pop('experiment')
-                if 'choice' in event:
-                    event.pop('choice')
-                session.experiment = ''
-                session.choice = ''
-            session.save()
+        try:
+            from mist.core.experiments.helpers import cross_populate_session_data
+        except ImportError:
+            from mist.io.dummy.methods import cross_populate_session_data
+        event = cross_populate_session_data(event, kwargs)
 
         event['_id'] = str(coll.save(event.copy()))
         if event['type'] == 'ui':

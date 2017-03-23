@@ -52,17 +52,33 @@ def add_routes(configurator):
 
     """
 
+
+    def valid_ui_section(context, request):
+        ui_sections = ['clouds', 'machines', 'images', 'keys', 'scripts',
+                       'templates', 'stacks', 'teams', 'networks', 'tunnels',
+                       'members', 'insights', 'my-account', 'schedules',
+                       'zones']
+        landing_sections = ['about', 'product', 'pricing',
+                            'sign-up', 'sign-in', 'forgot-password',
+                            'error', 'index']
+        for section in ui_sections + landing_sections:
+            if request.path.startswith('/' + section):
+                return True
+        return False
+
+    configurator.add_route('ui_routes', '/{section}*fizzle', custom_predicates=[valid_ui_section])
     configurator.add_route('home', '/')
-    configurator.add_route('clouds', '/clouds')
-    configurator.add_route('cloud', '/clouds/{cloud}')
-    configurator.add_route('machines', '/machines')
-    configurator.add_route('machine', '/machines/{machine}')
-    configurator.add_route('networks', '/networks')
-    configurator.add_route('network', '/networks/{network}')
-    configurator.add_route('keys', '/keys')
-    configurator.add_route('key', '/keys/{key}')
-    configurator.add_route('images', '/images')
-    configurator.add_route('image', '/images/{image}')
+    configurator.add_route('switch_context', '/switch_context')
+    configurator.add_route('switch_context_org', '/switch_context/{org_id}')
+    configurator.add_route('login', '/login')
+    configurator.add_route('login_service', 'login/{service}')
+    configurator.add_route('logout', '/logout')
+    configurator.add_route('register', '/register')
+    configurator.add_route('confirm', '/confirm')
+    configurator.add_route('set_password', '/set-password')
+    configurator.add_route('forgot_password', '/forgot')
+    configurator.add_route('reset_password', '/reset-password')
+    configurator.add_route('confirm_invitation', '/confirm-invitation')
 
     configurator.add_route('api_v1_avatars', '/api/v1/avatars')
     configurator.add_route('api_v1_avatar', '/api/v1/avatars/{avatar}')
