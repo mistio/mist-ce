@@ -6,7 +6,7 @@ from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 
 from mist.io.methods import notify_user
-from mist.core.tasks import app
+from mist.io.tasks import app
 
 
 log = logging.getLogger(__name__)
