@@ -11,9 +11,6 @@ from uuid import uuid4
 
 from passlib.context import CryptContext
 
-from social.backends.utils import get_backend
-from social.apps.pyramid_app.utils import get_helper
-
 from mist.core.rbac.models import Policy
 
 try:
@@ -175,6 +172,10 @@ class SocialAuthUser(me.Document):
         return True
 
     def get_backend(self, strategy):
+
+        from social.backends.utils import get_backend
+        from social.apps.pyramid_app.utils import get_helper
+
         if self.provider is None or self.provider == '':
             raise ValueError('Provider has not been set')
         backends = get_helper('AUTHENTICATION_BACKENDS')
