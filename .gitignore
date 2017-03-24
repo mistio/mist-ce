@@ -1,7 +1,4 @@
-src/mist/io/tests/passwordless
-src/mist/io/tests/gce.json
 bin
-cloudpy
 dist
 parts
 develop-eggs
@@ -16,14 +13,9 @@ var
 *.pyc
 *.pyo
 *.egg-info
-src/libcloud
-src/fabric
-src/paramiko
-src/deploy_collectd
 .DS_Store
 .Python
 /.project
-*.yaml
 /.pydevproject
 settings.py
 local/
