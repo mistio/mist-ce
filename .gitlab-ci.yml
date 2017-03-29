@@ -4,9 +4,6 @@ stages:
 #################### BUILD STAGE ####################
 .docker_build_template: &docker_build_template
   stage: build
-  before_script:
-    - docker login --username "$DOCKER_USERNAME" -u _json_key -p "$KEYFILE_JSON" https://gcr.io
-    - docker login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_PASSWORD"
   tags:
     - builder
   dependencies: []
