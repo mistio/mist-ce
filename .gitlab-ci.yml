@@ -1,0 +1,22 @@
+stages:
+  - build
+
+#################### BUILD STAGE ####################
+.docker_build_template: &docker_build_template
+  stage: build
+  before_script:
+    - docker login --username "$DOCKER_USERNAME" -u _json_key -p "$KEYFILE_JSON" https://gcr.io
+    - docker login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_PASSWORD"
+  tags:
+    - builder
+  dependencies: []
+
+alpine_base_manual_build:
+  <<: *docker_build_template
+  when: manual
+  script:
+    - cd containers/alpine
+    - docker build --rm -t gcr.io/mist-ops/alpine:3.4 .
+    - docker tag gcr.io/mist-ops/alpine:3.4 mist/alpine:3.4
+    - docker push gcr.io/mist-ops/alpine:3.4
+    - docker push mist/alpine:3.4
