@@ -1,0 +1,16 @@
+stages:
+  - build
+
+#################### BUILD STAGE ####################
+alpine_base_manual_build:
+  stage: build
+  when: manual
+  script:
+    - cd containers/alpine
+    - docker build --rm -t gcr.io/mist-ops/alpine:3.4 .
+    - docker tag gcr.io/mist-ops/alpine:3.4 mist/alpine:3.4
+    - docker push gcr.io/mist-ops/alpine:3.4
+    - docker push mist/alpine:3.4
+  tags:
+    - builder
+  dependencies: []
