@@ -1,0 +1,125 @@
+version: '2.0'
+
+services:
+
+
+  mongodb:
+    image: mongo:3.2
+    volumes:
+      - mongodb:/data/db:rw
+
+  rabbitmq:
+    image: rabbitmq:3.6.6-management
+
+  memcached:
+    image: memcached
+
+
+  elasticsearch:
+    image: elasticsearch:5.1.2
+    ports:
+      - 9200:9200
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data:rw
+
+  logstash:
+    image: logstash:5.1.2
+    environment:
+      ELASTIC_PASSWORD: admin
+      ELASTIC_URI: http://elasticsearch:9200
+      ELASTIC_USERNAME: admin
+    command: logstash -f /config-dir
+    volumes:
+      - ./docker/logstash:/config-dir:rw
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+
+  kibana:
+    image: kibana:5.1.2
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
+
+  mailmock:
+    image: gcr.io/mist-ops/mailmock
+
+#  debugger:
+#    image: gcr.io/mist-ops/debugger:ubuntu
+#    environment:
+#      PUBLIC_KEY: ""
+#    command: sh /entry.sh
+#    stdin_open: true
+#    tty: true
+
+
+  api: &api
+    image: gcr.io/mist-ops/mist:io-api-$MIST_TAG
+    environment:
+      SETTINGS_FILE: /mist.core/settings.py
+    command: /mist.api/bin/uwsgi
+    depends_on:
+      - memcached
+      - mongodb
+      - rabbitmq
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./api:/mist.api:rw
+
+  sockjs:
+    <<: *api
+    command: /mist.api/bin/sockjs
+
+  celery:
+    <<: *api
+    command: /mist.api/bin/celery
+
+  scheduler:
+    <<: *api
+    command: /mist.api/bin/scheduler
+
+  poller:
+    <<: *api
+    command: /mist.api/bin/poller
+
+  hubshell:
+    <<: *api
+    command: /mist.api/bin/hubshell
+
+
+  ui:
+    image: gcr.io/mist-ops/ui:io-$MIST_TAG
+    command: sh /entry.sh
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./ui:/ui:rw
+
+  landing:
+    image: gcr.io/mist-ops/landing:io-$MIST_TAG
+    command: sh /entry.sh
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./landing:/landing:rw
+
+
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
+    depends_on:
+      - api
+      - landing
+      - ui
+
+volumes:
+  elasticsearch: {}
+  mongodb: {}
