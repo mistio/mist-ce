@@ -45,23 +45,29 @@ services:
       - elasticsearch
 
 
+  socat:
+    build: ./docker/socat/
+    command:
+      - TCP4-LISTEN:2375,fork,reuseaddr
+      - UNIX-CONNECT:/var/run/docker.sock
+    expose:
+      - 2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+
   mailmock:
     image: gcr.io/mist-ops/mailmock
 
-#  debugger:
-#    image: gcr.io/mist-ops/debugger:ubuntu
-#    environment:
-#      PUBLIC_KEY: ""
-#    command: sh /entry.sh
-#    stdin_open: true
-#    tty: true
+  debugger:
+    build: ./docker/debugger
+    volumes:
+      - ./keys:/keys
 
 
-  api: &api
+  celery: &backend
     image: gcr.io/mist-ops/mist:io-api-$MIST_TAG
     environment:
       SETTINGS_FILE: /mist.core/settings.py
-    command: /mist.api/bin/uwsgi
     depends_on:
       - memcached
       - mongodb
@@ -70,26 +76,32 @@ services:
     tty: true
     volumes:
       - ./api:/mist.api:rw
-
-  sockjs:
-    <<: *api
-    command: /mist.api/bin/sockjs
-
-  celery:
-    <<: *api
+      - ./keys:/keys
     command: /mist.api/bin/celery
 
   scheduler:
-    <<: *api
+    <<: *backend
     command: /mist.api/bin/scheduler
 
   poller:
-    <<: *api
+    <<: *backend
     command: /mist.api/bin/poller
 
   hubshell:
-    <<: *api
+    <<: *backend
     command: /mist.api/bin/hubshell
+
+  api:
+    <<: *backend
+    command: /mist.api/bin/uwsgi
+    expose:
+      - 80
+
+  sockjs:
+    <<: *backend
+    command: /mist.api/bin/sockjs
+    expose:
+      - 8081
 
 
   ui:
@@ -99,6 +111,8 @@ services:
     tty: true
     volumes:
       - ./ui:/ui:rw
+    expose:
+      - 80
 
   landing:
     image: gcr.io/mist-ops/landing:io-$MIST_TAG
@@ -107,6 +121,8 @@ services:
     tty: true
     volumes:
       - ./landing:/landing:rw
+    expose:
+      - 80
 
 
   nginx:
