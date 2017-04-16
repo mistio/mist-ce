@@ -1,4 +1,4 @@
-mist.io
+mmist.io
 =======
 
 Mist.io helps you manage and monitor your virtual machines, across different
