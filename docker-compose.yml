@@ -68,7 +68,6 @@ services:
     image: gcr.io/mist-ops/mist:io-api-$MIST_TAG
     environment:
       SETTINGS_FILE: /mist.core/settings.py
-      CELERY_CONTEXT: "1"
     depends_on:
       - memcached
       - mongodb
@@ -78,7 +77,7 @@ services:
     volumes:
       - ./api:/mist.api:rw
       - ./keys:/keys
-    command: /mist.api/bin/celery
+    command: /mist.api/bin/celery -l INFO
 
   scheduler:
     <<: *backend
