@@ -3,8 +3,6 @@ dist
 parts
 develop-eggs
 eggs
-bower_components
-node_modules
 include
 /lib
 var
@@ -33,4 +31,4 @@ pip-selfcheck.json
 test_settings.py
 error*.png
 .cache
-ui/fullstack_ssh_key
+keys/
