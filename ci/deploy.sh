@@ -97,7 +97,7 @@ log "Application deployed"
 # Label namespace to expire after a few hours.
 if [ -n "$EXPIRE_HOURS" ]; then
     log "Will label namespace to expire after $EXPIRE_HOURS hours."
-    expires=$(date -d "+$EXPIRE_HOURS hour")
+    expires=$(date -d "+$EXPIRE_HOURS hour" +%s)
     kubectl label namespace $NAMESPACE time-of-destruction="$expires" \
         --overwrite=true
 fi
