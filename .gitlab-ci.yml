@@ -62,7 +62,6 @@ wait-api-image:
   before_script:
     - REPO=mistio/mist.api
     - IMG=gcr.io/mist-ops/mist
-    - TAG_PREFIX=api-
 
 wait-ui-image:
   <<: *docker_wait_img_template
