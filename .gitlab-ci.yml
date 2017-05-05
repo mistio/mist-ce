@@ -104,6 +104,8 @@ alpine_base_manual_build:
   dependencies: []
   script:
     - ./ci/deploy.sh
+  tags:
+    - kube-default
 
 deploy_review_env:
   <<: *deploy_template
@@ -149,6 +151,8 @@ deploy_test_env:
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
     - /mist.tests/prepare_env.py --api -s $TEST_FILE || export FAILED=1
     - ./update-pipelines result
+  tags:
+    - kube-default
 
 .ui_test_template: &ui_test_template
   <<: *test_template
@@ -299,6 +303,8 @@ UI:orchestration:
   script:
     - kubectl delete namespace $NAMESPACE
     - cli53 rrdelete mist.io $DNS_PREFIX A || echo "Already deleted"
+  tags:
+    - kube-default
 
 undeploy_review_env:
   <<: *undeploy_template
