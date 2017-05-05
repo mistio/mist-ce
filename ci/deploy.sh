@@ -106,7 +106,7 @@ fi
 if [ -n "$DNS_PREFIX" ] && [ -n "$DNS_ZONE" ]; then
     log "Creating DNS name."
     cli53 rrcreate --replace --wait \
-        mist.io "$CI_COMMIT_REF_SLUG.fatboy.ops 30 A $IP_ADDR"
+        $DNS_ZONE "$DNS_PREFIX 30 A $IP_ADDR"
 fi
 
 # Wait for environment to become ready.
