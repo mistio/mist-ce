@@ -26,7 +26,7 @@ Options:
                     $ALL_CSV_FILE.
 "
 
-while getopts "hne:" opt; do
+while getopts "hnr:a:" opt; do
     case "$opt" in
         h)
             echo "$USAGE"

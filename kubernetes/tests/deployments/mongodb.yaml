@@ -1,0 +1,30 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: mongodb
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      volumes:
+        - name: mongodb-disk
+          emptyDir: {}
+      containers:
+        - name: mongodb
+          image: mongo:3.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-disk
+              mountPath: /data/db
+          resources:
+            requests:
+              memory: 800Mi
+              cpu: 300m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
