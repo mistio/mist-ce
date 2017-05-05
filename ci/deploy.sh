@@ -62,6 +62,7 @@ if ! command -v kubectl > /dev/null; then
 fi
 
 log "Preparing kubernetes files"
+set -x
 TEMP_DIR=`mktemp -d`
 cp -r kubernetes/tests/ $TEMP_DIR
 
