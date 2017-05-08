@@ -2,7 +2,7 @@
 
 set -e
 
-TAG=${TAG:-$CI_COMMIT_REF_SLUG}
+TAG=${TAG:-$CI_COMMIT_SHA}
 STACK=${STACK:-io}
 DNS_ZONE=${ZONE:-mist.io}
 
