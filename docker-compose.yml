@@ -16,7 +16,7 @@ services:
 
 
   elasticsearch:
-    image: elasticsearch:5.2.2
+    image: elasticsearch:5.1.2
     ports:
       - 9200:9200
     volumes:
