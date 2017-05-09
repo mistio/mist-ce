@@ -196,10 +196,10 @@ API:machines:
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/machines.py
 
-API:orchestration:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/core/orchestration.py
+#API:orchestration:
+#  <<: *api_test_template
+#  before_script:
+#    - export TEST_FILE=/mist.tests/misttests/api/core/orchestration.py
 
 API:schedules:
   <<: *api_test_template
@@ -211,10 +211,10 @@ API:scripts:
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/scripts.py
 
-API:tunnels:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/tunnels.py
+#API:tunnels:
+#  <<: *api_test_template
+#  before_script:
+#    - export TEST_FILE=/mist.tests/misttests/api/io/tunnels.py
 
 
 UI:clouds_batch_a:
@@ -277,20 +277,20 @@ UI:rbac:teams:
   before_script:
     - export TEST_TAGS=rbac-teams
 
-UI:rbac:rules:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=rbac-rules
+#UI:rbac:rules:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=rbac-rules
 
-UI:rbac:rules_b:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=rbac-rules-v2
+#UI:rbac:rules_b:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=rbac-rules-v2
 
-UI:orchestration:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=orchestration
+#UI:orchestration:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=orchestration
 
 
 #################### UNDEPLOY STAGE ####################
