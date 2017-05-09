@@ -65,7 +65,7 @@ services:
 
 
   celery: &backend
-    image: gcr.io/mist-ops/mist:io-api-$MIST_TAG
+    image: gcr.io/mist-ops/mist:io-$MIST_TAG
     environment:
       SETTINGS_FILE: /mist.core/settings.py
     depends_on:
