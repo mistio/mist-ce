@@ -20,7 +20,9 @@ spec:
           env:
             - name: SETTINGS_FILE
               value: "/etc/config/mist.config"
-          args: ["bin/sockjs"]
+          args:
+            - bin/sockjs
+            - "80"
           ports:
             - containerPort: 80
           volumeMounts:
