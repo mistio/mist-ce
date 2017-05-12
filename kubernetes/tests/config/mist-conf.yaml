@@ -5,7 +5,7 @@ metadata:
   namespace: REPLACE_NAMESPACE
 data:
   mist.config: |+
-    CORE_URI="http://REPLACE_CORE_URI"
+    CORE_URI="http://REPLACE_MIST_URI"
     AMQP_URI="rabbitmq:5672"
     BROKER_URL="amqp://guest:guest@rabbitmq/"
     MONGO_URI="mongodb:27017"
