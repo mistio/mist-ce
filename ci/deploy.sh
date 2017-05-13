@@ -76,9 +76,11 @@ for var in NAMESPACE TAG SENDGRID_USERNAME SENDGRID_PASSWORD \
     find $TEMP_DIR/tests -type f -exec sed -i "s~REPLACE_$var~$val~g" {} \;
 done
 
+# Create load balancer and discover IP address.
 log "Start applying kubernetes namespace and service files"
 kubectl apply -f $TEMP_DIR/tests/namespace.yaml
 kubectl apply -f $TEMP_DIR/tests/services --namespace $NAMESPACE
+log "Discovering IP address of load balancer..."
 IP_ADDR=""
 while [ -z $IP_ADDR ]; do
     sleep 2
@@ -86,9 +88,16 @@ while [ -z $IP_ADDR ]; do
               --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
 done
 log "Application's load balancer endpoint is $IP_ADDR"
+
 # Create nginx and mist configs.
-sed -i "s/REPLACE_MIST_URI/$IP_ADDR/g" $TEMP_DIR/tests/config/mist-conf.yaml
+if [ -n "$DNS_PREFIX" ] && [ -n "$DNS_ZONE" ]; then
+    MIST_URI=$DNS_PREFIX.$DNS_NAME
+else
+    MIST_URI=$IP_ADDR
+fi
+sed -i "s/REPLACE_MIST_URI/$MIST_URI/g" $TEMP_DIR/tests/config/mist-conf.yaml
 kubectl apply -f $TEMP_DIR/tests/config/ --namespace $NAMESPACE
+
 # Deploy app.
 kubectl apply -f $TEMP_DIR/tests/deployments --namespace $NAMESPACE
 log "Application deployed"
