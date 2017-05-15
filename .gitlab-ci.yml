@@ -111,7 +111,7 @@ deploy_review_env:
   when: manual
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: http://$CI_COMMIT_REF_SLUG.review.ops.mist.io
+    url: http://$CI_COMMIT_REF_SLUG.io.review.ops.mist.io
     on_stop: undeploy_review_env
   variables:
     NAMESPACE: io-review-$CI_COMMIT_REF_SLUG
@@ -121,7 +121,7 @@ deploy_test_env:
   <<: *deploy_template
   environment:
     name: test/$CI_COMMIT_REF_SLUG
-    url: http://$CI_COMMIT_REF_SLUG.test.ops.mist.io
+    url: http://$CI_COMMIT_REF_SLUG.io.test.ops.mist.io
     on_stop: undeploy_test_env
   variables:
     NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
