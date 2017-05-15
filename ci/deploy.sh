@@ -6,11 +6,15 @@ TAG=${TAG:-$CI_COMMIT_SHA}
 STACK=${STACK:-io}
 DNS_ZONE=${ZONE:-mist.io}
 
-USAGE="Usage: $0 [-h|--help]
+USAGE="Usage: $0 [-h|--help] [<KUBE_DIR> [<KUBE_DIR> .. ]]
 
 Deploy application to kubernetes in order to run tests.
 
 Must run this from the top directory of the git repository.
+
+Positional arguments:
+    KUBE_DIR                Directory containing kubernetes templates to
+                            deploy. Defaults to
 
 Options:
     -h,--help               Show this help message and exit.
@@ -63,7 +67,13 @@ fi
 
 log "Preparing kubernetes files"
 TEMP_DIR=`mktemp -d`
-cp -r kubernetes/tests/ $TEMP_DIR
+if [ "$#" -eq 0 ]; then
+    cp -r kubernetes/tests/ $TEMP_DIR
+else
+    for kube_dir in "$@"; do
+        cp -r $kube_dir/ $TEMP_DIR
+    done
+fi
 
 # Substitute environmental variables in kubernetes yaml definitions.
 for var in NAMESPACE TAG SENDGRID_USERNAME SENDGRID_PASSWORD \
