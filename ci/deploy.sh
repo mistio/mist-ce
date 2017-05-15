@@ -2,6 +2,12 @@
 
 set -e
 
+if [ -d src/mist.io/ ]; then
+    io_dir=./src/mist.io
+else
+    io_dir=.
+fi
+
 TAG=${TAG:-$CI_COMMIT_SHA}
 STACK=${STACK:-io}
 DNS_ZONE=${ZONE:-mist.io}
@@ -129,8 +135,8 @@ fi
 
 # Wait for environment to become ready.
 log "Waiting for environment to become ready."
-./scripts/wupar.sh $NAMESPACE
-./scripts/wupiao.sh http://$IP_ADDR
+$io_dir/scripts/wupar.sh $NAMESPACE
+$io_dir/scripts/wupiao.sh http://$IP_ADDR
 
 if [ -n "$OUTPUT_FILE" ]; then
     log "Storing the ip address ($IP_ADDR) to $OUTPUT_FILE."
