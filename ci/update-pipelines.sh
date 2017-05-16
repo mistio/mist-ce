@@ -53,6 +53,7 @@ while getopts "hn:i:" opt; do
             exit 1
     esac
 done
+shift $(expr $OPTIND - 1)
 
 if [ -z "$GITLAB_API_TOKEN" ]; then
     echo "$USAGE" >&2
