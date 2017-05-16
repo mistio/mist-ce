@@ -146,20 +146,20 @@ deploy_test_env:
 .api_test_template: &api_test_template
   <<: *test_template
   script:
-    - ./update-pipelines running
+    - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
     - /mist.tests/prepare_env.py --api -s $TEST_FILE || export FAILED=1
-    - ./update-pipelines result
+    - ./update-pipelines -n io:$CI_JOB_NAME result
   tags:
     - kube-default
 
 .ui_test_template: &ui_test_template
   <<: *test_template
   script:
-    - ./update-pipelines running
+    - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
     - /mist.tests/prepare_env.py -k --stop --tags=$TEST_TAGS /mist.tests/misttests/gui/core/pr/features || export FAILED=1
-    - ./update-pipelines result
+    - ./update-pipelines -n io:$CI_JOB_NAME result
   artifacts:
     paths:
       - js_console.log
