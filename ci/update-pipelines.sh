@@ -4,7 +4,7 @@
 set -e
 
 GITLAB_URL=https://gitlab.ops.mist.io
-PARENT_REPO=${CI_PROJECT_NAME:-mistio/mist.io}
+PARENT_REPO=${CI_PROJECT_PATH:-mistio/mist.io}
 CSV_FILE=related-submodules.csv
 if [ -n "$CI_PROJECT_NAME" ] && [ -n "$CI_JOB_NAME" ]; then
     NAME="$CI_PROJECT_NAME:$CI_JOB_NAME"
