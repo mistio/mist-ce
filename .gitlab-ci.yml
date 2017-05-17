@@ -176,6 +176,13 @@ deploy_test_env:
 
 #################### TEST STAGE ####################
 
+fail:
+  stage: test
+  image: busybox
+  script:
+    - exit 1
+  dependencies: []
+
 .test_template: &test_template
   stage: test
   image: gcr.io/mist-ops/tests_base:io-$CI_COMMIT_SHA
