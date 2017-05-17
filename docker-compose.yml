@@ -46,26 +46,21 @@ services:
 
 
   socat:
-    build: ./docker/socat/
-    command:
-      - TCP4-LISTEN:2375,fork,reuseaddr
-      - UNIX-CONNECT:/var/run/docker.sock
-    expose:
-      - 2375
+    image: mist/docker-socat
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
 
   mailmock:
-    image: gcr.io/mist-ops/mailmock
+    image: mist/mailmock
 
   debugger:
-    build: ./docker/debugger
+    image: mist/debugger
     volumes:
       - ./keys:/keys
 
 
   celery: &backend
-    image: gcr.io/mist-ops/mist:io-$MIST_TAG
+    image: mist/mist:io-$MIST_TAG
     environment:
       SETTINGS_FILE: /mist.core/settings.py
     depends_on:
@@ -105,7 +100,7 @@ services:
 
 
   ui:
-    image: gcr.io/mist-ops/ui:io-$MIST_TAG
+    image: mist/ui:io-$MIST_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -115,7 +110,7 @@ services:
       - 80
 
   landing:
-    image: gcr.io/mist-ops/landing:io-$MIST_TAG
+    image: mist/landing:io-$MIST_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
