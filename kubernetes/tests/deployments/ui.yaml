@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ui
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ui
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: ui
+          image: gcr.io/mist-ops/ui:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          args: ["nginx"]
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 300m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
