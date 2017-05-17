@@ -13,6 +13,8 @@ discover-submodules:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
+    # Will fetch to get all new branches for find-submodules.sh
+    - git fetch -p --recurse-submodules
     - ./ci/find-submodules.sh -n
     - cp ci/update-pipelines.sh update-pipelines
   artifacts:
