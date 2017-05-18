@@ -317,10 +317,10 @@ UI:user_actions:
   before_script:
     - export TEST_TAGS=user-actions
 
-UI:rbac:teams:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=rbac-teams
+#UI:rbac:teams:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=rbac-teams
 
 #UI:rbac:rules:
 #  <<: *ui_test_template
