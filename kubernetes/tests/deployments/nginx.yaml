@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: nginx
+          image: nginx
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+          - name: nginx-conf
+            mountPath: /opt/nginx/
+          command: ["nginx", "-c", "/opt/nginx/nginx.conf"]
+          resources:
+            requests:
+              memory: 600Mi
+              cpu: 500m
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
