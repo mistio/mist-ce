@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: rabbitmq
+  namespace: REPLACE_NAMESPACE
+  labels:
+    name: rabbitmq
+spec:
+  ports:
+    - port: 5672
+  selector:
+    app: rabbitmq
