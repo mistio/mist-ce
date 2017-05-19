@@ -226,6 +226,11 @@ API:clouds:
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/clouds.py
 
+API:dns:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/dns.py
+
 API:keys:
   <<: *api_test_template
   before_script:
