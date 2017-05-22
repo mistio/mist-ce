@@ -66,12 +66,14 @@ services:
     depends_on:
       - memcached
       - mongodb
+      - elasticsearch
       - rabbitmq
     stdin_open: true
     tty: true
     volumes:
       - ./api:/mist.api:rw
       - ./keys:/keys
+      - ./elasticsearch:/elasticsearch
     command: /mist.api/bin/celery -l INFO
 
   scheduler:
