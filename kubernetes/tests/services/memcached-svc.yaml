@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: memcached
+  namespace: REPLACE_NAMESPACE
+  labels:
+    name: memcached
+spec:
+  ports:
+    - port: 11211
+  selector:
+    app: memcached

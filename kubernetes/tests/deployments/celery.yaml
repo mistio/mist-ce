@@ -1,0 +1,114 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: celery
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: celery
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          args: ["bin/celery"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          resources:
+            requests:
+              memory: 2000Mi
+              cpu: 400m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-beat
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: celery-beat
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          args: ["bin/scheduler"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          resources:
+            requests:
+              memory: 800Mi
+              cpu: 300m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-poller
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: celery-poller
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: celery-poller
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          args: ["bin/poller"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          resources:
+            requests:
+              memory: 800Mi
+              cpu: 400m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mist-config

@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sockjs
+  namespace: REPLACE_NAMESPACE
+  labels:
+    name: sockjs
+    component: REPLACE_STACK
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: sockjs
+    component: REPLACE_STACK

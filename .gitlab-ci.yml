@@ -1,16 +1,380 @@
 stages:
+  - discover-submodules
   - build
+  - deploy
+  - test
+  - undeploy
+
+
+#################### DISCOVER-SUBMODULES STAGE ####################
+
+discover-submodules:
+  stage: discover-submodules
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+    # Will fetch to get all new branches for find-submodules.sh
+    - git fetch -p --recurse-submodules
+    - ./ci/find-submodules.sh -n
+    - cp ci/update-pipelines.sh update-pipelines
+  artifacts:
+    paths:
+      - all-submodules.csv
+      - related-submodules.csv
+      - update-pipelines
+    expire_in: 3 days
+  tags:
+    - shell-docker-light
+  dependencies: []
+
 
 #################### BUILD STAGE ####################
-alpine_base_manual_build:
+
+.docker_wait_img_template: &docker_wait_img_template
+  stage: build
+  variables:
+    GIT_STRATEGY: none
+    NUM: "60"
+    SLEEP: "10"
+    RETAG: "1"
+  script:
+    - SHA=$(grep ^$REPO, all-submodules.csv | cut -d, -f2)
+    - echo SHA is $SHA
+    - IMGTAG="$IMG:$SHA"
+    - echo IMTAG is $IMGTAG
+    - DOCKERHUB_IMG=mist/$(echo $IMG | cut -d/ -f3)
+    - echo DOCKERHUB_IMG is $DOCKERHUB_IMG
+
+    - echo "Will pull docker image $IMGTAG"
+    - for i in $(seq 1 $NUM); do docker pull $IMGTAG && OK=1 && break || sleep $SLEEP; done
+    - if [ -z "$OK" ]; then echo "ERROR Couldn't pull $IMGTAG!" && exit 1; fi
+    - if [ -z "$RETAG" ]; then exit 0; fi
+
+    - IMGTAG2="$IMG:io-$CI_COMMIT_SHA"
+    - echo "Retagging using mist.io sha"
+    - echo "$IMGTAG -> $IMGTAG2"
+    - docker tag $IMGTAG $IMGTAG2
+    - docker push $IMGTAG2
+
+    - IMGTAG2="$IMG:io-$CI_COMMIT_REF_SLUG"
+    - echo "Retagging using mist.io branch"
+    - echo "$IMGTAG -> $IMGTAG2"
+    - docker tag $IMGTAG $IMGTAG2
+    - docker push $IMGTAG2
+
+    - IMGTAG2="$DOCKERHUB_IMG:io-$CI_COMMIT_SHA"
+    - echo "Retagging using mist.io sha"
+    - echo "$IMGTAG -> $IMGTAG2"
+    - docker tag $IMGTAG $IMGTAG2
+    - docker push $IMGTAG2
+
+    - IMGTAG2="$DOCKERHUB_IMG:io-$CI_COMMIT_REF_SLUG"
+    - echo "Retagging to push to dockerhub"
+    - echo "$IMGTAG -> $IMGTAG2"
+    - docker tag $IMGTAG $IMGTAG2
+    - docker push $IMGTAG2
+  tags:
+    - shell-docker-light
+  dependencies:
+    - discover-submodules
+
+wait-api-image:
+  <<: *docker_wait_img_template
+  before_script:
+    - REPO=mistio/mist.api
+    - IMG=gcr.io/mist-ops/mist
+
+wait-ui-image:
+  <<: *docker_wait_img_template
+  before_script:
+    - REPO=mistio/mist.ui
+    - IMG=gcr.io/mist-ops/ui
+
+wait-landing-image:
+  <<: *docker_wait_img_template
+  before_script:
+    - REPO=mistio/mist.landing
+    - IMG=gcr.io/mist-ops/landing
+
+wait-tests-image:
+  <<: *docker_wait_img_template
+  before_script:
+    - REPO=mistio/mist.tests
+    - IMG=gcr.io/mist-ops/tests_base
+
+
+.docker_build_img_template: &docker_build_img_template
   stage: build
   when: manual
   script:
-    - cd containers/alpine
-    - docker build --rm -t gcr.io/mist-ops/alpine:3.4 .
-    - docker tag gcr.io/mist-ops/alpine:3.4 mist/alpine:3.4
-    - docker push gcr.io/mist-ops/alpine:3.4
-    - docker push mist/alpine:3.4
+    - export TAG="${TAG:-latest}"
+    - echo "Will build img $IMG with tag $TAG."
+    - cd docker/$IMG
+    - docker build -t gcr.io/mist-ops/$IMG:$TAG .
+    - docker tag gcr.io/mist-ops/$IMG:$TAG mist/$IMG:$TAG
+    - docker push gcr.io/mist-ops/$IMG:$TAG
+    - docker push mist/$IMG:$TAG
   tags:
     - builder
   dependencies: []
+
+build-alpine-manual:
+  <<: *docker_build_img_template
+  variables:
+    IMG: alpine
+    TAG: "3.4"
+
+build-socat-manual:
+  <<: *docker_build_img_template
+  variables:
+    IMG: docker-socat
+
+build-mailmock-manual:
+  <<: *docker_build_img_template
+  variables:
+    IMG: mailmock
+
+build-debugger-manual:
+  <<: *docker_build_img_template
+  variables:
+    IMG: debugger
+
+
+#################### DEPLOY STAGE ####################
+
+.deploy_template: &deploy_template
+  stage: deploy
+  image: gcr.io/mist-ops/deployer
+  dependencies: []
+  script:
+    - ./ci/deploy.sh
+  tags:
+    - kube-default
+
+deploy_review_env:
+  <<: *deploy_template
+  when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: http://$CI_COMMIT_REF_SLUG.io.review.ops.mist.io
+    on_stop: undeploy_review_env
+  variables:
+    NAMESPACE: io-review-$CI_COMMIT_REF_SLUG
+    DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.review.ops
+
+deploy_test_env:
+  <<: *deploy_template
+  environment:
+    name: test/$CI_COMMIT_REF_SLUG
+    url: http://$CI_COMMIT_REF_SLUG.io.test.ops.mist.io
+    on_stop: undeploy_test_env
+  variables:
+    NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
+    DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
+    EXPIRE_HOURS: "12"
+
+
+#################### TEST STAGE ####################
+
+.test_template: &test_template
+  stage: test
+  image: gcr.io/mist-ops/tests_base:io-$CI_COMMIT_SHA
+  variables:
+    GIT_STRATEGY: none
+    MIST_URL: http://$CI_COMMIT_REF_SLUG.io.test.ops.mist.io
+    DISPLAY: ":1.0"
+    REGISTER_USER_BEFORE_FEATURE: "True"
+    EMAIL: fatboy.tester.mist.io+${CI_JOB_ID}@gmail.com
+  dependencies:
+    - discover-submodules
+
+.api_test_template: &api_test_template
+  <<: *test_template
+  script:
+    - ./update-pipelines -n io:$CI_JOB_NAME running
+    - echo $TEST_SETTINGS | base64 -d > test_settings.py
+    - /mist.tests/prepare_env.py --api -s $TEST_FILE || export FAILED=1
+    - ./update-pipelines -n io:$CI_JOB_NAME result
+  tags:
+    - kube-default
+
+.ui_test_template: &ui_test_template
+  <<: *test_template
+  script:
+    - ./update-pipelines -n io:$CI_JOB_NAME running
+    - echo $TEST_SETTINGS | base64 -d > test_settings.py
+    - /mist.tests/prepare_env.py -k --stop --tags=$TEST_TAGS /mist.tests/misttests/gui/core/pr/features || export FAILED=1
+    - ./update-pipelines -n io:$CI_JOB_NAME result
+  artifacts:
+    paths:
+      - js_console.log
+      - error*
+      - test.mp4
+    expire_in: 3 days
+    when: on_failure
+  tags:
+    - cpu
+
+
+API:api_token:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/api_token.py
+
+API:clouds:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/clouds.py
+
+API:dns:
+ <<: *api_test_template
+ before_script:
+   - export TEST_FILE=/mist.tests/misttests/api/io/dns.py
+
+API:keys:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/keys.py
+
+API:images:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/images.py
+
+API:libcloud:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/libcloud.py
+
+API:machines:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/machines.py
+
+#API:orchestration:
+#  <<: *api_test_template
+#  before_script:
+#    - export TEST_FILE=/mist.tests/misttests/api/core/orchestration.py
+
+API:schedules:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/schedules.py
+
+API:scripts:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/scripts.py
+
+#API:tunnels:
+#  <<: *api_test_template
+#  before_script:
+#    - export TEST_FILE=/mist.tests/misttests/api/io/tunnels.py
+
+
+UI:clouds_batch_a:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=clouds-add-a
+
+UI:clouds_batch_b:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=clouds-add-b
+
+UI:clouds_actions:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=clouds-actions
+
+UI:keys:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=keys
+
+UI:machines:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=machines
+
+UI:schedulers_batch_a:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=schedulers
+
+UI:schedulers_batch_b:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=schedulers_v2
+
+UI:scripts:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=scripts
+
+UI:scripts_actions:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=scripts-actions
+
+UI:images_networks:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=images-networks
+
+UI:user_actions:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=user-actions
+
+UI:rbac:teams:
+  <<: *ui_test_template
+  before_script:
+    - export TEST_TAGS=rbac-teams
+
+#UI:rbac:rules:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=rbac-rules
+
+#UI:rbac:rules_b:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=rbac-rules-v2
+
+#UI:orchestration:
+#  <<: *ui_test_template
+#  before_script:
+#    - export TEST_TAGS=orchestration
+
+
+#################### UNDEPLOY STAGE ####################
+
+.undeploy_template: &undeploy_template
+  stage: undeploy
+  image: gcr.io/mist-ops/deployer
+  dependencies: []
+  script:
+    - kubectl delete namespace $NAMESPACE
+    - cli53 rrdelete mist.io $DNS_PREFIX A || echo "Already deleted"
+  tags:
+    - kube-default
+
+undeploy_review_env:
+  <<: *undeploy_template
+  when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  variables:
+    NAMESPACE: io-review-$CI_COMMIT_REF_SLUG
+    DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.review.ops
+
+undeploy_test_env:
+  <<: *undeploy_template
+  environment:
+    name: test/$CI_COMMIT_REF_SLUG
+    action: stop
+  variables:
+    NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
+    DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
