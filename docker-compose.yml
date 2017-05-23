@@ -90,7 +90,7 @@ services:
 
   api:
     <<: *backend
-    command: /mist.api/bin/uwsgi
+    command: sh -c "/mist.api/bin/elasticsearch && /mist.api/bin/uwsgi"
     expose:
       - 80
 
