@@ -193,7 +193,6 @@ deploy_test_env:
   script:
     - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
-    - export VAULT_ENABLED=True
     - /mist.tests/prepare_env.py --api -s $TEST_FILE || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   tags:
@@ -204,7 +203,6 @@ deploy_test_env:
   script:
     - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
-    - export VAULT_ENABLED=True
     - /mist.tests/prepare_env.py -k --stop --tags=$TEST_TAGS /mist.tests/misttests/gui/core/pr/features || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   artifacts:
