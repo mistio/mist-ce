@@ -61,8 +61,6 @@ services:
 
   celery: &backend
     image: mist/mist:io-$MIST_TAG
-    environment:
-      SETTINGS_FILE: /mist.core/settings.py
     depends_on:
       - memcached
       - mongodb

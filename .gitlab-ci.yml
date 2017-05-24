@@ -241,10 +241,20 @@ API:images:
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/images.py
 
+API:libcloud:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/libcloud.py
+
 API:machines:
   <<: *api_test_template
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/machines.py
+
+API:networks:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/networks.py
 
 #API:orchestration:
 #  <<: *api_test_template
