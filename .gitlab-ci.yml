@@ -274,7 +274,7 @@ API:scripts:
 #API:tunnels:
 #  <<: *api_test_template
 #  before_script:
-#    - export TEST_FILE=/mist.tests/misttests/api/io/tunnels.py
+#    - export TEST_FILE=/mist.tests/misttests/api/core/tunnels.py
 
 
 UI:clouds_batch_a:

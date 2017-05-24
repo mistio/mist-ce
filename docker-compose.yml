@@ -64,12 +64,14 @@ services:
     depends_on:
       - memcached
       - mongodb
+      - elasticsearch
       - rabbitmq
     stdin_open: true
     tty: true
     volumes:
       - ./api:/mist.api:rw
       - ./keys:/keys
+      - ./elasticsearch:/elasticsearch
     command: /mist.api/bin/celery -l INFO
 
   scheduler:
@@ -86,7 +88,7 @@ services:
 
   api:
     <<: *backend
-    command: /mist.api/bin/uwsgi
+    command: sh -c "/mist.api/bin/elasticsearch && /mist.api/bin/uwsgi"
     expose:
       - 80
 
