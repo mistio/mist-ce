@@ -1,0 +1,62 @@
+# Docker compose overrides for running mist.io in dev mode. This mounts local
+# code in the running containers, defines some extra containers needed for
+# development, etc. This is not a standalone file. It extends
+# docker-compose.yml and requires a local recursive clone of the mist.io git
+# repository.
+
+version: '2.0'
+
+services:
+
+
+  elasticsearch:
+    ports:
+      - 9200:9200
+
+  logstash:
+    volumes:
+      - ./docker/logstash:/config-dir:rw
+
+  kibana:
+    ports:
+      - 5601:5601
+
+  elasticsearch-manage:
+    image: mist/elasticsearch-manage:$MIST_TAG
+    volumes:
+      - ./docker/elasticsearch-manage:/opt/elasticsearch-manage
+
+
+  debugger:
+    image: mist/debuggeru
+    volumes:
+      - ./keys:/keys
+
+
+  celery: &backend
+    image: mist/mist:io-$MIST_TAG
+    volumes:
+      - ./api:/mist.api:rw
+      - ./keys:/keys
+      - ./elasticsearch:/elasticsearch
+  scheduler: *backend
+  poller: *backend
+  hubshell: *backend
+  api: *backend
+  sockjs: *backend
+
+
+  ui:
+    image: mist/ui:io-$MIST_TAG
+    volumes:
+      - ./ui:/ui:rw
+
+  landing:
+    image: mist/landing:io-$MIST_TAG
+    volumes:
+      - ./landing:/landing:rw
+
+
+  nginx:
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
