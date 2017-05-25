@@ -15,7 +15,7 @@ services:
 
   logstash:
     volumes:
-      - ./docker/logstash:/config-dir:rw
+      - ./docker/logstash/config:/config-dir:rw
 
   kibana:
     ports:
