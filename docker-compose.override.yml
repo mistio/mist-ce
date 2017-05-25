@@ -28,7 +28,7 @@ services:
 
 
   debugger:
-    image: mist/debuggeru
+    image: mist/debugger
     volumes:
       - ./keys:/keys
 
