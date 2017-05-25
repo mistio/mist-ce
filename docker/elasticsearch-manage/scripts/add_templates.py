@@ -1,16 +1,26 @@
+#!/usr/bin/env python
+
 import os
 import sys
 import json
-import logging
 import argparse
 import traceback
 
-from mist.api.helpers import es_client
+from elasticsearch import Elasticsearch
 
-
-logging.getLogger('elasticsearch').setLevel(logging.WARNING)
 
 EXCLUDED = ('heapster', )  # Templates to be excluded.
+
+
+def es_client():
+    return Elasticsearch(
+        os.getenv('ELASTIC_HOST', 'elasticsearch'),
+        port=os.getenv('ELASTIC_PORT', '9200'),
+        http_auth=(os.getenv('ELASTIC_USER', ''),
+                   os.getenv('ELASTIC_PASSWORD', '')),
+        use_ssl=bool(os.getenv('ELASTIC_SSL', False)),
+        verify_certs=bool(os.getenv('ELASTIC_VERIFY_CERTS', False)),
+    )
 
 
 def add_templates(force=False):
@@ -32,6 +42,7 @@ def add_templates(force=False):
     tpath = os.path.abspath(os.path.join(spath, '../templates/'))
 
     # Load templates from path.
+    err = False
     for tfile in os.listdir(tpath):
         tfile = '%s/%s' % (tpath, tfile)
 
@@ -47,8 +58,11 @@ def add_templates(force=False):
             except Exception as exc:
                 print 'ERROR'
                 traceback.print_exc()
+                err = True
             else:
                 print 'OK'
+    if err:
+        raise Exception("Completed with errors")
 
 
 if __name__ == '__main__':
@@ -66,4 +80,3 @@ if __name__ == '__main__':
         add_templates(args.force)
     except KeyboardInterrupt:
         sys.exit(1)
-
