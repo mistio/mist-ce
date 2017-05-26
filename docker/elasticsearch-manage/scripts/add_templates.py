@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
 import json
 import argparse
 import traceback
@@ -13,7 +14,7 @@ EXCLUDED = ('heapster', )  # Templates to be excluded.
 
 
 def es_client():
-    return Elasticsearch(
+    es = Elasticsearch(
         os.getenv('ELASTIC_HOST', 'elasticsearch'),
         port=os.getenv('ELASTIC_PORT', '9200'),
         http_auth=(os.getenv('ELASTIC_USER', ''),
@@ -21,6 +22,13 @@ def es_client():
         use_ssl=bool(os.getenv('ELASTIC_SSL', False)),
         verify_certs=bool(os.getenv('ELASTIC_VERIFY_CERTS', False)),
     )
+    for i in range(20):
+        if es.ping():
+            return es
+        print "Elasticsearch not up yet"
+        time.sleep(1)
+    print "Elasticsearch doesn't respond to ping"
+    raise Exception()
 
 
 def add_templates(force=False):
