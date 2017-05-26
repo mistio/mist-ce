@@ -1,11 +1,21 @@
+#!/usr/bin/env python
+
+import os
 import sys
-import logging
 import traceback
 
-from mist.api.helpers import es_client
+from elasticsearch import Elasticsearch
 
 
-logging.getLogger('elasticsearch').setLevel(logging.ERROR)
+def es_client():
+    return Elasticsearch(
+        os.getenv('ELASTIC_HOST', 'elasticsearch'),
+        port=os.getenv('ELASTIC_PORT', '9200'),
+        http_auth=(os.getenv('ELASTIC_USER', ''),
+                   os.getenv('ELASTIC_PASSWORD', '')),
+        use_ssl=bool(os.getenv('ELASTIC_SSL', False)),
+        verify_certs=bool(os.getenv('ELASTIC_VERIFY_CERTS', False)),
+    )
 
 
 def delete_indices(index):

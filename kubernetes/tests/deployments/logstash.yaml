@@ -42,16 +42,8 @@ spec:
             memory: 800Mi
             cpu: 500m
         terminationMessagePath: /dev/termination-log
-        volumeMounts:
-        - mountPath: /config-dir
-          name: logstash-conf
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
-      volumes:
-      - configMap:
-          defaultMode: 420
-          name: logstash-conf
-        name: logstash-conf
