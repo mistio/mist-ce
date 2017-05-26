@@ -8,6 +8,14 @@ An enterprise version that includes Role Based Access, VPN tunnels and
 Insights for cost optimization is available as a service at https://mist.io
 
 
+## Hardware requirements
+
+Recommended hardware resources are:
+    4 CPU cores
+    8 GB RAM
+    10 GB disk (accessible to /var/lib/docker/)
+
+
 ## Installation
 
 Mist.io is a large application split into microservices which are packages in
@@ -58,8 +66,44 @@ run
     ./bin/adduser --admin --docker-cloud admin@example.com
 
 Replace the email address with yours. Try running `./bin/adduser -h` for more
-options.
+options. The `--docker-cloud` flag will add the docker daemon hosting the
+mist.io installation as a docker cloud in the created account.
 
 Visit http://localhost and login with the email and password specified above.
 
 Welcome to mist.io! Enjoy!
+
+
+## Managing mist.io
+
+Mist.io is managed using `docker-compose`. Look that up for details. Some
+useful commands:
+
+    # See status of all applications
+    docker-compose ps
+
+    # Almost all containers should be in the UP state. An exception to this
+    # is shortlived containers. Currently the only such container is
+    # elasticsearch-manage. This should run for a few seconds and exit 0 if
+    # everything went fine.
+
+    # Restart nginx container
+    docker-compose restart nginx
+
+    # See the logs of the api and celery containers, starting with the last
+    # 50 lines.
+    docker-compose logs --tail=50 -f api celery
+
+    # Stop mist.io
+    docker-compose stop
+
+    # Start mist.io
+    docker-compose start
+    # or even better
+    docker-compose up -d
+
+    # Stop and remove all containers
+    docker-compose down
+
+    # Completely remove all containers and data volumes.
+    docker-compose down -v
