@@ -1,3 +1,6 @@
+# Docker compose definition to run mist.io in production mode, so no mounted
+# code, no dev containers etc. Only this single file is required.
+
 version: '2.0'
 
 services:
@@ -17,20 +20,18 @@ services:
 
   elasticsearch:
     image: elasticsearch:5.1.2
-    ports:
-      - 9200:9200
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
 
   logstash:
-    image: logstash:5.1.2
-    environment:
-      ELASTIC_PASSWORD: admin
-      ELASTIC_URI: http://elasticsearch:9200
-      ELASTIC_USERNAME: admin
-    command: logstash -f /config-dir
-    volumes:
-      - ./docker/logstash:/config-dir:rw
+    image: mist/logstash:$MIST_TAG
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+
+  elasticsearch-manage:
+    image: mist/elasticsearch-manage:$MIST_TAG
+    command: ./scripts/add_templates.py
     depends_on:
       - elasticsearch
       - rabbitmq
@@ -39,98 +40,77 @@ services:
     image: kibana:5.1.2
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
-    ports:
-      - 5601:5601
     depends_on:
       - elasticsearch
 
 
   socat:
-    build: ./docker/socat/
-    command:
-      - TCP4-LISTEN:2375,fork,reuseaddr
-      - UNIX-CONNECT:/var/run/docker.sock
-    expose:
-      - 2375
+    image: mist/docker-socat
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
 
   mailmock:
-    image: gcr.io/mist-ops/mailmock
-
-  debugger:
-    build: ./docker/debugger
-    volumes:
-      - ./keys:/keys
+    image: mist/mailmock
 
 
   celery: &backend
-    image: gcr.io/mist-ops/mist:io-api-$MIST_TAG
-    environment:
-      SETTINGS_FILE: /mist.core/settings.py
+    image: mist/mist:io-$MIST_TAG
     depends_on:
       - memcached
       - mongodb
+      - elasticsearch
       - rabbitmq
     stdin_open: true
     tty: true
-    volumes:
-      - ./api:/mist.api:rw
-      - ./keys:/keys
-    command: /mist.api/bin/celery -l INFO
+    command: /mist.api/bin/celery
+    command: bin/wait-all bin/celery
 
   scheduler:
     <<: *backend
-    command: /mist.api/bin/scheduler
+    command: bin/wait-all bin/scheduler
 
   poller:
     <<: *backend
-    command: /mist.api/bin/poller
+    command: bin/wait-all bin/poller
 
   hubshell:
     <<: *backend
-    command: /mist.api/bin/hubshell
+    command: bin/wait-all bin/hubshell
 
   api:
     <<: *backend
-    command: /mist.api/bin/uwsgi
+    command: bin/wait-all bin/uwsgi
     expose:
       - 80
 
   sockjs:
     <<: *backend
-    command: /mist.api/bin/sockjs
+    command: bin/wait-all bin/sockjs
     expose:
       - 8081
 
 
   ui:
-    image: gcr.io/mist-ops/ui:io-$MIST_TAG
+    image: mist/ui:io-$MIST_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
-    volumes:
-      - ./ui:/ui:rw
     expose:
       - 80
 
   landing:
-    image: gcr.io/mist-ops/landing:io-$MIST_TAG
+    image: mist/landing:io-$MIST_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
-    volumes:
-      - ./landing:/landing:rw
     expose:
       - 80
 
 
   nginx:
-    image: nginx
+    image: mist/nginx:$MIST_TAG
     ports:
       - 80:80
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
     depends_on:
       - api
       - landing
