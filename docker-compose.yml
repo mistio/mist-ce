@@ -14,6 +14,11 @@ services:
     volumes:
       - influxdb:/var/lib/influxdb
 
+  beringei:
+    image: mist/beringei
+    ports:
+      - 9999:9999
+      - 9990:9990
 
   mongodb:
     image: mongo:3.2
