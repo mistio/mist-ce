@@ -63,28 +63,29 @@ services:
     stdin_open: true
     tty: true
     command: /mist.api/bin/celery
+    command: bin/wait-all bin/celery
 
   scheduler:
     <<: *backend
-    command: /mist.api/bin/scheduler
+    command: bin/wait-all bin/scheduler
 
   poller:
     <<: *backend
-    command: /mist.api/bin/poller
+    command: bin/wait-all bin/poller
 
   hubshell:
     <<: *backend
-    command: /mist.api/bin/hubshell
+    command: bin/wait-all bin/hubshell
 
   api:
     <<: *backend
-    command: /mist.api/bin/uwsgi
+    command: bin/wait-all bin/uwsgi
     expose:
       - 80
 
   sockjs:
     <<: *backend
-    command: /mist.api/bin/sockjs
+    command: bin/wait-all bin/sockjs
     expose:
       - 8081
 
