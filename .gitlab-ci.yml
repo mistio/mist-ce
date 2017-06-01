@@ -424,7 +424,7 @@ release: &release_template
     - pip install requests python-magic
   script:
     - mkdir release
-    - sed "s/\$MIST_TAG/$CI_BUILD_REF_NAME/g" docker-compose.yml > release/docker-compose.yml
+    - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
     - sed "s/TAG/$CI_BUILD_REF_NAME/g" ci/release.md > release.md
     - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist.io $CI_BUILD_REF_NAME
   only:
