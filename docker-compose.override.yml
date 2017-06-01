@@ -10,6 +10,7 @@ services:
 
 
   elasticsearch:
+    image: elasticsearch:$ELASTICSEARCH_TAG
     ports:
       - 9200:9200
 
@@ -18,6 +19,7 @@ services:
       - ./docker/logstash/config:/config-dir:rw
 
   kibana:
+    image: kibana:$ELASTICSEARCH_TAG
     ports:
       - 5601:5601
 
