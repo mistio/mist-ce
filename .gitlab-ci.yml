@@ -4,6 +4,7 @@ stages:
   - deploy
   - test
   - undeploy
+  - release
 
 
 #################### DISCOVER-SUBMODULES STAGE ####################
@@ -411,3 +412,32 @@ undeploy_test_env:
   variables:
     NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
     DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
+
+
+#################### RELEASE STAGE ####################
+
+release: &release_template
+  stage: release
+  image: python:2.7-alpine
+  before_script:
+    - apk add --update libmagic
+    - pip install requests python-magic
+  script:
+    - mkdir release
+    - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
+    - sed "s/TAG/$CI_BUILD_REF_NAME/g" ci/release.md > release.md
+    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist.io $CI_BUILD_REF_NAME
+  only:
+    # only for references that match a version string (v1.2.3)
+    - /^v\d+\.\d+\.\d+$/
+  except:
+    # Except branches, meaning it'll only apply to git tags
+    - branches
+
+prerelease:
+  <<: *release_template
+  variables:
+    RELEASE_ARGS: "--prerelease"
+  only:
+    # only for references that match a prelease version string (v1.2.3-beta)
+    - /^v\d+\.\d+\.\d+-.+$/

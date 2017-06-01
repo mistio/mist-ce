@@ -28,9 +28,18 @@ There are two ways to run this application with docker-compose:
 
 ### Single file deployment
 
-Simply download the `docker-compose.yml` file from this repository and put it
+If you want to install a stable release, head over to mist.io's github
+[releases](https://github.com/mistio/mist.io/releases/) and follow the
+instructions there.
+
+Alternatively, if you want to run the latest development version of mist.io,
+simply download the `docker-compose.yml` file from this repository and put it
 in a directory. The directory name is used by `docker-compose` as the `project`
 name, so use something descriptive and unique, like `mist.io`.
+
+You also need to set the environmental variable `MIST_TAG=staging`. Do that by
+either running `export MIST_TAG=staging` or for it to persist, do
+`echo MIST_TAG=staging > .env`.
 
 
 ### Development deployment
