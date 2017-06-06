@@ -270,10 +270,15 @@ API:images:
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/images.py
 
-API:libcloud:
+API:libcloud_a:
   <<: *api_test_template
   before_script:
     - export TEST_FILE=/mist.tests/misttests/api/io/libcloud.py
+
+API:libcloud_b:
+  <<: *api_test_template
+  before_script:
+    - export TEST_FILE=/mist.tests/misttests/api/io/libcloud_b.py
 
 API:machines:
   <<: *api_test_template
