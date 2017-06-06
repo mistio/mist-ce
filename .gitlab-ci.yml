@@ -340,6 +340,7 @@ UI:schedulers_batch_a:
   <<: *ui_test_template
   before_script:
     - export TEST_TAGS=schedulers
+  allow_failure: true
 
 UI:schedulers_batch_b:
   <<: *ui_test_template
