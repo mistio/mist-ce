@@ -14,6 +14,7 @@ services:
       - 9200:9200
 
   logstash:
+    image: mist/logstash:$MIST_TAG
     volumes:
       - ./docker/logstash/config:/config-dir:rw
 
@@ -58,5 +59,6 @@ services:
 
 
   nginx:
+    image: mist/nginx:$MIST_TAG
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
