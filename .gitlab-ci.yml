@@ -140,8 +140,10 @@ build-elasticsearch-manage:
     - echo "Will build img $IMG with tag $TAG."
     - cd docker/$IMG
     - docker build --pull -t gcr.io/mist-ops/$IMG:$TAG .
+    - docker tag gcr.io/mist-ops/$IMG:$TAG gcr.io/mist-ops/$IMG:io-$TAG
     - docker tag gcr.io/mist-ops/$IMG:$TAG mist/$IMG:$TAG
     - docker push gcr.io/mist-ops/$IMG:$TAG
+    - docker push gcr.io/mist-ops/$IMG:io-$TAG
     - docker push mist/$IMG:$TAG
   tags:
     - builder
