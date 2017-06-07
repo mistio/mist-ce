@@ -104,10 +104,12 @@ wait-tests-image:
     - |
         for img_name in $GCR_IMG $DOCKERHUB_IMG; do
           for ref in $CI_COMMIT_SHA $CI_COMMIT_REF_SLUG; do
-            IMGTAG2=$img_name:$ref
-            echo "Will tag and push $IMGTAG2"
-            docker tag $IMGTAG $IMGTAG2
-            docker push $IMGTAG2
+            for prefix in "io-" ""; do
+              IMGTAG2=$img_name:$ref
+              echo "Will tag and push $IMGTAG2"
+              docker tag $IMGTAG $IMGTAG2
+              docker push $IMGTAG2
+            done
           done
         done
   tags:
