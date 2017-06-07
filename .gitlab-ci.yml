@@ -217,7 +217,7 @@ deploy_test_env:
   dependencies:
     - discover-submodules
   before_script:
-    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d " " -f1 | cut -d: -f2)'
+    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
     - echo "Test argument is $TEST"
     - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
@@ -246,26 +246,26 @@ deploy_test_env:
     - cpu
 
 
-API:io/api_token: *api_test_template
-API:io/clouds: *api_test_template
-API:io/dns: *api_test_template
-API:io/keys: *api_test_template
-API:io/images: *api_test_template
-API:io/libcloud_1 2: *api_test_template
-API:io/libcloud_2 2: *api_test_template
-API:io/machines: *api_test_template
-API:io/networks: *api_test_template
-API:io/schedules: *api_test_template
-API:io/scripts: *api_test_template
+API:io:api_token: *api_test_template
+API:io:clouds: *api_test_template
+API:io:dns: *api_test_template
+API:io:keys: *api_test_template
+API:io:images: *api_test_template
+API:io:libcloud_1/2: *api_test_template
+API:io:libcloud_2/2: *api_test_template
+API:io:machines: *api_test_template
+API:io:networks: *api_test_template
+API:io:schedules: *api_test_template
+API:io:scripts: *api_test_template
 
 
-UI:clouds-add-1 2: *ui_test_template
-UI:clouds-add-2 2: *ui_test_template
+UI:clouds-add-1/2: *ui_test_template
+UI:clouds-add-2/2: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
 UI:machines: *ui_test_template
-UI:schedulers-1 2: *ui_test_template
-UI:schedulers-2 2: *ui_test_template
+UI:schedulers-1/2: *ui_test_template
+UI:schedulers-2/2: *ui_test_template
 UI:scripts: *ui_test_template
 UI:scripts-actions: *ui_test_template
 UI:images-networks: *ui_test_template
