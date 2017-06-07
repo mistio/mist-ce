@@ -216,13 +216,16 @@ deploy_test_env:
     EMAIL: fatboy.tester.mist.io+${CI_JOB_ID}@gmail.com
   dependencies:
     - discover-submodules
+  before_script:
+    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d " " -f1 | cut -d: -f2)'
+    - echo "Test argument is $TEST"
+    - ./update-pipelines -n io:$CI_JOB_NAME running
+    - echo $TEST_SETTINGS | base64 -d > test_settings.py
 
 .api_test_template: &api_test_template
   <<: *test_template
   script:
-    - ./update-pipelines -n io:$CI_JOB_NAME running
-    - echo $TEST_SETTINGS | base64 -d > test_settings.py
-    - /mist.tests/prepare_env.py --api -s $TEST_FILE || export FAILED=1
+    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/api/$TEST.py || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   tags:
     - kube-default
@@ -230,9 +233,7 @@ deploy_test_env:
 .ui_test_template: &ui_test_template
   <<: *test_template
   script:
-    - ./update-pipelines -n io:$CI_JOB_NAME running
-    - echo $TEST_SETTINGS | base64 -d > test_settings.py
-    - /mist.tests/prepare_env.py -k --stop --tags=$TEST_TAGS /mist.tests/misttests/gui/core/pr/features || export FAILED=1
+    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/gui/core/pr/features || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   artifacts:
     paths:
@@ -245,146 +246,31 @@ deploy_test_env:
     - cpu
 
 
-API:api_token:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/api_token.py
-
-API:clouds:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/clouds.py
-
-API:dns:
- <<: *api_test_template
- before_script:
-   - export TEST_FILE=/mist.tests/misttests/api/io/dns.py
-
-API:keys:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/keys.py
-
-API:images:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/images.py
-
-API:libcloud_a:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/libcloud.py
-
-API:libcloud_b:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/libcloud_b.py
-
-API:machines:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/machines.py
-
-API:networks:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/networks.py
-
-#API:orchestration:
-#  <<: *api_test_template
-#  before_script:
-#    - export TEST_FILE=/mist.tests/misttests/api/core/orchestration.py
-
-API:schedules:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/schedules.py
-
-API:scripts:
-  <<: *api_test_template
-  before_script:
-    - export TEST_FILE=/mist.tests/misttests/api/io/scripts.py
-
-#API:tunnels:
-#  <<: *api_test_template
-#  before_script:
-#    - export TEST_FILE=/mist.tests/misttests/api/core/tunnels.py
+API:io/api_token: *api_test_template
+API:io/clouds: *api_test_template
+API:io/dns: *api_test_template
+API:io/keys: *api_test_template
+API:io/images: *api_test_template
+API:io/libcloud_1 2: *api_test_template
+API:io/libcloud_2 2: *api_test_template
+API:io/machines: *api_test_template
+API:io/networks: *api_test_template
+API:io/schedules: *api_test_template
+API:io/scripts: *api_test_template
 
 
-UI:clouds_batch_a:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=clouds-add-a
-
-UI:clouds_batch_b:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=clouds-add-b
-
-UI:clouds_actions:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=clouds-actions
-
-UI:keys:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=keys
-
-UI:machines:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=machines
-
-UI:schedulers_batch_a:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=schedulers
-
-UI:schedulers_batch_b:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=schedulers_v2
-
-UI:scripts:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=scripts
-
-UI:scripts_actions:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=scripts-actions
-
-UI:images_networks:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=images-networks
-
-UI:user_actions:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=user-actions
-
-UI:rbac:teams:
-  <<: *ui_test_template
-  before_script:
-    - export TEST_TAGS=rbac-teams
-
-#UI:rbac:rules:
-#  <<: *ui_test_template
-#  before_script:
-#    - export TEST_TAGS=rbac-rules
-
-#UI:rbac:rules_b:
-#  <<: *ui_test_template
-#  before_script:
-#    - export TEST_TAGS=rbac-rules-v2
-
-#UI:orchestration:
-#  <<: *ui_test_template
-#  before_script:
-#    - export TEST_TAGS=orchestration
+UI:clouds-add-1 2: *ui_test_template
+UI:clouds-add-2 2: *ui_test_template
+UI:clouds-actions: *ui_test_template
+UI:keys: *ui_test_template
+UI:machines: *ui_test_template
+UI:schedulers-1 2: *ui_test_template
+UI:schedulers-2 2: *ui_test_template
+UI:scripts: *ui_test_template
+UI:scripts-actions: *ui_test_template
+UI:images-networks: *ui_test_template
+UI:user-actions: *ui_test_template
+UI:rbac-teams: *ui_test_template
 
 
 #################### UNDEPLOY STAGE ####################
