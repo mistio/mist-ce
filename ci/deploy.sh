@@ -11,6 +11,7 @@ fi
 TAG=${TAG:-$CI_COMMIT_SHA}
 STACK=${STACK:-io}
 DNS_ZONE=${ZONE:-mist.io}
+JS_BUILD=${JS_BUILD:-True}
 
 USAGE="Usage: $0 [-h|--help] [<KUBE_DIR> [<KUBE_DIR> .. ]]
 
@@ -38,6 +39,10 @@ Required environmental variables:
     ELASTIC_PASSWORD        $ELASTIC_PASSWORD
 
 Optional environmental variables:
+
+    Configure if built ui files are served
+
+    JS_BUILD                0
 
     Set both to create DNS record for application:
 
@@ -83,7 +88,7 @@ fi
 
 # Substitute environmental variables in kubernetes yaml definitions.
 for var in NAMESPACE TAG SENDGRID_USERNAME SENDGRID_PASSWORD \
-           ELASTIC_URI ELASTIC_USERNAME ELASTIC_PASSWORD STACK; do
+           ELASTIC_URI ELASTIC_USERNAME ELASTIC_PASSWORD STACK JS_BUILD; do
     val=$(eval echo \$$var)
     if [ -z "$val" ]; then
         log "Enviromental variable \$$var is not set."
