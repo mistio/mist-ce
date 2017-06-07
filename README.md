@@ -83,6 +83,13 @@ Visit http://localhost and login with the email and password specified above.
 Welcome to mist.io! Enjoy!
 
 
+## Configuring mist.io
+
+After the initial `docker-compose up -d`, you'll see that a configuration file
+is created in `./config/settings.py`. Edit this file to modify configuration
+and restart services (for example with `docker-compose restart`).
+
+
 ## Managing mist.io
 
 Mist.io is managed using `docker-compose`. Look that up for details. Some
