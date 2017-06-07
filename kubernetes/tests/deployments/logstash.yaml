@@ -34,7 +34,7 @@ spec:
           value: REPLACE_ELASTIC_USERNAME
         - name: ELASTIC_PASSWORD
           value: REPLACE_ELASTIC_PASSWORD
-        image: mist/logstash:REPLACE_TAG
+        image: gcr.io/mist-ops/logstash:REPLACE_STACK-REPLACE_TAG
         imagePullPolicy: IfNotPresent
         name: logstash
         resources:
