@@ -20,74 +20,67 @@ Recommended hardware resources are:
 
 Mist.io is a large application split into microservices which are packages in
 docker containers. The easiest way to run it is by using `docker-compose`. So,
-in order to run it, one needs to install a recent version of `docker` and
-`docker-compose`.
+in order to run it, one needs to install a recent version of [docker](https://docs.docker.com/engine/installation/) and
+[docker-compose](https://docs.docker.com/compose/install/)
 
-There are two ways to run this application with docker-compose:
+With docker and docker-compose installed, run
 
+    wget https://github.com/mistio/mist.io/releases/download/v2.0.0-rc4/docker-compose.yml
+    docker-compose up -d
 
-### Single file deployment
+After a few minutes (depending on your connection) all mist.io containers will be downloaded
+and started in the background.
 
-If you want to install a stable release, head over to mist.io's github
-[releases](https://github.com/mistio/mist.io/releases/) and follow the
-instructions there.
+Run
 
-Alternatively, if you want to run the latest development version of mist.io,
-simply download the `docker-compose.yml` file from this repository and put it
-in a directory. The directory name is used by `docker-compose` as the `project`
-name, so use something descriptive and unique, like `mist.io`.
+    docker-compose ps
 
-You also need to set the environmental variable `MIST_TAG=staging`. Do that by
-either running `export MIST_TAG=staging` or for it to persist, do
-`echo MIST_TAG=staging > .env`.
-
-
-### Development deployment
-
-Clone this git repo and all its submodules with something like:
-
-    git clone --recursive https://github.com/mistio/mist.io.git
-    cd mist.io
-
-This may take some time.
-
-This setup will mount the checked out code into the containers. By cloning the
-directory, now there's also a `docker-compose.override.yml` file in the current
-directory in addition to `docker-compose.yml` and is used to modify the
-configuration for development mode.
+all containers should be in the UP state, except shortlived container elasticsearch-manage
 
 
 ## Running mist.io
 
-Switch to the directory containing the `docker-compose.yml` file and run
+Mist.io binds on port 80 of all interfaces on the server it has been run.
 
-    docker-compose up -d
+Visit http://server_ip_address or http://localhost, mist.io main page welcomes you!
 
-This will start all the mist.io docker containers in the background.
-
-To create a user for the first time, first run
+To create a user for the first time, run
 
     docker-compose exec api sh
 
 This should drop you in a shell into one of the mist.io containers. In there,
 run
 
-    ./bin/adduser --admin --docker-cloud admin@example.com
+    ./bin/adduser --admin admin@example.com
 
 Replace the email address with yours. Try running `./bin/adduser -h` for more
 options. The `--docker-cloud` flag will add the docker daemon hosting the
 mist.io installation as a docker cloud in the created account.
 
-Visit http://localhost and login with the email and password specified above.
-
-Welcome to mist.io! Enjoy!
+You can now login through this email and password specified above.
 
 
 ## Configuring mist.io
 
 After the initial `docker-compose up -d`, you'll see that a configuration file
-is created in `./config/settings.py`. Edit this file to modify configuration
-and restart services (for example with `docker-compose restart`).
+is created in `./config/settings.py`. Edit this file to modify configuration. Any changes to the `.config/settings.py` file need restart of docker-compose in order to take effect
+
+    docker-compose restart
+
+
+## Setting mail settings
+
+In order to read email produced by mist.io (eg on user register, forgot password, invite members to team) edit
+`.config/settings.py` and set the `CORE_URI`. Example
+
+    CORE_URI = "http://54.229.180.245"
+
+You can either set the `MAILER_SETTINGS` to use a real mail server, or attach to the mailmock container and read all email
+generated
+
+    docker-compose logs -f mailmock
+
+Don't forget to restart docker-compose for changes to take effect.
 
 
 ## Managing mist.io
@@ -123,3 +116,9 @@ useful commands:
 
     # Completely remove all containers and data volumes.
     docker-compose down -v
+
+
+## Development version
+
+There's also a development version of mist.io, you will find instructions on how to get it working
+on [dev-install](README-dev.md).
