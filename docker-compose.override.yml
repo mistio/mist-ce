@@ -39,6 +39,7 @@ services:
       - ./elasticsearch:/elasticsearch
   scheduler: *backend
   poller: *backend
+  beat: *backend
   hubshell: *backend
   api: *backend
   sockjs: *backend
