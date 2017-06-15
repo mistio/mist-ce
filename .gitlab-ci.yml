@@ -65,12 +65,6 @@ discover-submodules:
   dependencies:
     - discover-submodules
 
-wait-api-image:
-  <<: *docker_wait_submodule_img_template
-  before_script:
-    - REPO=mistio/mist.api
-    - IMG=mist
-
 wait-ui-image:
   <<: *docker_wait_submodule_img_template
   before_script:
@@ -88,6 +82,46 @@ wait-tests-image:
   before_script:
     - REPO=mistio/mist.tests
     - IMG=tests_base
+
+
+# Rebuild api image.
+
+rebuild-api-image:
+  stage: build
+  variables:
+    NUM: "60"
+    SLEEP: "10"
+    REPO: mistio/mist.api
+    IMG: mist
+  script:
+    - SUBMODULE_SHA=$(grep ^$REPO, all-submodules.csv | cut -d, -f2)
+    - echo SUBMODULE_SHA is $SUBMODULE_SHA
+    - GCR_IMG="gcr.io/mist-ops/$IMG"
+    - DOCKERHUB_IMG="mist/$IMG"
+    - IMGTAG="$GCR_IMG:$SUBMODULE_SHA"
+    - echo IMTAG is $IMGTAG
+
+    - echo "Will pull docker image $IMGTAG"
+    - for i in $(seq 1 $NUM); do docker pull $IMGTAG && OK=1 && break || sleep $SLEEP; done
+    - if [ -z "$OK" ]; then echo "ERROR Couldn't pull $IMGTAG!" && exit 1; fi
+
+    - echo "Will rebuild api image"
+    - sed -i "s/^FROM.*/FROM $IMGTAG/" docker/mist/Dockerfile
+    - docker build -t $IMG/io-$CI_COMMIT_SHA docker/mist
+
+    - |
+        for img_name in $GCR_IMG $DOCKERHUB_IMG; do
+          for ref in $CI_COMMIT_SHA $CI_COMMIT_REF_SLUG; do
+            IMGTAG2=$img_name:io-$ref
+            echo "Will tag and push $IMGTAG2"
+            docker tag $$IMG/io-$CI_COMMIT_SHA $IMGTAG2
+            docker push $IMGTAG2
+          done
+        done
+  tags:
+    - shell-docker-light
+  dependencies:
+    - discover-submodules
 
 
 # Build secondary images needed for deploying. Tag with SHA and branch name.
