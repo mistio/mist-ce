@@ -9,7 +9,7 @@ ARG VERSION_NAME
 # redefined as ENV in addition to ARG.
 ENV VERSION_REPO=$VERSION_REPO \
     VERSION_SHA=$VERSION_SHA \
-    VERSION_NAME=VERSION_NAME
+    VERSION_NAME=$VERSION_NAME
 
 RUN echo "{\"sha\":\"$VERSION_SHA\",\"name\":\"$VERSION_NAME\",\"repo\":\"$VERSION_REPO\",\"modified\":false}" \
         > /mist-version.json
