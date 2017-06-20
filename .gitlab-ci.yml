@@ -107,7 +107,7 @@ rebuild-api-image:
 
     - echo "Will rebuild api image"
     - sed -i "s~^FROM.*~FROM $IMGTAG~" docker/mist/Dockerfile
-    - docker build -t $IMG/io-$CI_COMMIT_SHA --build-arg VERSION_SHA=$CI_COMMIT_SHA --build-arg VERSION_NAME=$CI_COMMIT_REF_NAME docker/mist
+    - docker build -t $IMG/io-$CI_COMMIT_SHA --build-arg IO_VERSION_SHA=$CI_COMMIT_SHA --build-arg IO_VERSION_NAME=$CI_COMMIT_REF_NAME docker/mist
 
     - |
         for img_name in $GCR_IMG $DOCKERHUB_IMG; do
