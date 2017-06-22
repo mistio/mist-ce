@@ -86,6 +86,10 @@ services:
     <<: *backend
     command: bin/wait-all bin/poller
 
+  beat:
+    <<: *backend
+    command: bin/wait-all bin/beat
+
   hubshell:
     <<: *backend
     command: bin/wait-all bin/hubshell
