@@ -69,6 +69,10 @@ services:
       - mongodb
       - elasticsearch
       - rabbitmq
+    volumes:
+      - ./config:/etc/mist.io
+    environment:
+      SETTINGS_FILE: /etc/mist.io/settings.py
     stdin_open: true
     tty: true
     restart: on-failure:5
@@ -81,6 +85,10 @@ services:
   poller:
     <<: *backend
     command: bin/wait-all bin/poller
+
+  beat:
+    <<: *backend
+    command: bin/wait-all bin/beat
 
   hubshell:
     <<: *backend
