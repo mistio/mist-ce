@@ -164,7 +164,7 @@ class Changelog(object):
 
     def to_string(self):
         return '# Changelog\n\n\n' + '\n\n'.join(map(Version.to_string,
-                                                     reversed(self.versions)))
+                                                     self.versions))
 
     def __str__(self):
         return self.to_string()
@@ -222,7 +222,7 @@ class Version(object):
 
         months = '|'.join(MONTHS)
         match = re.match(
-            r'^##\s*(v\d+\.\d+\.\d+(?:-.+)?)\s*'
+            r'^##\s*(v\d+\.\d+\.\d+(?:-[a-z0-9\.-]+)?)\s*'
             r'\(\s*(\d+)\s*(%s)\s*(\d+)\s*\)\s*$' % months,
             lines[0], re.IGNORECASE
         )
@@ -498,7 +498,7 @@ def main():
         if last_version is not None and last_version.prerelease:
             for change in last_version.changes:
                 text += '%s\n' % change.to_string()
-            changelog.versions[-1].pop()
+            changelog.versions.pop(0)
         while True:
             text = editor(text, tmp_suffix='.md')
             try:
@@ -510,7 +510,7 @@ def main():
                     sys.exit(1)
             else:
                 break
-        changelog.versions.append(version)
+        changelog.versions.insert(0, version)
         changelog.show()
         if prompt_boolean("Do you wish to update %s?" % args.file):
             changelog.to_file(args.file)
