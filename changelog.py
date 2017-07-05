@@ -14,6 +14,9 @@ import dateutil.parser
 import requests
 
 
+GITLAB_URL = 'https://gitlab.ops.mist.io'
+GITLAB_REPO = 'mistio/mist.io'
+
 MONTHS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
 
@@ -95,10 +98,13 @@ def editor(text, tmp_suffix='.tmp'):
     """Spawn $EDITOR (defaults to vim) for user to edit given text"""
     if isinstance(text, unicode):
         text = text.encode('utf8')
+    command = os.getenv('EDITOR', 'vim')
     with tempfile.NamedTemporaryFile(suffix=tmp_suffix) as tf:
         tf.write(text)
         tf.flush()
-        subprocess.call([os.getenv('EDITOR', 'vim'), tf.name])
+        print >> sys.stderr, "INFO: Starting editor '%s'" % command
+        subprocess.check_call([command, tf.name])
+        print >> sys.stderr, "INFO: Exiting editor '%s'" % command
         tf.seek(0)
         return tf.read()
 
@@ -317,8 +323,8 @@ class Change(object):
 
 class GitlabRequest(object):
     """Wrapper around `requests` to help querying Gitlab's API"""
-    def __init__(self, url='https://gitlab.ops.mist.io', repo='mistio/mist.io',
-                 token=''):
+
+    def __init__(self, url=GITLAB_URL, repo=GITLAB_REPO, token=''):
         if url.endswith('/'):
             url = url[:-1]
         self.url = url
@@ -351,6 +357,28 @@ class GitlabRequest(object):
             print >> sys.stderr, resp.text
             raise
 
+    def paginated_get(self, url, params=None, per_page=20, **kwargs):
+        if params is None:
+            params = {}
+        log_prefix = "DEBUG: Fetching %s with params %s (%d per call)... " % (
+            url, params, per_page)
+        params['per_page'] = per_page
+        total = 0
+        page = 1
+        sys.stderr.write('%s   %d fetched' % (log_prefix, total))
+        sys.stderr.flush()
+        while True:
+            params['page'] = page
+            batch = self.get(url, params, **kwargs)
+            total += len(batch)
+            sys.stderr.write('\r%s   %d fetched' % (log_prefix, total))
+            sys.stderr.flush()
+            for item in batch:
+                yield item
+            if len(batch) < per_page:
+                break
+            page += 1
+
 
 def get_mrs(gitlab, branches=('master', 'staging'), since=None):
     """Find MR's from gitlab
@@ -363,40 +391,23 @@ def get_mrs(gitlab, branches=('master', 'staging'), since=None):
     """
 
     assert since is None or isinstance(since, datetime.datetime)
+    print >> sys.stderr, "INFO: Searching for MR's..."
 
     # Find all MR's, sorted by updated_at, optionally limit updated_at with
     # since param.
     mrs = []
-    per_page = 100
-    page = 1
-    sys.stderr.write("INFO: Fetching MR's...")
-    sys.stderr.flush()
-    while True:
-        batch = gitlab.get('merge_requests', {'state': 'merged',
-                                              'order_by': 'updated_at',
-                                              'sort': 'desc',
-                                              'per_page': per_page,
-                                              'page': page})
-        sys.stderr.write(
-            "\rINFO: Fetching MR's...  %d" % (len(mrs) + len(batch)))
-        sys.stderr.flush()
-        break_updated_at = False
-        for mr in batch:
-            updated_at = dateutil.parser.parse(
-                mr['updated_at']
-            ).replace(tzinfo=None)
-            if since and updated_at < since:
-                break_updated_at = True
-                break
-            if branches and mr['target_branch'] not in branches:
-                continue
-            mrs.append(mr)
-        if break_updated_at:
+    params = {'state': 'merged', 'order_by': 'updated_at', 'sort': 'desc'}
+    for mr in gitlab.paginated_get('merge_requests', params):
+        updated_at = dateutil.parser.parse(
+            mr['updated_at']
+        ).replace(tzinfo=None)
+        if since and updated_at < since:
             break
-        if len(batch) < per_page:
-            break
-        page += 1
-    print >> sys.stderr
+        if branches and mr['target_branch'] not in branches:
+            continue
+        mrs.append(mr)
+    print >> sys.stderr, ("\nINFO: MR's filtered by 'updated_at' and "
+                          "'target_branch'   %d" % (len(mrs)))
 
     if since:
         sys.stderr.write("INFO: Fetching MR merge commits... 0/%d" % len(mrs))
@@ -414,9 +425,10 @@ def get_mrs(gitlab, branches=('master', 'staging'), since=None):
             ).replace(tzinfo=None)
             if created_at < since:
                 mrs.pop(i)
-        print >> sys.stderr
+        print >> sys.stderr, ("\nINFO: MR's filtered by merge_commit "
+                              "'created_at'   %d" % len(mrs))
 
-    print >> sys.stderr, "Returning %d mrs" % len(mrs)
+    print >> sys.stderr, "INFO: Returning %d mrs" % len(mrs)
 
     return mrs
 
@@ -433,16 +445,16 @@ def parse_args():
                                           dest="action")
 
     show_parser = subparsers.add_parser('show', help="Display changelog.")
-    show_parser.add_argument('-j', '--json', action='store_true',
-                             help="Display as json dict, not markdown text.")
+    show_parser.add_argument(
+        '-j', '--json', action='store_true',
+        help="Display as json dict, not markdown text.")
 
     add_parser = subparsers.add_parser('add',
                                        help="Add new version to changelog.")
-    add_parser.add_argument('-t', '--token',
-                            default=os.getenv('GITLAB_TOKEN', ''),
-                            help="Token to authenticate to Gitlab's API. "
-                                 "Taken by GITLAB_TOKEN env variable by "
-                                 "default.")
+    add_parser.add_argument(
+        '-t', '--token', default=os.getenv('GITLAB_TOKEN', ''),
+        help="Token to authenticate to Gitlab's API. Taken by GITLAB_TOKEN "
+             "env variable by default.")
     add_parser.add_argument('-b', '--branch', dest='branches', action='append',
                             help="Only include MR's merged into this branch. "
                                  "Can be specified multiple times. "
@@ -452,8 +464,15 @@ def parse_args():
     for parser in (argparser, show_parser, add_parser, ):
         parser.add_argument('-f', '--file', default='CHANGELOG.md',
                             help="Changelog file to read/write info.")
+
     for parser in (add_parser, ):
         parser.add_argument('version', help="Target version.")
+        parser.add_argument(
+            '-u', '--gitlab-url', default=GITLAB_URL,
+            help="URL of Gitlab installation. Default is '%s'." % GITLAB_URL)
+        parser.add_argument(
+            '-r', '--repo', default=GITLAB_REPO,
+            help="Git repo. Default is '%s'." % GITLAB_REPO)
 
     args = argparser.parse_args()
 
@@ -470,7 +489,8 @@ def main():
     if args.action == 'show':
         changelog.show(as_json=args.json)
     elif args.action == 'add':
-        gitlab = GitlabRequest(token=args.token)
+        gitlab = GitlabRequest(url=args.gitlab_url, repo=args.repo,
+                               token=args.token)
         now = datetime.datetime.now()
         version = Version(args.version,
                           int(now.day), MONTHS[now.month - 1], int(now.year))
@@ -517,4 +537,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print >> sys.stderr, "\n\nReceived SIGTERM, exiting"
