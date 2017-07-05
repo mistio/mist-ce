@@ -180,12 +180,18 @@ class Changelog(object):
         }
 
     def show(self, as_json=False):
-        print '----CHANGELOG-START----'
+        print >> sys.stderr, '----CHANGELOG-START----'
         if as_json:
-            print json.dumps(self.to_dict())
+            try:
+                import pprint
+            except ImportError:
+                raise
+                print json.dumps(self.to_dict())
+            else:
+                pprint.pprint(self.to_dict())
         else:
             print self.to_string()
-        print '----CHANGELOG-END----'
+        print >> sys.stderr, '----CHANGELOG-END----'
 
 
 class Version(object):
@@ -462,10 +468,7 @@ def main():
     changelog = Changelog.from_file(args.file)
 
     if args.action == 'show':
-        if args.json:
-            print changelog.to_dict()
-        else:
-            changelog.show()
+        changelog.show(as_json=args.json)
     elif args.action == 'add':
         gitlab = GitlabRequest(token=args.token)
         now = datetime.datetime.now()
