@@ -14,8 +14,8 @@ import dateutil.parser
 import requests
 
 
-GITLAB_URL = 'https://gitlab.ops.mist.io'
-GITLAB_REPO = 'mistio/mist.io'
+GITLAB_URL = os.getenv('GITLAB_URL', 'https://gitlab.ops.mist.io')
+GITLAB_REPO = os.getenv('GITLAB_REPO', 'mistio/mist.io')
 
 MONTHS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
