@@ -449,6 +449,10 @@ def parse_args():
         '-j', '--json', action='store_true',
         help="Display as json dict, not markdown text.")
 
+    rewrite_parser = subparsers.add_parser(
+        'rewrite',
+        help="Read and write changelog to fix minor formatting issues.")
+
     add_parser = subparsers.add_parser('add',
                                        help="Add new version to changelog.")
     add_parser.add_argument(
@@ -461,7 +465,7 @@ def parse_args():
                                  "Default includes MR's to master & staging.")
 
     # Common args
-    for parser in (argparser, show_parser, add_parser, ):
+    for parser in (argparser, show_parser, add_parser, rewrite_parser, ):
         parser.add_argument('-f', '--file', default='CHANGELOG.md',
                             help="Changelog file to read/write info.")
 
@@ -488,6 +492,8 @@ def main():
 
     if args.action == 'show':
         changelog.show(as_json=args.json)
+    elif args.action == 'rewrite':
+        changelog.to_file(args.file)
     elif args.action == 'add':
         gitlab = GitlabRequest(url=args.gitlab_url, repo=args.repo,
                                token=args.token)

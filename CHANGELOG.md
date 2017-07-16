@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## v2.0.0 (21 Jun 2017)
 
 This is a major update of the open source version Mist.io with many of the
@@ -11,6 +12,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 ### Changes
 
