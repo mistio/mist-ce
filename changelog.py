@@ -165,7 +165,7 @@ class Changelog(object):
             with open(path, 'r') as fobj:
                 return cls.from_string(fobj.read())
         except IOError as exc:
-            print >> sys.stderr, "WARNING: %r" % exc
+            print >> sys.stderr, "WARNING: Couldn't load file %r" % exc
             return cls()
 
     def to_string(self):
@@ -280,9 +280,9 @@ class Version(object):
 class Change(object):
     """Holds information about a particular change"""
 
-    KINDS = ('Changes', 'Bugfix', 'Feature', 'Optimization')
+    KINDS = ('Change', 'Bugfix', 'Feature', 'Optimization')
 
-    def __init__(self, title, kind='Changes', mr=0):
+    def __init__(self, title, kind='Change', mr=0):
 
         assert title
         self.title = title
