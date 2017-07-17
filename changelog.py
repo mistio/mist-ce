@@ -256,6 +256,19 @@ class Version(object):
         if self.notes:
             msg += '%s\n\n' % self.notes
         msg += '### Changes\n\n'
+        msg += self._get_changes_string()
+        return msg
+
+    def get_release_notes(self):
+        msg = ''
+        if self.notes:
+            msg += '%s\n\n' % self.notes
+        msg += '## Changes\n\n'
+        msg += self._get_changes_string()
+        return msg
+
+    def _get_changes_string(self):
+        msg = ''
         for change in self.changes:
             msg += '%s\n' % change.to_string()
         return msg
@@ -453,6 +466,11 @@ def parse_args():
         'rewrite',
         help="Read and write changelog to fix minor formatting issues.")
 
+    extract_parser = subparsers.add_parser(
+        'extract',
+        help="Extract content of given version, to include in release notes.")
+    extract_parser.add_argument('version', help="Target version.")
+
     add_parser = subparsers.add_parser('add',
                                        help="Add new version to changelog.")
     add_parser.add_argument(
@@ -494,6 +512,15 @@ def main():
         changelog.show(as_json=args.json)
     elif args.action == 'rewrite':
         changelog.to_file(args.file)
+    elif args.action == 'extract':
+        for version in changelog.versions:
+            if version.name == args.version:
+                print version.get_release_notes()
+                break
+        else:
+            print >> sys.stderr, "ERROR: Couldn't find version '%s'." % (
+                args.version)
+            sys.exit(1)
     elif args.action == 'add':
         gitlab = GitlabRequest(url=args.gitlab_url, repo=args.repo,
                                token=args.token)
