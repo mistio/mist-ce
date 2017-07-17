@@ -164,3 +164,4 @@ directory in addition to `docker-compose.yml` and is used to modify the
 configuration for development mode.
 
 The above instructions for running and managing mist.io apply.
+
