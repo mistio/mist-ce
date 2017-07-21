@@ -308,6 +308,7 @@ UI:scripts-actions: *ui_test_template
 UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
+UI:zones: *ui_test_template
 
 
 #################### UNDEPLOY STAGE ####################
