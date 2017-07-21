@@ -1,7 +1,7 @@
 # Changelog
 
 
-## v2.1.0-rc1 (21 Jul 2017)
+## v2.1.0 (21 Jul 2017)
 
 ### Changes
 
