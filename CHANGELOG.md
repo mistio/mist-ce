@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v2.1.0 (21 Jul 2017)
+
+### Changes
+
+* Change: Display stack logs grouped by workflow operation (!406)
+* Change: Notifications API & UI improvements (!390) (!409)
+* Change: Update to Libcloud v2
+* Change: Apply stricter checks on the dns enabled cloud field (!404)
+* Bugfix: Fix error in machine weight calculation
+* Change: Update DNS API (!396)
+* Bugfix: Fix association with a secondary key (!394)
+
+
 ## v2.0.0 (21 Jun 2017)
 
 This is a major update of the open source version Mist.io with many of the
@@ -12,6 +25,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 ### Changes
