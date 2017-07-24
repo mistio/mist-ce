@@ -546,7 +546,7 @@ def main():
             ).replace(tzinfo=None)
         mrs = get_mrs(gitlab, branches=args.branches, since=since)
         for mr in mrs:
-            version.changes.append(Change(mr['title'], mr=mr['id']))
+            version.changes.append(Change(mr['title'], mr=mr['iid']))
         text = version.to_string()
         if last_version is not None and last_version.prerelease:
             for change in last_version.changes:
