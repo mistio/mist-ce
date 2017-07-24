@@ -1,3 +1,5 @@
+## Installation
+
 To install, please run:
 
     wget https://github.com/mistio/mist.io/releases/download/TAG/docker-compose.yml
