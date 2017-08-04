@@ -2,8 +2,8 @@
 
 set -e
 
-if [ -d src/mist.io/ ]; then
-    io_dir=./src/mist.io
+if [ -d mist.io/ ]; then
+    io_dir=./mist.io
 else
     io_dir=.
 fi
