@@ -294,7 +294,7 @@ API:io:networks: *api_test_template
 API:io:schedules: *api_test_template
 API:io:scripts: *api_test_template
 API:io:rbac: *api_test_template
-
+API:io:ip_whitelisting: *api_test_template
 
 UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
