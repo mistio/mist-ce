@@ -115,6 +115,7 @@ while read -r line; do
                     "$GITLAB_URL/api/v4/projects/$repo/repository/commits/$commit/statuses?name=$NAME&ref=$branch" | \
                 jq '.[].status' | sed 's/"//g'
         )
+        echo "Previous state is $prev_state"
         if [ "$prev_state" = "running" ] || [ "$prev_state" = "pending" ] ; then
             curl -sf -X POST -H "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
                 "$GITLAB_URL/api/v4/projects/$repo/statuses/$commit/?name=$NAME&ref=$branch&state=canceled"
@@ -125,7 +126,7 @@ while read -r line; do
     target_url="$GITLAB_URL/$PARENT_REPO/builds/$CI_JOB_ID"
     query="name=$NAME&ref=$branch&state=$STATE&target_url=$target_url"
     set -x
-    curl -sf -X POST -H "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
+    curl -f -X POST -H "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
         "$GITLAB_URL/api/v4/projects/$repo/statuses/$commit/?$query"
     set +x
 
