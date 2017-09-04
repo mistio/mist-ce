@@ -17,23 +17,28 @@ services:
 
   mongodb:
     image: mongo:3.2
+    restart: on-failure:5
     volumes:
       - mongodb:/data/db:rw
 
   rabbitmq:
     image: rabbitmq:3.6.6-management
+    restart: on-failure:5
 
   memcached:
     image: memcached
+    restart: on-failure:5
 
 
   elasticsearch:
     image: elasticsearch:5.1.2
+    restart: on-failure:5
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
 
   logstash:
     image: mist/logstash:$MIST_TAG
+    restart: on-failure:5
     depends_on:
       - elasticsearch
       - rabbitmq
@@ -41,6 +46,7 @@ services:
   elasticsearch-manage:
     image: mist/elasticsearch-manage:$MIST_TAG
     command: ./scripts/add_templates.py
+    restart: on-failure:5
     depends_on:
       - elasticsearch
       - rabbitmq
@@ -49,17 +55,20 @@ services:
     image: kibana:5.1.2
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
+    restart: on-failure:5
     depends_on:
       - elasticsearch
 
 
   socat:
     image: mist/docker-socat
+    restart: on-failure:5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
 
   mailmock:
     image: mist/mailmock
+    restart: on-failure:5
 
 
   celery: &backend
@@ -69,9 +78,13 @@ services:
       - mongodb
       - elasticsearch
       - rabbitmq
+    volumes:
+      - ./config:/etc/mist.io
+    environment:
+      SETTINGS_FILE: /etc/mist.io/settings.py
     stdin_open: true
     tty: true
-    command: /mist.api/bin/celery
+    restart: on-failure:5
     command: bin/wait-all bin/celery
 
   scheduler:
@@ -81,6 +94,10 @@ services:
   poller:
     <<: *backend
     command: bin/wait-all bin/poller
+
+  beat:
+    <<: *backend
+    command: bin/wait-all bin/beat
 
   hubshell:
     <<: *backend
@@ -104,6 +121,7 @@ services:
     command: sh /entry.sh
     stdin_open: true
     tty: true
+    restart: on-failure:5
     expose:
       - 80
 
@@ -112,16 +130,19 @@ services:
     command: sh /entry.sh
     stdin_open: true
     tty: true
+    restart: on-failure:5
     expose:
       - 80
 
 
   nginx:
     image: mist/nginx:$MIST_TAG
+    restart: on-failure:5
     ports:
       - 80:80
     depends_on:
       - api
+      - sockjs
       - landing
       - ui
 

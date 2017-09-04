@@ -22,7 +22,6 @@ services:
       - 5601:5601
 
   elasticsearch-manage:
-    image: mist/elasticsearch-manage:$MIST_TAG
     volumes:
       - ./docker/elasticsearch-manage:/opt/elasticsearch-manage
 
@@ -34,25 +33,23 @@ services:
 
 
   celery: &backend
-    image: mist/mist:io-$MIST_TAG
     volumes:
       - ./api:/mist.api:rw
       - ./keys:/keys
       - ./elasticsearch:/elasticsearch
   scheduler: *backend
   poller: *backend
+  beat: *backend
   hubshell: *backend
   api: *backend
   sockjs: *backend
 
 
   ui:
-    image: mist/ui:io-$MIST_TAG
     volumes:
       - ./ui:/ui:rw
 
   landing:
-    image: mist/landing:io-$MIST_TAG
     volumes:
       - ./landing:/landing:rw
 
