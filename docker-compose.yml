@@ -6,6 +6,15 @@ version: '2.0'
 services:
 
 
+  influxdb:
+    image: influxdb:1.2.2
+    ports:
+      - 8083:8083
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+
+
   mongodb:
     image: mongo:3.2
     restart: on-failure:5
@@ -169,4 +178,5 @@ services:
 
 volumes:
   elasticsearch: {}
+  influxdb: {}
   mongodb: {}
