@@ -1,14 +1,13 @@
 # Changelog
 
 
-## v2.2.0-rc1 (8 Sep 2017)
+## v2.2.0 (8 Sep 2017)
 
 ### Changes
 
 * Feature: IP whitelisting (!434)
 * Change: Do not hardcore repo name in release process (!382)
 * Change: Ansible script example - update ref (!432)
-* Change: Update tests submodule (!431)
 * Change: Refactor poller (!420)
 * Change: Change submodule paths (!426)
 * Change: Update ES templates with merge policy (!419)
@@ -40,6 +39,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 
