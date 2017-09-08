@@ -352,7 +352,7 @@ release: &release_template
   image: python:2.7-alpine
   before_script:
     - apk add --update libmagic
-    - pip install requests python-magic
+    - pip install requests python-magic python-dateutil
   script:
     - mkdir release
     - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
