@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v2.2.0-rc1 (8 Sep 2017)
+
+### Changes
+
+* Feature: IP whitelisting (!434)
+* Change: Do not hardcore repo name in release process (!382)
+* Change: Ansible script example - update ref (!432)
+* Change: Update tests submodule (!431)
+* Change: Refactor poller (!420)
+* Change: Change submodule paths (!426)
+* Change: Update ES templates with merge policy (!419)
+* Bugfix: Fix async permission mappings (!401)
+* Change: Fix ordering and naming of crontab fields
+
+
 ## v2.1.0 (21 Jul 2017)
 
 ### Changes
@@ -25,6 +40,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 
