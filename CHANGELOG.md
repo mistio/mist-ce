@@ -1,6 +1,14 @@
 # Changelog
 
 
+## v2.2.1 (8 Sep 2017)
+
+### Changes
+
+* Bugfix: Use tz aware objects in changelog.py (!445)
+* Bugfix: Install dateutil for ci release step (!444)
+
+
 ## v2.2.0 (8 Sep 2017)
 
 ### Changes
@@ -39,6 +47,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 
