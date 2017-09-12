@@ -261,6 +261,7 @@ deploy_test_env:
 .api_test_template: &api_test_template
   <<: *test_template
   script:
+    - sleep 10
     - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/api/$TEST.py || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   tags:
