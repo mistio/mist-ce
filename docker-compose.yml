@@ -146,6 +146,7 @@ services:
       - landing
       - ui
 
+
   beringei:
     image: gcr.io/mist-ops/beringei:plain
     command: "./beringei/service/beringei_main -beringei_configuration_path /etc/beringei/beringei.json -create_directories -sleep_between_bucket_finalization_secs 60 -allowed_timestamp_behind 300 -bucket_size 600 -buckets 144 -logtostderr -v=2"
@@ -177,6 +178,14 @@ services:
       - beringei
       - beringei-http
       - rabbitmq
+
+  traefik:
+    image: traefik
+    command: --web --logLevel=DEBUG
+    ports:
+      - 8040:80
+      - 8041:8080
+
 
 volumes:
   elasticsearch: {}
