@@ -276,7 +276,7 @@ deploy_test_env:
     paths:
       - js_console.log
       - error*
-      - test.mp4
+      - output.mp4
     expire_in: 3 days
     when: on_failure
   tags:
