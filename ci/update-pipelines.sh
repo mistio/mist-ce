@@ -117,8 +117,10 @@ while read -r line; do
         )
         echo "Previous state is $prev_state"
         if [ "$prev_state" = "running" ] || [ "$prev_state" = "pending" ] ; then
+            set -x
             curl -sf -X POST -H "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
                 "$GITLAB_URL/api/v4/projects/$repo/statuses/$commit/?name=$NAME&ref=$branch&state=canceled"
+            set +x
         fi
     fi
 
