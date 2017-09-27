@@ -1,6 +1,16 @@
 # Changelog
 
 
+## v2.3.0 (19 Sep 2017)
+
+### Changes
+
+* Change: Whitelisting UI improvements (!446)
+* Change: Insights UI improvements
+* Bugfix: Catch invalid SSL cert for OnApp
+* Change: Update GCE pricing, improve list sizes behavior
+
+
 ## v2.2.1 (8 Sep 2017)
 
 ### Changes
@@ -47,6 +57,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 
