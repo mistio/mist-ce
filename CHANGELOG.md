@@ -1,6 +1,38 @@
 # Changelog
 
 
+## v2.3.0 (19 Sep 2017)
+
+### Changes
+
+* Change: Whitelisting UI improvements (!446)
+* Change: Insights UI improvements
+* Bugfix: Catch invalid SSL cert for OnApp
+* Change: Update GCE pricing, improve list sizes behavior
+
+
+## v2.2.1 (8 Sep 2017)
+
+### Changes
+
+* Bugfix: Use tz aware objects in changelog.py (!445)
+* Bugfix: Install dateutil for ci release step (!444)
+
+
+## v2.2.0 (8 Sep 2017)
+
+### Changes
+
+* Feature: IP whitelisting (!434)
+* Change: Do not hardcore repo name in release process (!382)
+* Change: Ansible script example - update ref (!432)
+* Change: Refactor poller (!420)
+* Change: Change submodule paths (!426)
+* Change: Update ES templates with merge policy (!419)
+* Bugfix: Fix async permission mappings (!401)
+* Change: Fix ordering and naming of crontab fields
+
+
 ## v2.1.0 (21 Jul 2017)
 
 ### Changes
@@ -25,6 +57,10 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
+
+
+
 
 
 

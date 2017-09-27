@@ -1,8 +1,8 @@
 {
-  "template": "exceptions-*",
+  "template": "cloudify-metrics-*",
     "settings": {
       "index": {
-        "refresh_interval": "30s",
+        "refresh_interval": "60s",
         "number_of_shards": "1",
         "number_of_replicas": "1",
         "routing": {
@@ -27,16 +27,6 @@
       "_default_": {
         "dynamic_templates": [
           {
-            "objects": {
-              "match_mapping_type": "object",
-              "match": "*",
-              "mapping": {
-                "enabled": false,
-                "type": "object"
-              }
-            }
-          },
-          {
             "strings": {
               "match_mapping_type": "string",
               "match": "*",
@@ -47,12 +37,22 @@
             }
           },
           {
+            "integers": {
+              "match_mapping_type": "integer",
+              "match": "*",
+              "mapping": {
+                "index": false,
+                "type": "float"
+              }
+            }
+          },
+          {
             "remaining": {
               "match_mapping_type": "*",
               "match": "*",
               "mapping": {
                 "index": false,
-                "type": "keyword"
+                "type": "{dynamic_type}"
               }
             }
           }
@@ -77,68 +77,52 @@
             "index": false,
             "type": "float"
           },
-          "type": {
-            "index": false,
-            "type": "keyword"
-          },
-          "event_type": {
-            "index": true,
-            "type": "keyword"
-          },
-          "action": {
-            "index": true,
-            "type": "keyword"
-          },
           "owner_id": {
             "index": true,
             "type": "keyword"
           },
-          "user_id": {
+          "resource_id": {
             "index": true,
             "type": "keyword"
           },
-          "email": {
+          "deployment_id": {
             "index": true,
             "type": "keyword"
           },
-          "traceback": {
-            "index": true,
-            "type": "text"
-          },
-          "exception": {
-            "index": true,
-            "type": "text"
-          },
-          "cloud_id": {
+          "node_id": {
             "index": true,
             "type": "keyword"
           },
-          "machine_id": {
+          "host": {
             "index": true,
             "type": "keyword"
           },
-          "key_id": {
+          "name": {
             "index": true,
             "type": "keyword"
           },
-          "script_id": {
+          "node_name": {
             "index": true,
             "type": "keyword"
           },
-          "template_id": {
+          "metric": {
+            "index": true,
+            "type": "float"
+          },
+          "service": {
             "index": true,
             "type": "keyword"
           },
-          "stack_id": {
+          "path": {
             "index": true,
             "type": "keyword"
           },
-          "tunnel_id": {
-            "index": true,
+          "unit": {
+            "index": false,
             "type": "keyword"
           },
-          "schedule_id": {
-            "index": true,
+          "type": {
+            "index": false,
             "type": "keyword"
           },
           "tags": {

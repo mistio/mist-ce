@@ -10,6 +10,14 @@
             "total_shards_per_node": "1"
           }
         },
+        "merge": {
+          "policy": {
+            "floor_segment": "2mb",
+            "segments_per_tier": "8",
+            "max_merge_at_once": "4",
+            "max_merged_segment": "512mb"
+          }
+        },
         "translog": {
           "durability": "async"
         }
@@ -23,7 +31,7 @@
               "match_mapping_type": "*",
               "match": "*",
               "mapping": {
-                "index": false,
+                "index": true,
                 "type": "keyword"
               }
             }
