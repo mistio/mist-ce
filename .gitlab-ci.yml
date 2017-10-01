@@ -282,43 +282,35 @@ deploy_test_env:
     - cpu
 
 
-#API:io:api_token: *api_test_template
-#API:io:clouds: *api_test_template
-#API:io:dns: *api_test_template
-#API:io:keys: *api_test_template
-#API:io:images: *api_test_template
-#API:io:libcloud_1/2: *api_test_template
-#API:io:libcloud_2/2: *api_test_template
-#API:io:machines: *api_test_template
-#API:io:networks: *api_test_template
-#API:io:schedules: *api_test_template
-#API:io:scripts: *api_test_template
-#API:io:rbac: *api_test_template
-#API:io:ip_whitelisting: *api_test_template
+API:io:api_token: *api_test_template
+API:io:clouds: *api_test_template
+API:io:dns: *api_test_template
+API:io:keys: *api_test_template
+API:io:images: *api_test_template
+API:io:libcloud_1/2: *api_test_template
+API:io:libcloud_2/2: *api_test_template
+API:io:machines: *api_test_template
+API:io:networks: *api_test_template
+API:io:schedules: *api_test_template
+API:io:scripts: *api_test_template
+API:io:rbac: *api_test_template
+API:io:ip_whitelisting: *api_test_template
 
 
-#UI:clouds-add-1/2: *ui_test_template
-#UI:clouds-add-2/2: *ui_test_template
-#UI:clouds-actions: *ui_test_template
-#UI:keys: *ui_test_template
-#UI:machines: *ui_test_template
-#UI:schedulers-1/2: *ui_test_template
-#UI:schedulers-2/2: *ui_test_template
-#UI:scripts: *ui_test_template
-#UI:scripts-actions: *ui_test_template
-#UI:images-networks: *ui_test_template
-#UI:user-actions: *ui_test_template
-#UI:rbac-teams: *ui_test_template
-#UI:zones: *ui_test_template
-#UI:ip-whitelisting: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
-UI:plan: *ui_test_template
+UI:clouds-add-1/2: *ui_test_template
+UI:clouds-add-2/2: *ui_test_template
+UI:clouds-actions: *ui_test_template
+UI:keys: *ui_test_template
+UI:machines: *ui_test_template
+UI:schedulers-1/2: *ui_test_template
+UI:schedulers-2/2: *ui_test_template
+UI:scripts: *ui_test_template
+UI:scripts-actions: *ui_test_template
+UI:images-networks: *ui_test_template
+UI:user-actions: *ui_test_template
+UI:rbac-teams: *ui_test_template
+UI:zones: *ui_test_template
+UI:ip-whitelisting: *ui_test_template
 
 #################### UNDEPLOY STAGE ####################
 
