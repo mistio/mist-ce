@@ -297,21 +297,21 @@ API:io:rbac: *api_test_template
 API:io:ip_whitelisting: *api_test_template
 
 
-UI:clouds-add-1/2: *ui_test_template
-UI:clouds-add-2/2: *ui_test_template
+#UI:clouds-add-1/2: *ui_test_template
+#UI:clouds-add-2/2: *ui_test_template
 #UI:clouds-add-3/3: *ui_test_template
-UI:clouds-actions: *ui_test_template
-UI:keys: *ui_test_template
-UI:machines: *ui_test_template
-UI:schedulers-1/2: *ui_test_template
-UI:schedulers-2/2: *ui_test_template
-UI:scripts: *ui_test_template
-UI:scripts-actions: *ui_test_template
-UI:images-networks: *ui_test_template
-UI:user-actions: *ui_test_template
-UI:rbac-teams: *ui_test_template
-UI:zones: *ui_test_template
-UI:ip-whitelisting: *ui_test_template
+#UI:clouds-actions: *ui_test_template
+#UI:keys: *ui_test_template
+#UI:machines: *ui_test_template
+#UI:schedulers-1/2: *ui_test_template
+#UI:schedulers-2/2: *ui_test_template
+#UI:scripts: *ui_test_template
+#UI:scripts-actions: *ui_test_template
+#UI:images-networks: *ui_test_template
+#UI:user-actions: *ui_test_template
+#UI:rbac-teams: *ui_test_template
+#UI:zones: *ui_test_template
+#UI:ip-whitelisting: *ui_test_template
 
 
 #################### UNDEPLOY STAGE ####################
