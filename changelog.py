@@ -411,9 +411,7 @@ def get_mrs(gitlab, branches=('master', 'staging'), since=None):
     mrs = []
     params = {'state': 'merged', 'order_by': 'updated_at', 'sort': 'desc'}
     for mr in gitlab.paginated_get('merge_requests', params):
-        updated_at = dateutil.parser.parse(
-            mr['updated_at']
-        ).replace(tzinfo=None)
+        updated_at = dateutil.parser.parse(mr['updated_at'])
         if since and updated_at < since:
             break
         if branches and mr['target_branch'] not in branches:
@@ -433,9 +431,7 @@ def get_mrs(gitlab, branches=('master', 'staging'), since=None):
             sha = mr['merge_commit_sha']
             assert sha
             commit = gitlab.get('repository/commits/%s' % sha)
-            created_at = dateutil.parser.parse(
-                commit['created_at']
-            ).replace(tzinfo=None)
+            created_at = dateutil.parser.parse(commit['created_at'])
             if created_at < since:
                 mrs.pop(i)
         print >> sys.stderr, ("\nINFO: MR's filtered by merge_commit "
@@ -541,9 +537,7 @@ def main():
                 print >> sys.stderr, ("ERROR: Can't find previous release "
                                       "'%s' on Gitlab." % last_version.name)
                 raise
-            since = dateutil.parser.parse(
-                last_tag['commit']['committed_date']
-            ).replace(tzinfo=None)
+            since = dateutil.parser.parse(last_tag['commit']['committed_date'])
         mrs = get_mrs(gitlab, branches=args.branches, since=since)
         for mr in mrs:
             version.changes.append(Change(mr['title'], mr=mr['iid']))

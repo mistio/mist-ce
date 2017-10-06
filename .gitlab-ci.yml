@@ -294,6 +294,7 @@ API:io:networks: *api_test_template
 API:io:schedules: *api_test_template
 API:io:scripts: *api_test_template
 API:io:rbac: *api_test_template
+API:io:ip_whitelisting: *api_test_template
 
 
 UI:clouds-add-1/2: *ui_test_template
@@ -309,6 +310,7 @@ UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:zones: *ui_test_template
+UI:ip-whitelisting: *ui_test_template
 
 
 #################### UNDEPLOY STAGE ####################
@@ -350,13 +352,13 @@ release: &release_template
   image: python:2.7-alpine
   before_script:
     - apk add --update libmagic
-    - pip install requests python-magic
+    - pip install requests python-magic python-dateutil
   script:
     - mkdir release
     - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
     - ./changelog.py extract $CI_BUILD_REF_NAME > release.md || true
     - echo >> release.md
-    - sed "s/TAG/$CI_BUILD_REF_NAME/g" ci/release.md >> release.md
+    - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/mist\.io/g" ci/release.md >> release.md
     - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist.io $CI_BUILD_REF_NAME
   only:
     # only for references that match a version string (v1.2.3)
