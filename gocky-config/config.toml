@@ -14,3 +14,4 @@ beringei-update-url = "http://beringei-http:9990/update"
 output = [
     { name="local1", location="beringei-http:9990"}
 ]
+graphite-output = "graphite:2003"
