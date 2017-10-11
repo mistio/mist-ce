@@ -275,7 +275,7 @@ deploy_test_env:
     paths:
       - js_console.log
       - artifacts/error.png
-      - output.mp4
+      - artifacts/output.mp4
     expire_in: 3 days
     when: on_failure
   tags:
