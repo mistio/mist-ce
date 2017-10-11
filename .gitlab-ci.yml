@@ -299,7 +299,7 @@ API:io:ip_whitelisting: *api_test_template
 
 UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
-#UI:clouds-add-3/3: *ui_test_template
+UI:clouds-add-3/3: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
 UI:machines: *ui_test_template
