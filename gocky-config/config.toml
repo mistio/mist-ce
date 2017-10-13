@@ -11,7 +11,7 @@ name = "example-beringei"
 bind-addr = "0.0.0.0:9097"
 amqp-url = "amqp://guest:guest@rabbitmq:5672/"
 beringei-update-url = "http://beringei-http:9990/update"
-output = [
-    { name="local1", location="beringei-http:9990"}
-]
+#output = [
+#    { name="local1", location="beringei-http:9990"}
+#]
 graphite-output = "graphite:2003"
