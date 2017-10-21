@@ -213,6 +213,7 @@ build-debugger-manual:
   dependencies: []
   script:
     - ./ci/deploy.sh
+    - sleep 2
   tags:
     - kube-default
 
@@ -297,8 +298,8 @@ API:io:rbac: *api_test_template
 API:io:ip_whitelisting: *api_test_template
 
 
-UI:clouds-add-1/2: *ui_test_template
-UI:clouds-add-2/2: *ui_test_template
+UI:clouds-add-1/3: *ui_test_template
+UI:clouds-add-2/3: *ui_test_template
 UI:clouds-add-3/3: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
