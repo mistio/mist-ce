@@ -274,8 +274,8 @@ deploy_test_env:
   artifacts:
     paths:
       - js_console.log
-      - error*
-      - test.mp4
+      - artifacts/error.png
+      - artifacts/output.mp4
     expire_in: 3 days
     when: on_failure
   tags:
@@ -299,6 +299,7 @@ API:io:ip_whitelisting: *api_test_template
 
 UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
+UI:clouds-add-3/3: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
 UI:machines: *ui_test_template
