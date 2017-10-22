@@ -213,8 +213,6 @@ build-debugger-manual:
   dependencies: []
   script:
     - ./ci/deploy.sh
-    # wait for logstash to be running
-    - sleep 50
   tags:
     - kube-default
 
