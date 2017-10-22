@@ -213,7 +213,7 @@ build-debugger-manual:
   dependencies: []
   script:
     - ./ci/deploy.sh
-    - sleep 2
+    - sleep 5
   tags:
     - kube-default
 
