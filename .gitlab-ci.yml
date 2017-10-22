@@ -282,6 +282,11 @@ deploy_test_env:
   tags:
     - cpu
 
+.ip_whitelisting_test_template: &ip_whitelisting_test_template
+  <<: *ui_test_template
+  only:
+    - staging
+
 
 API:io:api_token: *api_test_template
 API:io:clouds: *api_test_template
@@ -312,7 +317,7 @@ UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:zones: *ui_test_template
-UI:ip-whitelisting: *ui_test_template
+UI:ip-whitelisting: *ip_whitelisting_test_template
 
 
 #################### UNDEPLOY STAGE ####################
