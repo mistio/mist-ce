@@ -154,7 +154,7 @@ services:
     ports:
       - 9999:9999
     volumes:
-      - ./beringei-config:/etc/beringei
+      - ./docker/beringei:/etc/beringei
 
   beringei-http:
     image: gcr.io/mist-ops/beringei:plain
@@ -162,7 +162,7 @@ services:
     ports:
       - 9990:9990
     volumes:
-      - ./beringei-config:/etc/beringei
+      - ./docker/beringei:/etc/beringei
     depends_on:
       - beringei
 
@@ -173,7 +173,7 @@ services:
       - 9096:9096
       - 9097:9097
     volumes:
-      - ./gocky-config:/etc/gocky
+      - ./docker/gocky:/etc/gocky
     depends_on:
       - beringei
       - beringei-http
