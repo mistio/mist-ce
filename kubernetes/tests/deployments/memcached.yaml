@@ -18,7 +18,7 @@ spec:
             - containerPort: 11211
           resources:
             requests:
-              memory: 200Mi
-              cpu: 200m
+              memory: 100Mi
+              cpu: 50m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic

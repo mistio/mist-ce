@@ -30,8 +30,8 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 1500Mi
-              cpu: 400m
+              memory: 500Mi
+              cpu: 100m
       volumes:
       - name: config-volume
         configMap:

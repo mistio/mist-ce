@@ -39,7 +39,7 @@ spec:
         name: logstash
         resources:
           requests:
-            memory: 800Mi
+            memory: 600Mi
             cpu: 500m
         terminationMessagePath: /dev/termination-log
       dnsPolicy: ClusterFirst

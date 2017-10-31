@@ -28,7 +28,7 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 2000Mi
+              memory: 800Mi
               cpu: 400m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
