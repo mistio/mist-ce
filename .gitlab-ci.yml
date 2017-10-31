@@ -315,6 +315,7 @@ UI:scripts: *ui_test_template
 UI:scripts-actions: *ui_test_template
 UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
+UI:pricing: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:zones: *ui_test_template
 UI:ip-whitelisting: *ip_whitelisting_test_template
