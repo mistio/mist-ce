@@ -25,8 +25,11 @@ spec:
           command: ["nginx", "-c", "/opt/nginx/nginx.conf"]
           resources:
             requests:
-              memory: 50Mi
-              cpu: 50m
+              memory: 30Mi
+              cpu: 10m
+            limits:
+              memory: 60Mi
+              cpu: 1000m
       volumes:
       - name: nginx-conf
         configMap:
