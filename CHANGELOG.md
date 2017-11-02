@@ -1,6 +1,28 @@
 # Changelog
 
 
+## v2.4.0 (27 Oct 2017)
+
+### Changes
+
+* Feature: Azurearm provisioning (!457)
+* Feature: Improved Windows support
+* Feature: Granular Notification Overrides (!460)
+* Feature: Resize machine action for EC2, DigitalOcean, OpenStack
+* Bugfix: Fix lock bug https://gitlab.ops.mist.io/mistio/mist.core/issues/1221 (!454)
+* Bugfix: Properly read cost from tags for generic (non-libcloud) machines
+* Bugfix: Fix ping parsing
+* Bugfix: Fix poller computed property
+* Change: Update xterm.js & fix shell display issues
+* Change: Improve display of probe data
+* Change: Exclude audit log ES templates (!473)
+* Change: Run tests with headless Chrome (!442)
+* Change: New rules models (!472)
+* Change: Sso refresh token (!461)
+* Change: Update docker/nginx/nginx.conf (!459)
+* Change: Move ES template for cloudify-metrics to mist.io/docker/elasticsearch-manage (!458)
+
+
 ## v2.3.0 (19 Sep 2017)
 
 ### Changes
@@ -57,6 +79,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 
