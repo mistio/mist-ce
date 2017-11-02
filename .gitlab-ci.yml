@@ -236,7 +236,7 @@ deploy_test_env:
   variables:
     NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
     DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
-    EXPIRE_HOURS: "12"
+    EXPIRE_HOURS: "2"
 
 
 #################### TEST STAGE ####################

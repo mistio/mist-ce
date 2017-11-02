@@ -24,7 +24,10 @@ spec:
               mountPath: /data/db
           resources:
             requests:
-              memory: 800Mi
-              cpu: 300m
+              memory: 100Mi
+              cpu: 100m
+            limits:
+              memory: 200Mi
+              cpu: 1000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
