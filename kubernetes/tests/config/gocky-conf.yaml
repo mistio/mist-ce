@@ -11,7 +11,7 @@ data:
 
     # output is a list of graphite backends
     output = [
-        { name="graphite1", location="graphite:2003"}
+        { name="graphite1", location="graphite.default:2003"}
     ]
 
     # metering will send stats for samples/org/machine
