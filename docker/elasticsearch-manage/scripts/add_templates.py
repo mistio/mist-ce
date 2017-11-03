@@ -10,7 +10,7 @@ import traceback
 from elasticsearch import Elasticsearch
 
 
-EXCLUDED = ('heapster', )  # Templates to be excluded.
+EXCLUDED = ('heapster', 'audit', )  # Templates to be excluded.
 
 
 def es_client():

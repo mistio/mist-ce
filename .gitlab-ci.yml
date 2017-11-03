@@ -236,7 +236,7 @@ deploy_test_env:
   variables:
     NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
     DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
-    EXPIRE_HOURS: "12"
+    EXPIRE_HOURS: "2"
 
 
 #################### TEST STAGE ####################
@@ -249,7 +249,7 @@ deploy_test_env:
     MIST_URL: http://$CI_COMMIT_REF_SLUG.io.test.ops.mist.io
     DISPLAY: ":1.0"
     REGISTER_USER_BEFORE_FEATURE: "True"
-    EMAIL: fatboy.tester.mist.io+${CI_JOB_ID}@gmail.com
+    EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
   dependencies:
     - discover-submodules
   before_script:
@@ -257,6 +257,7 @@ deploy_test_env:
     - echo "Test argument is $TEST"
     - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
+    - cat test_settings.py
 
 .api_test_template: &api_test_template
   <<: *test_template
@@ -274,12 +275,17 @@ deploy_test_env:
   artifacts:
     paths:
       - js_console.log
-      - error*
-      - test.mp4
+      - artifacts/error.png
+      - artifacts/output.mp4
     expire_in: 3 days
     when: on_failure
   tags:
     - cpu
+
+.ip_whitelisting_test_template: &ip_whitelisting_test_template
+  <<: *ui_test_template
+  only:
+    - staging
 
 
 API:io:api_token: *api_test_template
@@ -297,8 +303,9 @@ API:io:rbac: *api_test_template
 API:io:ip_whitelisting: *api_test_template
 
 
-UI:clouds-add-1/2: *ui_test_template
-UI:clouds-add-2/2: *ui_test_template
+UI:clouds-add-1/3: *ui_test_template
+UI:clouds-add-2/3: *ui_test_template
+UI:clouds-add-3/3: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
 UI:machines: *ui_test_template
@@ -310,7 +317,7 @@ UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:zones: *ui_test_template
-UI:ip-whitelisting: *ui_test_template
+UI:ip-whitelisting: *ip_whitelisting_test_template
 
 
 #################### UNDEPLOY STAGE ####################
