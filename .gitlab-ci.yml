@@ -236,7 +236,7 @@ deploy_test_env:
   variables:
     NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
     DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
-    EXPIRE_HOURS: "12"
+    EXPIRE_HOURS: "2"
 
 
 #################### TEST STAGE ####################
@@ -249,7 +249,7 @@ deploy_test_env:
     MIST_URL: http://$CI_COMMIT_REF_SLUG.io.test.ops.mist.io
     DISPLAY: ":1.0"
     REGISTER_USER_BEFORE_FEATURE: "True"
-    EMAIL: fatboy.tester.mist.io+${CI_JOB_ID}@gmail.com
+    EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
   dependencies:
     - discover-submodules
   before_script:
@@ -257,6 +257,7 @@ deploy_test_env:
     - echo "Test argument is $TEST"
     - ./update-pipelines -n io:$CI_JOB_NAME running
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
+    - cat test_settings.py
 
 .api_test_template: &api_test_template
   <<: *test_template
