@@ -1,3 +1,6 @@
+variables:
+  GET_SOURCES_ATTEMPTS: 3
+
 stages:
   - discover-submodules
   - build
