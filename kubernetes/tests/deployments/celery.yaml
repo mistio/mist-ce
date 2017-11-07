@@ -26,8 +26,11 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
+              memory: 1000Mi
+              cpu: 280m
+            limits:
               memory: 2000Mi
-              cpu: 400m
+              cpu: 2000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
       volumes:
@@ -65,8 +68,11 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 800Mi
-              cpu: 300m
+              memory: 100Mi
+              cpu: 10m
+            limits:
+              memory: 200Mi
+              cpu: 1000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
       volumes:
@@ -104,8 +110,11 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 800Mi
-              cpu: 400m
+              memory: 100Mi
+              cpu: 200m
+            limits:
+              memory: 200Mi
+              cpu: 2000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
       volumes:
