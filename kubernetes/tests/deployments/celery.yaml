@@ -4,7 +4,7 @@ metadata:
   name: celery
   namespace: REPLACE_NAMESPACE
 spec:
-  replicas: 2
+  replicas: 4
   template:
     metadata:
       labels:
