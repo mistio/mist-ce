@@ -28,8 +28,8 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 700Mi
-              cpu: 180m
+              memory: 1000Mi
+              cpu: 300m
             limits:
               memory: 1500Mi
               cpu: 2000m
