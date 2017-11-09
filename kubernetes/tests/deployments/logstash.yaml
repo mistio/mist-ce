@@ -39,8 +39,8 @@ spec:
         name: logstash
         resources:
           requests:
-            memory: 6500Mi
-            cpu: 270m
+            memory: 700Mi
+            cpu: 300m
           limits:
             memory: 1000Mi
             cpu: 1000m
