@@ -121,3 +121,40 @@ spec:
       - name: config-volume
         configMap:
           name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-exporter
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: celery-exporter
+        component: REPLACE_STACK
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "8888"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+        - name: celery-exporter
+          image: dimrozakis/celery-exporter
+          imagePullPolicy: Always
+          args:
+          - --broker
+          - amqp://guest:guest@rabbitmq/
+          - --enable-events
+          resources:
+            limits:
+              memory: 200Mi
+              cpu: 200m
+            requests:
+              memory: 25Mi
+              cpu: 3m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
