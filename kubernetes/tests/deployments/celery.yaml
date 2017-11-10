@@ -143,11 +143,12 @@ spec:
     spec:
       containers:
         - name: celery-exporter
-          image: zerok/celery_exporter:1.1.0-celery3
+          image: dimrozakis/celery-exporter
           imagePullPolicy: Always
           args:
           - --broker
           - amqp://guest:guest@rabbitmq/
+          - --enable-events
           resources:
             limits:
               memory: 200Mi
