@@ -122,10 +122,10 @@ spec:
         configMap:
           name: mist-config
 
+---
 
-
-apiVersion: extensions/v1beta1
 kind: Deployment
+apiVersion: extensions/v1beta1
 metadata:
   name: celery-ping
   namespace: REPLACE_NAMESPACE
@@ -140,32 +140,35 @@ spec:
       imagePullSecrets:
         - name: mistopskey
       containers:
-      - args:
-        - celery
-        - worker
-        - -A
-        - mist.core.tasks
-        - -Q
-        - ping
-        - -l
-        - WARNING
-        - -Ofair
-        env:
-        - name: SETTINGS_FILE
-          value: /etc/config/mist.config
-      volumeMounts:
-      - name: config-volume
-        mountPath: /etc/config/
-      resources:
-        requests:
-          memory: 100Mi
-          cpu: 50m
-        limits:
-          memory: 500Mi
-          cpu: 2000m
+        - name: celery-ping
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          - args:
+            - celery
+            - worker
+            - -A
+            - mist.core.tasks
+            - -Q
+            - ping
+            - -l
+            - WARNING
+            - -Ofair
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 200m
+            limits:
+              memory: 200Mi
+              cpu: 2000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
       volumes:
       - name: config-volume
-      configMap:
-        name: mist-config
+        configMap:
+          name: mist-config
