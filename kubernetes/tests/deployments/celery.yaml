@@ -164,8 +164,8 @@ spec:
           memory: 500Mi
           cpu: 2000m
       nodeSelector:
-      cloud.google.com/gke-nodepool: generic
+        cloud.google.com/gke-nodepool: generic
       volumes:
       - name: config-volume
       configMap:
-      name: mist-config
+        name: mist-config
