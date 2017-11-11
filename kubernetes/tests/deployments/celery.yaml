@@ -1,7 +1,7 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: celery
+  name: celery-prefork
   namespace: REPLACE_NAMESPACE
 spec:
   replicas: 2
@@ -14,13 +14,13 @@ spec:
       imagePullSecrets:
         - name: mistopskey
       containers:
-        - name: celery
+        - name: celery-prefork
           image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
           imagePullPolicy: Always
           env:
             - name: SETTINGS_FILE
               value: "/etc/config/mist.config"
-          args: ["bin/celery"]
+          args: ["bin/celery-prefork"]
           volumeMounts:
           - name: config-volume
             mountPath: /etc/config/
@@ -31,6 +31,48 @@ spec:
             limits:
               memory: 2000Mi
               cpu: 2000m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-gevent
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: celery
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: celery-gevent
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          args: ["bin/celery-gevent"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          resources:
+            requests:
+              memory: 500Mi
+              # FIXME cpu: 280m
+            limits:
+              memory: 1000Mi
+              cpu: 1000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
       volumes:
