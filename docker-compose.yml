@@ -62,7 +62,7 @@ services:
     restart: on-failure:5
 
 
-  celery: &backend
+  celery-prefork: &backend
     image: mist/mist:io-$MIST_TAG
     depends_on:
       - memcached
@@ -76,7 +76,11 @@ services:
     stdin_open: true
     tty: true
     restart: on-failure:5
-    command: bin/wait-all bin/celery
+    command: bin/wait-all bin/celery-prefork
+
+  celery-gevent:
+    <<: *backend
+    command: bin/wait-all bin/celery-gevent
 
   scheduler:
     <<: *backend
@@ -136,6 +140,15 @@ services:
       - sockjs
       - landing
       - ui
+
+  celery-exporter:
+    image: dimrozakis/celery-exporter
+    command:
+      - --broker
+      - amqp://guest:guest@rabbitmq/
+      - --enable-events
+    ports:
+      - 8888:8888
 
 volumes:
   elasticsearch: {}
