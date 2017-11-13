@@ -4,7 +4,7 @@ metadata:
   name: celery-prefork
   namespace: REPLACE_NAMESPACE
 spec:
-  replicas: 2
+  replicas: 4
   template:
     metadata:
       labels:
@@ -27,7 +27,7 @@ spec:
           resources:
             requests:
               memory: 1000Mi
-              cpu: 250m
+              cpu: 400m
             limits:
               memory: 2000Mi
               cpu: 2000m
@@ -46,7 +46,7 @@ metadata:
   name: celery-gevent
   namespace: REPLACE_NAMESPACE
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -153,7 +153,7 @@ spec:
           resources:
             requests:
               memory: 100Mi
-              cpu: 200m
+              cpu: 500m
             limits:
               memory: 200Mi
               cpu: 2000m
