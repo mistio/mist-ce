@@ -4,7 +4,7 @@ metadata:
   name: celery-prefork
   namespace: REPLACE_NAMESPACE
 spec:
-  replicas: 4
+  replicas: 3
   template:
     metadata:
       labels:
