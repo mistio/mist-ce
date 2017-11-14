@@ -40,7 +40,6 @@ Required environmental variables:
     STRIPE_SECRET_APIKEY    $STRIPE_SECRET_APIKEY
     STRIPE_PUBLIC_APIKEY    $STRIPE_PUBLIC_APIKEY
 
-
 Optional environmental variables:
 
     Configure if built ui files are served
@@ -91,7 +90,7 @@ fi
 
 # Substitute environmental variables in kubernetes yaml definitions.
 for var in NAMESPACE TAG SENDGRID_USERNAME SENDGRID_PASSWORD \
-           ELASTIC_URI ELASTIC_USERNAME ELASTIC_PASSWORD STRIPE_SECRET_APIKEY STRIPE_PUBLIC_APIKEY STACK JS_BUILD; do
+           ELASTIC_URI ELASTIC_USERNAME ELASTIC_PASSWORD STACK STRIPE_SECRET_APIKEY STRIPE_PUBLIC_APIKEY JS_BUILD; do
     val=$(eval echo \$$var)
     if [ -z "$val" ]; then
         log "Enviromental variable \$$var is not set."
