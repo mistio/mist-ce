@@ -4,7 +4,7 @@ metadata:
   name: celery-prefork
   namespace: REPLACE_NAMESPACE
 spec:
-  replicas: 4
+  replicas: 3
   template:
     metadata:
       labels:
@@ -68,7 +68,7 @@ spec:
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 500Mi
+              memory: 150Mi
               cpu: 60m
             limits:
               memory: 1000Mi
