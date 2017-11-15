@@ -1,7 +1,49 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: celery
+  name: celery-prefork
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: celery
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: celery-prefork
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          args: ["bin/celery-prefork"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          resources:
+            requests:
+              memory: 1000Mi
+              cpu: 400m
+            limits:
+              memory: 2000Mi
+              cpu: 2000m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-gevent
   namespace: REPLACE_NAMESPACE
 spec:
   replicas: 2
@@ -14,23 +56,23 @@ spec:
       imagePullSecrets:
         - name: mistopskey
       containers:
-        - name: celery
+        - name: celery-gevent
           image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
           imagePullPolicy: Always
           env:
             - name: SETTINGS_FILE
               value: "/etc/config/mist.config"
-          args: ["bin/celery"]
+          args: ["bin/celery-gevent"]
           volumeMounts:
           - name: config-volume
             mountPath: /etc/config/
           resources:
             requests:
-              memory: 1000Mi
-              cpu: 280m
+              memory: 150Mi
+              cpu: 60m
             limits:
-              memory: 2000Mi
-              cpu: 2000m
+              memory: 1000Mi
+              cpu: 1000m
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
       volumes:
@@ -111,7 +153,7 @@ spec:
           resources:
             requests:
               memory: 100Mi
-              cpu: 200m
+              cpu: 500m
             limits:
               memory: 200Mi
               cpu: 2000m
@@ -121,3 +163,40 @@ spec:
       - name: config-volume
         configMap:
           name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-exporter
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: celery-exporter
+        component: REPLACE_STACK
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "8888"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+        - name: celery-exporter
+          image: dimrozakis/celery-exporter
+          imagePullPolicy: Always
+          args:
+          - --broker
+          - amqp://guest:guest@rabbitmq/
+          - --enable-events
+          resources:
+            limits:
+              memory: 200Mi
+              cpu: 200m
+            requests:
+              memory: 25Mi
+              cpu: 3m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
