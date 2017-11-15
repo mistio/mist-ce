@@ -29,8 +29,8 @@ spec:
             mountPath: /etc/gocky/
           resources:
             requests:
-              memory: 50Mi
-              cpu: 100m
+              memory: 10Mi
+              cpu: 10m
             limits:
               memory: 100Mi
               cpu: 1000m
