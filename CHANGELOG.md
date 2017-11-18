@@ -1,7 +1,7 @@
 # Changelog
 
 
-## v2.5.0-rc1 (18 Nov 2017)
+## v2.5.0 (18 Nov 2017)
 
 ### Changes
 
@@ -93,6 +93,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 
