@@ -172,7 +172,11 @@ services:
 
   gocky:
     image: gcr.io/mist-ops/gocky:v0.5
-    command: /gocky -config /etc/gocky/config.toml
+    command:
+      - go-wrapper
+      - run
+      - -config
+      - /etc/gocky/config.toml
     ports:
       - 9096:9096
       - 9097:9097
