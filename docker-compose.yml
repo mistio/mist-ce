@@ -7,7 +7,9 @@ services:
 
 
   influxdb:
-    image: influxdb:1.2.2
+    image: influxdb
+    environment:
+      INFLUXDB_DB: telegraf
     ports:
       - 8083:8083
       - 8086:8086
