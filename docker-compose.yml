@@ -31,7 +31,7 @@ services:
 
 
   elasticsearch:
-    image: elasticsearch:5.4.0
+    image: elasticsearch:5.5.2
     restart: on-failure:5
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
@@ -52,7 +52,7 @@ services:
       - rabbitmq
 
   kibana:
-    image: kibana:5.4.0
+    image: kibana:5.5.2
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
     restart: on-failure:5
