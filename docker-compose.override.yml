@@ -32,11 +32,12 @@ services:
       - ./keys:/keys
 
 
-  celery: &backend
+  celery-prefork: &backend
     volumes:
       - ./api:/mist.api:rw
       - ./keys:/keys
       - ./elasticsearch:/elasticsearch
+  celery-gevent: *backend
   scheduler: *backend
   poller: *backend
   beat: *backend
