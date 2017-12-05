@@ -7,9 +7,11 @@ metadata:
     name: mailmock
     component: REPLACE_STACK
 spec:
+  type: NodePort
   ports:
     - port: 8143
-      targetPort: 8143
+      nodePort: 30007
+      name: imap
   selector:
     app: mailmock
     component: REPLACE_STACK
