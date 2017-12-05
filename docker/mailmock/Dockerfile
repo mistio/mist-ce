@@ -1,6 +1,6 @@
 FROM python:2.7-alpine
 
-RUN apk add --update python-dev libffi-dev musl-dev openssl-dev gcc
+RUN apk add --update python-dev libffi-dev musl-dev openssl-dev gcc git
 RUN pip install behaving service_identity git+https://gitlab.ops.mist.io/mistio/localmail.git
 
 WORKDIR /var/mail
