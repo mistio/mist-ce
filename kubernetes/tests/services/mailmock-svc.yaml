@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mailmock
+  namespace: REPLACE_NAMESPACE
+  labels:
+    name: mailmock
+    component: REPLACE_STACK
+spec:
+  ports:
+    - port: 8143
+      targetPort: 8143
+  selector:
+    app: mailmock
+    component: REPLACE_STACK
