@@ -20,6 +20,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8025
+              name: smtp
+            - containerPort: 8143
+              name: imap
           resources:
             requests:
               memory: 20Mi
