@@ -9,7 +9,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 8143
+    - port: 8025
       nodePort: 30007
       name: imap
   selector:
