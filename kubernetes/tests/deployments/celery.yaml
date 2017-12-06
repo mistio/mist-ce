@@ -193,9 +193,9 @@ spec:
           resources:
             limits:
               cpu: 500m
-              memory: 100Mi
+              memory: 150Mi
             requests:
-              cpu: 200m
+              cpu: 70m
               memory: 80Mi
           volumeMounts:
             - name: config-volume
