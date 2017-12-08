@@ -10,6 +10,8 @@ spec:
   ports:
     - port: 8143
       targetPort: 8143
+    - port: 8025
+      targetPort: 8025
   selector:
     app: mailmock
     component: REPLACE_STACK
