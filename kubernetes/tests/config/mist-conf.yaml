@@ -13,14 +13,6 @@ data:
     BROKER_URL="amqp://guest:guest@rabbitmq/"
     MONGO_URI="mongodb:27017"
     MEMCACHED_HOST=["memcached:11211"]
-    MAILER_SETTINGS = {
-        'mail.host': "smtp.sendgrid.net",
-        'mail.port': "2525",
-        'mail.tls': False,
-        'mail.starttls': True,
-        'mail.username': "REPLACE_SENDGRID_USERNAME",
-        'mail.password': "REPLACE_SENDGRID_PASSWORD"
-    }
     ELASTICSEARCH = {
         'elastic_host': 'REPLACE_ELASTIC_URI',
         'elastic_port': '9243',
@@ -35,4 +27,3 @@ data:
     JS_BUILD=REPLACE_JS_BUILD
     STRIPE_SECRET_APIKEY="REPLACE_STRIPE_SECRET_APIKEY"
     STRIPE_PUBLIC_APIKEY="REPLACE_STRIPE_PUBLIC_APIKEY"
-
