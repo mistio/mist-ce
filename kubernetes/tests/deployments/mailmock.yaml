@@ -15,8 +15,7 @@ spec:
         - name: mistopskey
       containers:
         - name: mailmock
-          #image: gcr.io/mist-ops/landing:REPLACE_STACK-REPLACE_TAG
-          image: gcr.io/mist-ops/mailmock
+          image: gcr.io/mist-ops/mailmock-test
           imagePullPolicy: Always
           ports:
             - containerPort: 8025
