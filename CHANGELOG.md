@@ -1,6 +1,16 @@
 # Changelog
 
 
+## v2.6.0 (10 Dec 2017)
+
+### Changes
+
+* Feature: Export CSV on any list
+* Change: Improve layout in small screens
+* Bugfix: Update required fields for provisioning in OpenStack
+* Change: Remove deprecated polling tasks (!510)
+
+
 ## v2.5.0 (18 Nov 2017)
 
 ### Changes
@@ -94,6 +104,7 @@ new functionality.
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
 
+<<<<<<< Updated upstream
 
 
 
@@ -102,6 +113,9 @@ For more details on the changes also check out the
 
 
 
+
+=======
+>>>>>>> Stashed changes
 
 ### Changes
 
