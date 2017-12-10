@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v2.5.0 (18 Nov 2017)
+
+### Changes
+
+* Feature: Chained actions in Rules, backend only (!475)
+* Feature: CSV renderer for API results
+* Feature: Send multipart emails when required
+* Feature: List all machines view
+* Change: Dismiss notifications menu
+* Change: Async session update (!503)
+* Change: Vsphere opts and metadata (!487)
+* Bugfix: Catch me.NotUniqueError when renaming a Cloud
+
+
 ## v2.4.0 (27 Oct 2017)
 
 ### Changes
@@ -79,6 +93,8 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
+
 
 
 
