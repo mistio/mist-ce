@@ -1,6 +1,7 @@
 """
 Default configuration options for ClearGLASS Community
 """
+PORTAL_NAME = "ClearGLASS"
 
 
 LANDING_CATEGORIES = [{

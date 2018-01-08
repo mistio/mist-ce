@@ -39,6 +39,3 @@ services:
     volumes:
       - ./landing:/landing:rw
 
-  nginx:
-    volumes:
-      - ./config/nginx.conf:/etc/nginx/nginx.conf:rw
