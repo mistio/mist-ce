@@ -1,4 +1,4 @@
-# ClearCLASS Community
+# ClearGLASS Community
 
 ClearGLASS helps you operate, monitor and govern your computing infrastructure,
 across clouds and platforms. The code is provided under the GNU AGPL v3.0
