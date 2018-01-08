@@ -2,7 +2,7 @@
 Default configuration options for ClearGLASS Community
 """
 PORTAL_NAME = "ClearGLASS"
-
+THEME = "clearglass"
 
 LANDING_CATEGORIES = [{
     'href': '/',

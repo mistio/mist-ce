@@ -74,7 +74,6 @@ services:
     environment:
       DEFAULTS_FILE: /etc/clearglass/defaults.py
       SETTINGS_FILE: /etc/clearglass/settings.py
-      THEME: clearglass
     stdin_open: true
     tty: true
     restart: on-failure:5
