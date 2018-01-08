@@ -1,0 +1,146 @@
+# Docker compose definition to run mist.io in production mode, so no mounted
+# code, no dev containers etc. Only this single file is required.
+
+version: '2.0'
+
+services:
+
+
+  mongodb:
+    image: mongo:3.2
+    restart: on-failure:5
+    volumes:
+      - mongodb:/data/db:rw
+
+  rabbitmq:
+    image: rabbitmq:3.6.6-management
+    restart: on-failure:5
+
+  memcached:
+    image: memcached
+    restart: on-failure:5
+
+
+  elasticsearch:
+    image: elasticsearch:5.5.2
+    restart: on-failure:5
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data:rw
+
+  logstash:
+    image: mist/logstash:$GLASS_TAG
+    restart: on-failure:5
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+
+  elasticsearch-manage:
+    image: mist/elasticsearch-manage:$GLASS_TAG
+    command: ./scripts/add_templates.py
+    restart: on-failure:5
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+
+  kibana:
+    image: kibana:5.5.2
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    restart: on-failure:5
+    depends_on:
+      - elasticsearch
+
+
+  socat:
+    image: mist/docker-socat
+    restart: on-failure:5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+
+  mailmock:
+    image: mist/mailmock
+    restart: on-failure:5
+
+
+  celery-prefork: &backend
+    image: mist/mist:io-$GLASS_TAG
+    depends_on:
+      - memcached
+      - mongodb
+      - elasticsearch
+      - rabbitmq
+    volumes:
+      - ./config:/etc/clearglass
+    environment:
+      SETTINGS_FILE: /etc/clearglass/settings.py
+    stdin_open: true
+    tty: true
+    restart: on-failure:5
+    command: bin/wait-all bin/celery-prefork
+
+  celery-gevent:
+    <<: *backend
+    command: bin/wait-all bin/celery-gevent
+
+  scheduler:
+    <<: *backend
+    command: bin/wait-all bin/scheduler
+
+  poller:
+    <<: *backend
+    command: bin/wait-all bin/poller
+
+  beat:
+    <<: *backend
+    command: bin/wait-all bin/beat
+
+  hubshell:
+    <<: *backend
+    command: bin/wait-all bin/hubshell
+
+  api:
+    <<: *backend
+    command: bin/wait-all bin/uwsgi
+    expose:
+      - 80
+
+  sockjs:
+    <<: *backend
+    command: bin/wait-all bin/sockjs
+    expose:
+      - 8081
+
+
+  ui:
+    image: mist/ui:io-$GLASS_TAG
+    command: sh /entry.sh
+    stdin_open: true
+    tty: true
+    restart: on-failure:5
+    expose:
+      - 80
+
+  landing:
+    image: mist/landing:io-$GLASS_TAG
+    command: sh /entry.sh
+    stdin_open: true
+    tty: true
+    restart: on-failure:5
+    expose:
+      - 80
+
+
+  nginx:
+    image: mist/nginx:$GLASS_TAG
+    restart: on-failure:5
+    ports:
+      - 80:80
+    depends_on:
+      - api
+      - sockjs
+      - landing
+      - ui
+
+volumes:
+  elasticsearch: {}
+  mongodb: {}

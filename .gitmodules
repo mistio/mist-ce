@@ -1,0 +1,12 @@
+[submodule "api"]
+	path = api
+	url = git@gitlab.ops.mist.io:mistio/mist.api.git
+[submodule "ui"]
+	path = ui
+	url = git@gitlab.ops.mist.io:mistio/mist.ui.git
+[submodule "landing"]
+	path = landing
+	url = git@gitlab.ops.mist.io:mistio/mist.landing.git
+[submodule "tests"]
+	path = tests
+	url = git@gitlab.ops.mist.io:mistio/mist.tests.git

@@ -1,0 +1,14 @@
+setttings.py
+test_settings.py
+*~
+.*.sw[op]
+bower_components
+*.pyc
+*.pyo
+*.egg-info
+.DS_Store
+.Python
+/.project
+/.pydevproject
+.cache
+pip-selfcheck.json
