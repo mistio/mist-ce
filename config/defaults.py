@@ -19,7 +19,28 @@ LANDING_CATEGORIES = [{
             "image" : "",
             "alt" : "ClearGLASS cloud management dashboard",
             "cta" : "Get Started"
-        }
+        },
+        "social": [{
+                "icon" : "facebook",
+                "href" : "https://www.facebook.com/clearcenter",
+                "color": "#fff",
+                "size" : "24"
+            },{
+                "icon" : "linkedin",
+                "href" : "https://www.linkedin.com/company/clearcenter", 
+                "color": "#fff",
+                "size" : "24"
+            },{
+                "icon" : "twitter",
+                "href" : "https://twitter.com/getclearcenter",
+                "color": "#fff",
+                "size" : "24"
+            },{
+                "icon" : "googleplus",
+                "href" : "https://plus.google.com/b/117698302019888725708/+Clearcenter/posts",
+                "color": "#fff",
+                "size" : "24"
+            }]
     }
 }]
 
