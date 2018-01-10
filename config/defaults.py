@@ -4,6 +4,8 @@ Default configuration options for ClearGLASS Community
 PORTAL_NAME = "ClearGLASS"
 THEME = "clearglass"
 
+ENABLE_MONITORING = False
+
 LANDING_CATEGORIES = [{
     'href': '/',
     'name': 'home',
@@ -14,7 +16,7 @@ LANDING_CATEGORIES = [{
             "copy" : "",
             "subcopy" :
                 "ClearGLASS is a single dashboard to manage multi-cloud infrastructure",
-            "image" : "images/mockup-imac-n4.png",
+            "image" : "",
             "alt" : "ClearGLASS cloud management dashboard",
             "cta" : "Get Started"
         }
