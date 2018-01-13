@@ -9,18 +9,14 @@ spec:
     metadata:
       labels:
         app: gocky
+        component: REPLACE_STACK
     spec:
       imagePullSecrets:
         - name: mistopskey
       containers:
         - name: gocky
-          image: gcr.io/mist-ops/gocky:v0.5
+          image: gcr.io/mist-ops/gocky:REPLACE_STACK-REPLACE_TAG
           imagePullPolicy: IfNotPresent
-          command:
-            - go-wrapper
-            - run
-            - -config
-            - /etc/gocky/config.toml
           ports:
             - containerPort: 9096
             - containerPort: 9097
