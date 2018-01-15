@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: gocky
+  namespace: REPLACE_NAMESPACE
+  labels:
+    name: gocky
+spec:
+  ports:
+    - name: gocky-relay
+      port: 9097
+    - name: influxdb-relay
+      port: 9096
+  selector:
+    app: gocky
