@@ -7,7 +7,8 @@ RUN apt-get update && \
         collectd \
         python \
         wget \
-        cron && \
+        cron \
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/run/sshd && \

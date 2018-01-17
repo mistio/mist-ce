@@ -12,4 +12,9 @@ cat /keys/id_rsa.pub >> /root/.ssh/authorized_keys
 if [ -x /opt/mistio-collectd/collectd.sh ]; then
     /opt/mistio-collectd/collectd.sh start
 fi
-/usr/sbin/sshd -D
+
+if [ -x /etc/init.d/mist-telegraf ]; then
+    /etc/init.d/mist-telegraf status || /etc/init.d/mist-telegraf start
+fi
+
+exec /usr/sbin/sshd -D
