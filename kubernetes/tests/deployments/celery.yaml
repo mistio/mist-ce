@@ -130,7 +130,7 @@ metadata:
   name: celery-poller
   namespace: REPLACE_NAMESPACE
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
