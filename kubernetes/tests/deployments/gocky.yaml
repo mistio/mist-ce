@@ -15,8 +15,9 @@ spec:
         - name: mistopskey
       containers:
         - name: gocky
-          image: gcr.io/mist-ops/gocky:REPLACE_STACK-REPLACE_TAG
+          image: gcr.io/mist-ops/gocky:v0.5.1
           imagePullPolicy: IfNotPresent
+          args: ["-config", "/etc/gocky/config.toml"]
           ports:
             - containerPort: 9096
             - containerPort: 9097
