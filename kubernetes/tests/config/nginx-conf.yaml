@@ -92,6 +92,11 @@ data:
                 proxy_buffering off;
             }
 
+            location /ingress/ {
+                proxy_pass http://traefik/;
+                proxy_set_header  X-Real-IP  $remote_addr;
+            }
+
             location /resources/ {
             proxy_pass http://landing/;
             proxy_set_header  X-Real-IP  $remote_addr;
