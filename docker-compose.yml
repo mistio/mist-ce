@@ -162,7 +162,7 @@ services:
       - rabbitmq
 
   traefik:
-    image: traefik
+    image: traefik:v1.4
     command: --web --logLevel=DEBUG
     ports:
       - 8040:80
