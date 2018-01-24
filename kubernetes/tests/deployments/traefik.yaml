@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: traefik
-          image: traefik:1.4.6
+          image: traefik:v1.4
           imagePullPolicy: Always
           args:
             - --web
