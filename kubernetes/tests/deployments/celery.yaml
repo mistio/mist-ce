@@ -85,20 +85,20 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: celery-beat
+  name: celery-scheduler
   namespace: REPLACE_NAMESPACE
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: celery-beat
+        app: celery-scheduler
         component: REPLACE_STACK
     spec:
       imagePullSecrets:
         - name: mistopskey
       containers:
-        - name: celery-beat
+        - name: celery-scheduler
           image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
           imagePullPolicy: Always
           env:
