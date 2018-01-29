@@ -243,7 +243,7 @@ class Version(object):
             else:
                 break
         notes = '\n'.join(notes)
-        lines = filter(None, crop_line_padding(lines[i+1:]))
+        lines = filter(None, crop_line_padding(lines[i + 1:]))
 
         version = cls(name, int(day), month, int(year), notes)
         for line in lines:
