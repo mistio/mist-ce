@@ -101,6 +101,10 @@ services:
     <<: *backend
     command: bin/wait-all bin/poller
 
+  cilia:
+    <<: *backend
+    command: bin/wait-all bin/cilia
+
   beat:
     <<: *backend
     command: bin/wait-all bin/beat
@@ -155,6 +159,7 @@ services:
 
   gocky:
     image: mist/gocky:$MIST_TAG
+    command: -config /etc/gocky/config.toml
     ports:
       - 9096:9096
       - 9097:9097
@@ -162,7 +167,7 @@ services:
       - rabbitmq
 
   traefik:
-    image: traefik
+    image: traefik:v1.4
     command: --web --logLevel=DEBUG
     ports:
       - 8040:80

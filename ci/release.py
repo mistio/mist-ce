@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import re
 import sys
 import hashlib
 import argparse
@@ -13,7 +12,7 @@ import requests
 def main():
     args = parse_args()
     request = Client(args.owner, args.repo, args.token)
-    release = update_release(
+    update_release(
         request, args.tag, msg=args.msg, files=args.files,
         prerelease=args.prerelease, draft=args.draft,
         remove_undefined_files=args.remove_undefined_files,
@@ -169,7 +168,6 @@ def update_release(request, tag, msg=None, files=None,
         print_release(release)
 
     # Add or update assets.
-    upload_url = re.sub('{\?.*}', '', release['upload_url'])
     assets = list(release['assets'])
     for path in files or []:
         name = os.path.basename(path)
