@@ -39,3 +39,8 @@ services:
     volumes:
       - ./landing:/landing:rw
 
+  debugger:
+    image: mist/debugger
+    volumes:
+      - ./keys:/keys
+
