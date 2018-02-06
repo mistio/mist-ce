@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.8.0 (0c0c027)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: socat
+  name: socat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: socat
+    spec:
+      containers:
+      - image: mist/docker-socat
+        name: socat
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: socat-claim0
+      restartPolicy: Always
+      volumes:
+      - name: socat-claim0
+        persistentVolumeClaim:
+          claimName: socat-claim0
+status: {}

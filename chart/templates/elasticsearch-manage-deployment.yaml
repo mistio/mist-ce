@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.8.0 (0c0c027)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: elasticsearch-manage
+  name: elasticsearch-manage
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: elasticsearch-manage
+    spec:
+      containers:
+      - args:
+        - ./scripts/add_templates.py
+        image: mist/elasticsearch-manage:staging
+        name: elasticsearch-manage
+        resources: {}
+      restartPolicy: Always
+status: {}

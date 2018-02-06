@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.8.0 (0c0c027)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: nginx
+  name: nginx
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: nginx
+    spec:
+      containers:
+      - image: mist/nginx:staging
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/nginx/nginx.conf
+          name: nginx-claim0
+        - mountPath: /srv/www/static
+          name: nginx-claim1
+      restartPolicy: Always
+      volumes:
+      - name: nginx-claim0
+        persistentVolumeClaim:
+          claimName: nginx-claim0
+      - name: nginx-claim1
+        persistentVolumeClaim:
+          claimName: nginx-claim1
+status: {}
