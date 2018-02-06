@@ -23,18 +23,14 @@ spec:
         name: nginx
         ports:
         - containerPort: 80
-        resources: {}
-        volumeMounts:
-        - mountPath: /etc/nginx/nginx.conf
-          name: nginx-claim0
-        - mountPath: /srv/www/static
-          name: nginx-claim1
+        resources:
+          volumeMounts:
+          - name: nginx-conf
+            mountPath: /opt/nginx/
+          command: ["nginx", "-c", "/opt/nginx/nginx.conf"]
       restartPolicy: Always
       volumes:
-      - name: nginx-claim0
-        persistentVolumeClaim:
-          claimName: nginx-claim0
-      - name: nginx-claim1
-        persistentVolumeClaim:
-          claimName: nginx-claim1
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
 status: {}
