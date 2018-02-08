@@ -6,6 +6,17 @@ version: '2.0'
 services:
 
 
+  influxdb:
+    image: influxdb
+    environment:
+      INFLUXDB_DB: telegraf
+    ports:
+      - 8083:8083
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+
+
   mongodb:
     image: mongo:3.2
     restart: on-failure:5
@@ -90,6 +101,10 @@ services:
     <<: *backend
     command: bin/wait-all bin/poller
 
+  cilia:
+    <<: *backend
+    command: bin/wait-all bin/cilia
+
   beat:
     <<: *backend
     command: bin/wait-all bin/beat
@@ -141,6 +156,25 @@ services:
       - landing
       - ui
 
+
+  gocky:
+    image: mist/gocky:$MIST_TAG
+    command: -config /etc/gocky/config.toml
+    ports:
+      - 9096:9096
+      - 9097:9097
+    depends_on:
+      - rabbitmq
+
+  traefik:
+    image: traefik:v1.4
+    command: --web --logLevel=DEBUG
+    ports:
+      - 8040:80
+      - 8041:8080
+
+
 volumes:
   elasticsearch: {}
+  influxdb: {}
   mongodb: {}

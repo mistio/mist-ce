@@ -1,0 +1,39 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: gocky
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gocky
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: gocky
+          image: gcr.io/mist-ops/gocky:v0.5.1
+          imagePullPolicy: IfNotPresent
+          args: ["-config", "/etc/gocky/config.toml"]
+          ports:
+            - containerPort: 9096
+            - containerPort: 9097
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/gocky/
+          resources:
+            requests:
+              memory: 10Mi
+              cpu: 10m
+            limits:
+              memory: 100Mi
+              cpu: 1000m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
+      volumes:
+      - name: config-volume
+        configMap:
+          name: gocky-conf

@@ -168,6 +168,11 @@ build-elasticsearch-manage:
   variables:
     IMG: elasticsearch-manage
 
+build-gocky:
+  <<: *docker_build_img_template
+  variables:
+    IMG: gocky
+
 
 # Manually build images, tag is SHA/branch independant
 
