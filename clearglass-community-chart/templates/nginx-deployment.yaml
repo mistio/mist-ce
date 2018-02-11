@@ -23,14 +23,13 @@ spec:
         name: nginx
         ports:
         - containerPort: 80
-        resources:
-          volumeMounts:
-          - name: nginx-conf
-            mountPath: /opt/nginx/
-          command: ["nginx", "-c", "/opt/nginx/nginx.conf"]
+        volumeMounts:
+        - name: nginx-volume
+          mountPath: /opt
+        command: ["nginx", "-c", "/opt/nginx.conf"]
       restartPolicy: Always
       volumes:
-      - name: nginx-conf
+      - name: nginx-volume
         configMap:
-          name: nginx-conf
+          name: nginx-configmap
 status: {}
