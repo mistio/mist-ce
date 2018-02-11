@@ -1,3 +1,3 @@
-FROM mist/nginx:$GLASS_TAG
+FROM mist/nginx:staging
 
 COPY ./static /srv/www/static
