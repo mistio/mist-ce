@@ -9,12 +9,7 @@ metadata:
     io.kompose.service: sockjs
   name: sockjs
 spec:
-  clusterIP: None
   ports:
-  - name: headless
-    port: 55555
-    targetPort: 0
+  - port: 8081
   selector:
     io.kompose.service: sockjs
-status:
-  loadBalancer: {}

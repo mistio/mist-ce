@@ -9,12 +9,7 @@ metadata:
     io.kompose.service: landing
   name: landing
 spec:
-  clusterIP: None
   ports:
-  - name: headless
-    port: 55555
-    targetPort: 0
+  - port: 80
   selector:
     io.kompose.service: landing
-status:
-  loadBalancer: {}

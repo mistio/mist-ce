@@ -19,17 +19,17 @@ spec:
         io.kompose.service: nginx
     spec:
       containers:
-      - image: mist/nginx:staging
+      - image:  registry.gitlab.com/clearglass/clearglass-community/nginx:{{ .Values.COMMIT_SLUG }}
         name: nginx
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: nginx-volume
+        - name: nginx-config
           mountPath: /opt
         command: ["nginx", "-c", "/opt/nginx.conf"]
       restartPolicy: Always
       volumes:
-      - name: nginx-volume
+      - name: nginx-config
         configMap:
           name: nginx-configmap
 status: {}

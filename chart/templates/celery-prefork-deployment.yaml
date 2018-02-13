@@ -33,11 +33,11 @@ spec:
         stdin: true
         tty: true
         volumeMounts:
-        - mountPath: /etc/clearglass
-          name: celery-prefork-claim0
+        - name: clearglass-config
+          mountPath: /etc/clearglass
       restartPolicy: Always
       volumes:
-      - name: celery-prefork-claim0
-        persistentVolumeClaim:
-          claimName: celery-prefork-claim0
+      - name: clearglass-config
+        configMap:
+          name: clearglass-configmap
 status: {}
