@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  name: elasticsearch-manage
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      containers:
+      - args:
+        - ./scripts/add_templates.py
+        image: mist/elasticsearch-manage:staging
+        name: elasticsearch-manage
+        resources: {}
+      restartPolicy: Never
