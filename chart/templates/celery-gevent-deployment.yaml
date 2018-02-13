@@ -33,11 +33,11 @@ spec:
         stdin: true
         tty: true
         volumeMounts:
-        - mountPath: /etc/clearglass
-          name: celery-gevent-claim0
+        - name: clearglass-config
+          mountPath: /etc/clearglass
       restartPolicy: Always
       volumes:
-      - name: celery-gevent-claim0
-        persistentVolumeClaim:
-          claimName: celery-gevent-claim0
+      - name: clearglass-config
+        configMap:
+          name: clearglass-configmap
 status: {}

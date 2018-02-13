@@ -33,11 +33,11 @@ spec:
         stdin: true
         tty: true
         volumeMounts:
-        - mountPath: /etc/clearglass
-          name: beat-claim0
+        - name: clearglass-config
+          mountPath: /etc/clearglass
       restartPolicy: Always
       volumes:
-      - name: beat-claim0
-        persistentVolumeClaim:
-          claimName: beat-claim0
+      - name: clearglass-config
+        configMap:
+          name: clearglass-configmap
 status: {}
