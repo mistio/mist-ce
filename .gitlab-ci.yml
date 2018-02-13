@@ -42,6 +42,6 @@ undeploy:
     action: stop
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
-    - helm delete "$name"
+    - helm delete --purge "$name"
   when: manual
   allow_failure: true
