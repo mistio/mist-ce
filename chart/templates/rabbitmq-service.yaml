@@ -9,12 +9,7 @@ metadata:
     io.kompose.service: rabbitmq
   name: rabbitmq
 spec:
-  clusterIP: None
   ports:
-  - name: headless
-    port: 55555
-    targetPort: 0
+  - port: 5672
   selector:
     io.kompose.service: rabbitmq
-status:
-  loadBalancer: {}

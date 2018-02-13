@@ -9,12 +9,7 @@ metadata:
     io.kompose.service: mongodb
   name: mongodb
 spec:
-  clusterIP: None
   ports:
-  - name: headless
-    port: 55555
-    targetPort: 0
+  - port: 27017
   selector:
     io.kompose.service: mongodb
-status:
-  loadBalancer: {}
