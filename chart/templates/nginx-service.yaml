@@ -16,4 +16,4 @@ spec:
   selector:
     io.kompose.service: nginx
 status:
-  loadBalancer: {}
+  ClusterIP: {}

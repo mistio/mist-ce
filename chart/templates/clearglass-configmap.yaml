@@ -3,7 +3,8 @@ kind: ConfigMap
 metadata:
   name: clearglass-configmap
 data:
-  settings.py: ""
+  settings.py: |
+    CORE_URI = "http://{{ .Values.MIST_HOST }}"
   defaults.py: |
     """
     Default configuration options for ClearGLASS Community

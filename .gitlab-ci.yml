@@ -65,7 +65,7 @@ deploy:
     on_stop: undeploy
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
-    - helm upgrade --install --namespace "$name" "$name" ./chart/
+    - helm upgrade --install --namespace "$name" --set COMMIT_SLUG=$CI_COMMIT_REF_SLUG "$name" ./chart/
 
 undeploy:
   stage: undeploy
