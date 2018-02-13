@@ -5,6 +5,14 @@ metadata:
 data:
   settings.py: |
     CORE_URI = "http://{{ .Values.MIST_HOST }}"
+    MAILER_SETTINGS = {
+        'mail.host': "{{ .Values.SMTP_HOST }}",
+        'mail.port': "{{ .Values.SMTP_PORT }}",
+        'mail.tls': {{ .Values.SMTP_TLS }},
+        'mail.starttls': {{ .Values.SMTP_STARTTLS }},
+        'mail.username': "{{ .Values.SMTP_USERNAME }}",
+        'mail.password': "{{ .Values.SMTP_PASSWORD }}"
+    }
   defaults.py: |
     """
     Default configuration options for ClearGLASS Community
