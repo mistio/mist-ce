@@ -21,11 +21,11 @@ deploy:
   image: dtzar/helm-kubectl
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_PROJECT_PATH_SLUG-$CI_ENVIRONMENT_SLUG.$AUTO_DEVOPS_DOMAIN
+    url: http://$CI_COMMIT_REF_SLUG.community.env.clear.glass
     on_stop: undeploy
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
-    - helm upgrade --install --namespace "$name" --set COMMIT_SLUG=$CI_COMMIT_REF_SLUG "$name" ./chart/
+    - helm upgrade --install --namespace "$name" --set COMMIT_SLUG=$CI_COMMIT_REF_SLUG --set MIST_HOST=$CI_COMMIT_REF_SLUG.community.env.clear.glass "$name" ./chart/
 
 undeploy:
   stage: undeploy
