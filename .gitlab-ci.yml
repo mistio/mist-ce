@@ -316,9 +316,7 @@ UI:machines:
 UI:schedulers-1/2: *ui_test_template
 UI:schedulers-2/2: *ui_test_template
 UI:scripts: *ui_test_template
-UI:images-networks:
-  <<: *ui_test_template
-  allow_failure: true
+UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:zones:
