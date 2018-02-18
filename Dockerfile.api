@@ -1,0 +1,21 @@
+# Inherit the mist.api image.
+ARG FROM_IMAGE=mist/mist:staging
+FROM $FROM_IMAGE
+
+# Configure product defaults.
+COPY ./config/defaults.py /etc/clearglass/defaults.py
+ENV DEFAULTS_FILE=/etc/clearglass/defaults.py
+
+# Pass version info.
+ARG CC_VERSION_SHA
+ARG CC_VERSION_NAME
+
+# Variables defined solely by ARG are accessible as environmental variables
+# during build but not during runtime. To persist these in the image, they're
+# redefined as ENV in addition to ARG.
+ENV VERSION_REPO=clearglass/clearglass-community \
+    VERSION_SHA=$CC_VERSION_SHA \
+    VERSION_NAME=$CC_VERSION_NAME
+
+RUN echo "{\"sha\":\"$VERSION_SHA\",\"name\":\"$VERSION_NAME\",\"repo\":\"$VERSION_REPO\",\"modified\":false}" \
+        > /mist-version.json
