@@ -74,7 +74,7 @@ discover submodules:
           img=$2
           src_img="$img:$(get_submodule_sha $repo)"
           docker_pull $src_img
-          docker_push $src_img landing
+          docker_push $src_img $repo
         }
   dependencies:
     - discover submodules
