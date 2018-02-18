@@ -134,7 +134,7 @@ deploy:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - |
         helm upgrade --install --namespace "$name" \
-          --set COMMIT_SLUG=$CI_COMMIT_REF_SLUG \
+          --set IMAGE_TAG=$CI_COMMIT_SHA \
           --set MIST_HOST=$CI_COMMIT_REF_SLUG.community.env.clear.glass \
           --set SMTP_PASSWORD=$SMTP_PASSWORD \
           "$name" ./chart/

@@ -19,7 +19,7 @@ spec:
         io.kompose.service: nginx
     spec:
       containers:
-      - image:  registry.gitlab.com/clearglass/clearglass-community/nginx:{{ .Values.COMMIT_SLUG }}
+      - image: registry.gitlab.com/clearglass/clearglass-community/nginx:{{ .Values.IMAGE_TAG }}
         name: nginx
         ports:
         - containerPort: 80

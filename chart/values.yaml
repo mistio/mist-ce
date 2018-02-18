@@ -1,5 +1,5 @@
 MIST_HOST: localhost
-COMMIT_SLUG: latest
+IMAGE_TAG: master
 SMTP_HOST: smtp.sendgrid.net
 SMTP_PORT: 2525
 SMTP_TLS: "False"

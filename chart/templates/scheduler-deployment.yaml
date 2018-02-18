@@ -27,7 +27,7 @@ spec:
           value: /etc/clearglass/defaults.py
         - name: SETTINGS_FILE
           value: /etc/clearglass/settings.py
-        image: mist/mist:io-staging
+        image: registry.gitlab.com/clearglass/clearglass-community/api:{{ .Values.IMAGE_TAG }}
         name: scheduler
         resources: {}
         stdin: true
