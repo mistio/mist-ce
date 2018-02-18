@@ -4,6 +4,9 @@ stages:
   - deploy
   - undeploy
 
+variables:
+  DEPLOY_DOMAIN: community.env.clear.glass
+
 discover submodules:
   stage: discover
   image: alpine
@@ -104,13 +107,13 @@ build api:
     - docker_pull $SRC_IMG
     - |
         docker build \
-          -t clearglass-community/api:$CI_COMMIT_SHA \
+          -t $CI_PROJECT_NAME/api:$CI_COMMIT_SHA \
           -f Dockerfile.api \
           --build-arg FROM_IMAGE=$SRC_IMG \
           --build-arg CC_VERSION_SHA=$CI_COMMIT_SHA \
           --build-arg CC_VERSION_NAME=$CI_COMMIT_REF_NAME \
           .
-    - docker_push clearglass-community/api:$CI_COMMIT_SHA api
+    - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
 
 build nginx:
@@ -118,28 +121,46 @@ build nginx:
   script:
     - |
         docker build \
-          -t clearglass-community/nginx:$CI_COMMIT_SHA \
+          -t $CI_PROJECT_NAME/nginx:$CI_COMMIT_SHA \
           -f Dockerfile.nginx \
           .
-    - docker_push clearglass-community/nginx:$CI_COMMIT_SHA nginx
+    - docker_push $CI_PROJECT_NAME/nginx:$CI_COMMIT_SHA nginx
 
-deploy:
+.deploy_template: &deploy_template
   stage: deploy
   image: dtzar/helm-kubectl
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_COMMIT_REF_SLUG.community.env.clear.glass
+    url: http://$CI_COMMIT_REF_SLUG.$DEPLOY_DOMAIN
     on_stop: undeploy
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
+    - export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
     - |
         helm upgrade --install --namespace "$name" \
           --set IMAGE_TAG=$CI_COMMIT_SHA \
-          --set MIST_HOST=$CI_COMMIT_REF_SLUG.community.env.clear.glass \
+          --set MIST_HOST=$host \
           --set SMTP_PASSWORD=$SMTP_PASSWORD \
           "$name" ./chart/
 
-undeploy:
+deploy review:
+  <<: *deploy_template
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_COMMIT_REF_SLUG.$DEPLOY_DOMAIN
+    on_stop: undeploy review
+  except:
+    - master
+
+deploy master:
+  <<: *deploy_template
+  environment:
+    name: master
+    url: http://master.$DEPLOY_DOMAIN
+  only:
+    - master
+
+undeploy review:
   stage: undeploy
   image: dtzar/helm-kubectl
   variables:
@@ -152,3 +173,5 @@ undeploy:
     - helm delete --purge "$name"
   when: manual
   allow_failure: true
+  except:
+    - master
