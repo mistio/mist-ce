@@ -21,7 +21,7 @@ spec:
       - args:
         - sh
         - /entry.sh
-        image: registry.gitlab.com/clearglass/clearglass-community/landing:{{ .Values.IMAGE_TAG }}
+        image: {{ .Values.IMAGE_REGISTRY }}/landing:{{ .Values.IMAGE_TAG }}
         name: landing
         resources: {}
         stdin: true

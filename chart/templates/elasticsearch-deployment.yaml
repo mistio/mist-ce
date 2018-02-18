@@ -24,10 +24,10 @@ spec:
         resources: {}
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/data
-          name: clearglasscommunity-elasticsearch
+          name: clearglass-elasticsearch
       restartPolicy: Always
       volumes:
-      - name: clearglasscommunity-elasticsearch
+      - name: clearglass-elasticsearch
         persistentVolumeClaim:
-          claimName: clearglasscommunity-elasticsearch
+          claimName: clearglass-elasticsearch
 status: {}

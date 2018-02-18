@@ -1,4 +1,5 @@
 MIST_HOST: localhost
+IMAGE_REGISTRY: registry.gitlab.com/clearglass/clearglass-community
 IMAGE_TAG: master
 SMTP_HOST: smtp.sendgrid.net
 SMTP_PORT: 2525

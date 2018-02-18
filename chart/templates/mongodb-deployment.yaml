@@ -24,10 +24,10 @@ spec:
         resources: {}
         volumeMounts:
         - mountPath: /data/db
-          name: clearglasscommunity-mongodb
+          name: clearglass-mongodb
       restartPolicy: Always
       volumes:
-      - name: clearglasscommunity-mongodb
+      - name: clearglass-mongodb
         persistentVolumeClaim:
-          claimName: clearglasscommunity-mongodb
+          claimName: clearglass-mongodb
 status: {}

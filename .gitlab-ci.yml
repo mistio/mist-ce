@@ -139,6 +139,7 @@ build nginx:
     - |
         helm upgrade --install --namespace "$name" \
           --set IMAGE_TAG=$CI_COMMIT_SHA \
+          --set IMAGE_REGISTRY=$CI_REGISTRY_IMAGE \
           --set MIST_HOST=$host \
           --set SMTP_PASSWORD=$SMTP_PASSWORD \
           "$name" ./chart/

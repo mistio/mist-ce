@@ -27,7 +27,7 @@ spec:
           value: /etc/clearglass/defaults.py
         - name: SETTINGS_FILE
           value: /etc/clearglass/settings.py
-        image: registry.gitlab.com/clearglass/clearglass-community/api:{{ .Values.IMAGE_TAG }}
+        image: {{ .Values.IMAGE_REGISTRY }}/api:{{ .Values.IMAGE_TAG }}
         name: celery-gevent
         resources: {}
         stdin: true
