@@ -34,7 +34,8 @@ spec:
         tty: true
         volumeMounts:
         - name: clearglass-config
-          mountPath: /etc/clearglass
+          mountPath: /etc/clearglass/settings.py
+          subPath: settings.py
       restartPolicy: Always
       volumes:
       - name: clearglass-config

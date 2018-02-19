@@ -7,6 +7,7 @@ stages:
 variables:
   DEPLOY_DOMAIN: community.env.clear.glass
 
+
 discover submodules:
   stage: discover
   image: alpine
@@ -20,6 +21,7 @@ discover submodules:
     paths:
       - submodules.csv
     expire_in: 10 days
+
 
 .docker_image: &docker_image_template
   stage: build
@@ -115,7 +117,6 @@ build api:
           .
     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
-
 build nginx:
   <<: *docker_image_template
   script:
@@ -125,6 +126,7 @@ build nginx:
           -f Dockerfile.nginx \
           .
     - docker_push $CI_PROJECT_NAME/nginx:$CI_COMMIT_SHA nginx
+
 
 .deploy_template: &deploy_template
   stage: deploy
@@ -160,6 +162,7 @@ deploy master:
     url: http://master.$DEPLOY_DOMAIN
   only:
     - master
+
 
 undeploy review:
   stage: undeploy

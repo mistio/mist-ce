@@ -25,8 +25,8 @@ spec:
         - containerPort: 80
         volumeMounts:
         - name: nginx-config
-          mountPath: /opt
-        command: ["nginx", "-c", "/opt/nginx.conf"]
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
       restartPolicy: Always
       volumes:
       - name: nginx-config
