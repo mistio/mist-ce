@@ -18,8 +18,11 @@ spec:
       labels:
         io.kompose.service: nginx
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
-      - image: {{ .Values.IMAGE_REGISTRY }}/nginx:{{ .Values.IMAGE_TAG }}
+      - image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: nginx
         ports:
         - containerPort: 80

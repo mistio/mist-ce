@@ -1,9 +1,14 @@
 MIST_HOST: localhost
-IMAGE_REGISTRY: registry.gitlab.com/clearglass/clearglass-community
-IMAGE_TAG: master
 SMTP_HOST: smtp.sendgrid.net
 SMTP_PORT: 2525
 SMTP_TLS: "False"
 SMTP_STARTTLS: "True"
 SMTP_USERNAME: apikey
 SMTP_PASSWORD: ""
+
+image:
+  registry: registry.gitlab.com/clearglass/clearglass-community
+  tag: master
+  pullPolicy: Always
+  secrets:
+    - name: gitlab-registry

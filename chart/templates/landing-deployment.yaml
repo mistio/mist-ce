@@ -17,11 +17,14 @@ spec:
       labels:
         io.kompose.service: landing
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - args:
         - sh
         - /entry.sh
-        image: {{ .Values.IMAGE_REGISTRY }}/landing:{{ .Values.IMAGE_TAG }}
+        image: {{ .Values.image.registry }}/landing:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: landing
         resources: {}
         stdin: true

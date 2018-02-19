@@ -139,9 +139,24 @@ build nginx:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
     - |
+        export secret_name=
+        if [[ "$CI_PROJECT_VISIBILITY" != "public" ]]; then
+          kubectl create secret --namespace "$name" \
+            docker-registry gitlab-registry \
+            --docker-server=$CI_REGISTRY \
+            --docker-username=$CI_REGISTRY_USER \
+            --docker-password=$CI_REGISTRY_PASSWORD \
+            --docker-email=$GITLAB_USER_EMAIL \
+            -o yaml --dry-run | \
+              kubectl replace --namespace "$name" --force -f -
+          export secret_name=gitlab-registry
+        fi
+    - |
         helm upgrade --install --namespace "$name" \
-          --set IMAGE_TAG=$CI_COMMIT_SHA \
-          --set IMAGE_REGISTRY=$CI_REGISTRY_IMAGE \
+          --set image.tag="$CI_COMMIT_SHA" \
+          --set image.repository="$CI_REGISTRY_IMAGE" \
+          --set image.pullPolicy=IfNotPresent \
+          --set image.secrets[0].name="$secret_name" \
           --set MIST_HOST=$host \
           --set SMTP_PASSWORD=$SMTP_PASSWORD \
           "$name" ./chart/
