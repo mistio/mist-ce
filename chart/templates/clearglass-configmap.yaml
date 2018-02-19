@@ -5,6 +5,7 @@ metadata:
 data:
   settings.py: |
     CORE_URI = "http://{{ .Values.MIST_HOST }}"
+    JS_BUILD = False
     MAILER_SETTINGS = {
         'mail.host': "{{ .Values.SMTP_HOST }}",
         'mail.port': "{{ .Values.SMTP_PORT }}",
