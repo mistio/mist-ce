@@ -138,6 +138,7 @@ build nginx:
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
+    - kubectl describe namespace "$name" || kubectl create namespace "$name"
     - |
         export secret_name=
         if [[ "$CI_PROJECT_VISIBILITY" != "public" ]]; then
@@ -190,6 +191,7 @@ undeploy review:
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - helm delete --purge "$name"
+    - kubectl delete namespace "$name"
   when: manual
   allow_failure: true
   except:
