@@ -20,6 +20,12 @@ spec:
       containers:
       - image: memcached
         name: memcached
-        resources: {}
+        resources:
+          requests:
+            memory: 30Mi
+            cpu: 1m
+          limits:
+            memory: 60Mi
+            cpu: 100m
       restartPolicy: Always
 status: {}

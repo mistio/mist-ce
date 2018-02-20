@@ -23,6 +23,12 @@ spec:
           value: http://elasticsearch:9200
         image: kibana:5.5.2
         name: kibana
-        resources: {}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 1500Mi
       restartPolicy: Always
 status: {}

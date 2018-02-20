@@ -32,7 +32,14 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: beat
-        resources: {}
+        resources:
+          resources:
+            limits:
+              memory: 1024Mi
+              cpu: 200m
+            requests:
+              memory: 200Mi
+              cpu: 50m
         stdin: true
         tty: true
         volumeMounts:

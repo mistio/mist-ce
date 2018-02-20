@@ -32,7 +32,13 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: sockjs
-        resources: {}
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 100m
+          limits:
+            memory: 200Mi
+            cpu: 1000m
         stdin: true
         tty: true
         volumeMounts:

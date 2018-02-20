@@ -32,7 +32,13 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: hubshell
-        resources: {}
+        resources:
+          requests:
+            memory: 80Mi
+            cpu: 10m
+          limits:
+            memory: 200Mi
+            cpu: 1000m
         stdin: true
         tty: true
         volumeMounts:

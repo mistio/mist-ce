@@ -26,7 +26,13 @@ spec:
         image: {{ .Values.image.registry }}/ui:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: ui
-        resources: {}
+        resources:
+          requests:
+            memory: 20Mi
+            cpu: 10m
+          limits:
+            memory: 40Mi
+            cpu: 100m
         stdin: true
         tty: true
       restartPolicy: Always

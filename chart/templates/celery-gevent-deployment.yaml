@@ -32,7 +32,13 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: celery-gevent
-        resources: {}
+        resources:
+          requests:
+            memory: 150Mi
+            cpu: 60m
+          limits:
+            memory: 1000Mi
+            cpu: 1000m
         stdin: true
         tty: true
         volumeMounts:

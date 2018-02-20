@@ -32,7 +32,13 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: poller
-        resources: {}
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 500m
+          limits:
+            memory: 200Mi
+            cpu: 2000m
         stdin: true
         tty: true
         volumeMounts:

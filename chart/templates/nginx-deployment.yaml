@@ -30,6 +30,13 @@ spec:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
+        resources:
+          requests:
+            memory: 30Mi
+            cpu: 10m
+          limits:
+            memory: 60Mi
+            cpu: 1000m
       restartPolicy: Always
       volumes:
       - name: nginx-config
