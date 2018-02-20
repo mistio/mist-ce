@@ -20,6 +20,12 @@ spec:
       containers:
       - image: mist/logstash:staging
         name: logstash
-        resources: {}
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 170m
+          limits:
+            memory: 1000Mi
+            cpu: 1000m
       restartPolicy: Always
 status: {}

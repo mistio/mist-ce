@@ -3,8 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: clearglasscommunity-elasticsearch
-  name: clearglasscommunity-elasticsearch
+    io.kompose.service: clearglass-elasticsearch
+  name: clearglass-elasticsearch
 spec:
   accessModes:
   - ReadWriteOnce

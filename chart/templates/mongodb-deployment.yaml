@@ -21,13 +21,19 @@ spec:
       containers:
       - image: mongo:3.2
         name: mongodb
-        resources: {}
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 100m
+          limits:
+            memory: 200Mi
+            cpu: 1000m
         volumeMounts:
         - mountPath: /data/db
-          name: clearglasscommunity-mongodb
+          name: clearglass-mongodb
       restartPolicy: Always
       volumes:
-      - name: clearglasscommunity-mongodb
+      - name: clearglass-mongodb
         persistentVolumeClaim:
-          claimName: clearglasscommunity-mongodb
+          claimName: clearglass-mongodb
 status: {}

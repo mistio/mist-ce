@@ -20,6 +20,12 @@ spec:
       containers:
       - image: rabbitmq:3.6.6-management
         name: rabbitmq
-        resources: {}
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 100m
+          limits:
+            memory: 400Mi
+            cpu: 1000m
       restartPolicy: Always
 status: {}

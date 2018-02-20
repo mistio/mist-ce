@@ -1,38 +1,186 @@
 stages:
+  - discover
   - build
   - deploy
   - undeploy
 
-build nginx:
+variables:
+  DEPLOY_DOMAIN: community.env.clear.glass
+
+
+discover submodules:
+  stage: discover
+  image: alpine
+  before_script:
+    - apk add --no-cache git
+  script:
+    - |
+        git submodule status | \
+          sed 's/^[ +-]\([0-9a-f]*\) \([^ ]*\).*$/\1,\2/' > submodules.csv
+  artifacts:
+    paths:
+      - submodules.csv
+    expire_in: 10 days
+
+
+.docker_image: &docker_image_template
   stage: build
   image: docker:git
   services:
-  - docker:dind
+    - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_REF_SLUG .
-    - docker push $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_REF_SLUG
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - |
+        function docker_pull() {
+          # docker_pull <img> : Will retry several times to pull image.
+          img=$1
+          tries=60
+          sleep=10
+          echo "Will try to pull image $img ($tries tries, ${sleep}s sleep)."
+          for i in $(seq 1 $tries); do
+            if docker pull $img; then
+              echo "Image $img pulled successfully!"
+              return 0
+            fi
+            sleep $sleep
+          done
+          echo "Failed too pull image $img."
+          return 1
+        }
+    - |
+        function docker_push() {
+          # docker_push <src> <dest>: Retag and push image
+          # <src> must be the full name of a local image.
+          # <dest> must be just the image identifier, registry and tag will be
+          # added automatically.
+          src=$1
+          for pref in $CI_REGISTRY_IMAGE; do
+            for suff in $CI_COMMIT_SHA $CI_COMMIT_REF_SLUG; do
+              dest=$pref/$2:$suff
+              echo "Tagging image $src as $dest..."
+              docker tag $src $dest
+              echo "Pushing image $dest..."
+              docker push $dest
+            done
+          done
+        }
+    - |
+        function get_submodule_sha() {
+          cat submodules.csv | grep ",$1$" | cut -d, -f1
+        }
+    - |
+        function docker_retag() {
+          repo=$1
+          img=$2
+          src_img="$img:$(get_submodule_sha $repo)"
+          docker_pull $src_img
+          docker_push $src_img $repo
+        }
+  dependencies:
+    - discover submodules
 
-deploy:
+.retag_mist_image: &retag_image_template
+  <<: *docker_image_template
+  variables:
+    DOCKER_DRIVER: overlay2
+    GIT_STRATEGY: none
+
+retag landing:
+  <<: *retag_image_template
+  script:
+    - docker_retag landing mist/landing
+
+retag ui:
+  <<: *retag_image_template
+  script:
+    - docker_retag ui mist/ui
+
+.retag tests:
+  <<: *retag_image_template
+  script:
+    - docker_retag tests mist/tests_base
+
+build api:
+  <<: *docker_image_template
+  script:
+    - SRC_IMG="mist/mist:$(get_submodule_sha api)"
+    - docker_pull $SRC_IMG
+    - |
+        docker build \
+          -t $CI_PROJECT_NAME/api:$CI_COMMIT_SHA \
+          -f Dockerfile.api \
+          --build-arg FROM_IMAGE=$SRC_IMG \
+          --build-arg CC_VERSION_SHA=$CI_COMMIT_SHA \
+          --build-arg CC_VERSION_NAME=$CI_COMMIT_REF_NAME \
+          .
+    - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
+
+build nginx:
+  <<: *docker_image_template
+  script:
+    - |
+        docker build \
+          -t $CI_PROJECT_NAME/nginx:$CI_COMMIT_SHA \
+          -f Dockerfile.nginx \
+          .
+    - docker_push $CI_PROJECT_NAME/nginx:$CI_COMMIT_SHA nginx
+
+
+.deploy_template: &deploy_template
   stage: deploy
   image: dtzar/helm-kubectl
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_COMMIT_REF_SLUG.community.env.clear.glass
+    url: http://$CI_COMMIT_REF_SLUG.$DEPLOY_DOMAIN
     on_stop: undeploy
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
+    - export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
+    - kubectl describe namespace "$name" || kubectl create namespace "$name"
+    - |
+        export secret_name=
+        if [[ "$CI_PROJECT_VISIBILITY" != "public" ]]; then
+          kubectl create secret --namespace "$name" \
+            docker-registry gitlab-registry \
+            --docker-server=$CI_REGISTRY \
+            --docker-username=${REGISTRY_USER:-$CI_REGISTRY_USER} \
+            --docker-password=${REGISTRY_PASSWORD:-$CI_REGISTRY_PASSWORD} \
+            --docker-email=$GITLAB_USER_EMAIL \
+            -o yaml --dry-run | \
+              kubectl replace --namespace "$name" --force -f -
+          export secret_name=gitlab-registry
+        fi
     - |
         helm upgrade --install --namespace "$name" \
-          --set COMMIT_SLUG=$CI_COMMIT_REF_SLUG \
-          --set MIST_HOST=$CI_COMMIT_REF_SLUG.community.env.clear.glass \
+          --set image.tag="$CI_COMMIT_SHA" \
+          --set image.repository="$CI_REGISTRY_IMAGE" \
+          --set image.pullPolicy=IfNotPresent \
+          --set image.secrets[0].name="$secret_name" \
+          --set MIST_HOST=$host \
           --set SMTP_PASSWORD=$SMTP_PASSWORD \
           "$name" ./chart/
 
-undeploy:
+deploy review:
+  <<: *deploy_template
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_COMMIT_REF_SLUG.$DEPLOY_DOMAIN
+    on_stop: undeploy review
+  except:
+    - master
+
+deploy master:
+  <<: *deploy_template
+  environment:
+    name: master
+    url: http://master.$DEPLOY_DOMAIN
+  only:
+    - master
+
+
+undeploy review:
   stage: undeploy
   image: dtzar/helm-kubectl
   variables:
@@ -43,5 +191,8 @@ undeploy:
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - helm delete --purge "$name"
+    - kubectl delete namespace "$name"
   when: manual
   allow_failure: true
+  except:
+    - master

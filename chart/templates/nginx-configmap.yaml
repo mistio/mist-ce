@@ -5,7 +5,6 @@ metadata:
 data:
   nginx.conf: |
     user  www-data;
-    daemon off;
     worker_processes  4;
 
     pid        /var/run/nginx.pid;

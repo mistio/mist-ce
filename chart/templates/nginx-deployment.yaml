@@ -18,15 +18,25 @@ spec:
       labels:
         io.kompose.service: nginx
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
-      - image:  registry.gitlab.com/clearglass/clearglass-community/nginx:{{ .Values.COMMIT_SLUG }}
+      - image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: nginx
         ports:
         - containerPort: 80
         volumeMounts:
         - name: nginx-config
-          mountPath: /opt
-        command: ["nginx", "-c", "/opt/nginx.conf"]
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          requests:
+            memory: 30Mi
+            cpu: 10m
+          limits:
+            memory: 60Mi
+            cpu: 1000m
       restartPolicy: Always
       volumes:
       - name: nginx-config
