@@ -145,8 +145,8 @@ build nginx:
           kubectl create secret --namespace "$name" \
             docker-registry gitlab-registry \
             --docker-server=$CI_REGISTRY \
-            --docker-username=$CI_REGISTRY_USER \
-            --docker-password=$CI_REGISTRY_PASSWORD \
+            --docker-username=${REGISTRY_USER:-$CI_REGISTRY_USER} \
+            --docker-password=${REGISTRY_PASSWORD:-$CI_REGISTRY_PASSWORD} \
             --docker-email=$GITLAB_USER_EMAIL \
             -o yaml --dry-run | \
               kubectl replace --namespace "$name" --force -f -
