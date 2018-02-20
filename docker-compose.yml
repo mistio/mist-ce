@@ -28,14 +28,14 @@ services:
       - elasticsearch:/usr/share/elasticsearch/data:rw
 
   logstash:
-    image: mist/logstash:$GLASS_TAG
+    image: mist/logstash:staging
     restart: on-failure:5
     depends_on:
       - elasticsearch
       - rabbitmq
 
   elasticsearch-manage:
-    image: mist/elasticsearch-manage:$GLASS_TAG
+    image: mist/elasticsearch-manage:staging
     command: ./scripts/add_templates.py
     restart: on-failure:5
     depends_on:
@@ -63,7 +63,7 @@ services:
 
 
   celery-prefork: &backend
-    image: mist/mist:io-$GLASS_TAG
+    image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - memcached
       - mongodb
@@ -111,7 +111,7 @@ services:
       - 8081
 
   ui:
-    image: mist/ui:io-$GLASS_TAG
+    image: $IMG_REGISTRY/ui:$IMG_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -120,7 +120,7 @@ services:
       - 80
 
   landing:
-    image: mist/landing:io-$GLASS_TAG
+    image: $IMG_REGISTRY/landing:$IMG_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -130,7 +130,7 @@ services:
 
 
   nginx:
-    image: mist/nginx:$GLASS_TAG
+    image: $IMG_REGISTRY/nginx:$IMG_TAG
     restart: on-failure:5
     ports:
       - 80:80
