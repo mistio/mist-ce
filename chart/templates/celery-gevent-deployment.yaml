@@ -1,22 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -c
-    kompose.version: 1.8.0 (0c0c027)
-  creationTimestamp: null
   labels:
-    io.kompose.service: celery-gevent
+    clearglass.service: celery-gevent
   name: celery-gevent
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: celery-gevent
+        clearglass.service: celery-gevent
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
@@ -24,11 +17,6 @@ spec:
       - args:
         - bin/wait-all
         - bin/celery-gevent
-        env:
-        - name: DEFAULTS_FILE
-          value: /etc/clearglass/defaults.py
-        - name: SETTINGS_FILE
-          value: /etc/clearglass/settings.py
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: celery-gevent
@@ -39,15 +27,11 @@ spec:
           limits:
             memory: 1000Mi
             cpu: 1000m
-        stdin: true
-        tty: true
         volumeMounts:
         - name: clearglass-config
           mountPath: /etc/clearglass/settings.py
           subPath: settings.py
-      restartPolicy: Always
       volumes:
       - name: clearglass-config
         configMap:
           name: clearglass-configmap
-status: {}

@@ -1,15 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -c
-    kompose.version: 1.8.0 (0c0c027)
-  creationTimestamp: null
   labels:
-    io.kompose.service: mongodb
+    clearglass.service: mongodb
   name: mongodb
 spec:
   ports:
   - port: 27017
   selector:
-    io.kompose.service: mongodb
+    clearglass.service: mongodb

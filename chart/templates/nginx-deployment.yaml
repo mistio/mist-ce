@@ -1,22 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -c
-    kompose.version: 1.8.0 (0c0c027)
-  creationTimestamp: null
   labels:
-    io.kompose.service: nginx
+    clearglass.service: nginx
   name: nginx
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: nginx
+        clearglass.service: nginx
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
@@ -37,9 +30,7 @@ spec:
           limits:
             memory: 60Mi
             cpu: 1000m
-      restartPolicy: Always
       volumes:
       - name: nginx-config
         configMap:
           name: nginx-configmap
-status: {}
