@@ -10,5 +10,7 @@ ENV VERSION_REPO=mistio/mist.io \
     VERSION_SHA=$IO_VERSION_SHA \
     VERSION_NAME=$IO_VERSION_NAME
 
+RUN ipython /mist.api/openapi/generate_api_spec.py
+
 RUN echo "{\"sha\":\"$VERSION_SHA\",\"name\":\"$VERSION_NAME\",\"repo\":\"$VERSION_REPO\",\"modified\":false}" \
         > /mist-version.json
