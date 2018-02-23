@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gocky
+  labels:
+    clearglass.service: gocky
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        clearglass.service: gocky
+    spec:
+      containers:
+        - name: gocky
+          image: mist/gocky:staging
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - -config
+            - /etc/gocky/config.toml
+          ports:
+            - containerPort: 9096
+            - containerPort: 9097
+          resources:
+            requests:
+              memory: 10Mi
+              cpu: 10m
+            limits:
+              memory: 100Mi
+              cpu: 1000m
