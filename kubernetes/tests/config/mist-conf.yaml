@@ -29,6 +29,9 @@ data:
         'elastic_use_ssl': True,
         'elastic_verify_certs': False
     }
+    INFLUX = {
+        "host": "http://influxdb.default:8086", "db": "telegraf"
+    }
     ENABLE_DEV_USERS=True
     DOCKER_IP="10.128.0.4"
     DOCKER_PORT="2376"
