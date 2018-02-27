@@ -89,7 +89,7 @@ else
 fi
 
 # Substitute environmental variables in kubernetes yaml definitions.
-for var in NAMESPACE TAG SENDGRID_USERNAME SENDGRID_PASSWORD \
+for var in NAMESPACE TAG SENDGRID_USERNAME SENDGRID_PASSWORD DEFAULT_MONITORING_METHOD \
            ELASTIC_URI ELASTIC_USERNAME ELASTIC_PASSWORD STACK STRIPE_SECRET_APIKEY STRIPE_PUBLIC_APIKEY JS_BUILD; do
     val=$(eval echo \$$var)
     if [ -z "$val" ]; then
