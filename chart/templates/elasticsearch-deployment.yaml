@@ -16,7 +16,13 @@ spec:
       containers:
       - image: elasticsearch:5.5.2
         name: elasticsearch
-        resources: {}
+        resources:
+          requests:
+            memory: 2500Mi
+            cpu: 50m
+          limits:
+            memory: 4000Mi
+            cpu: 2000m
         volumeMounts:
         - mountPath: /usr/share/elasticsearch/data
           name: clearglass-elasticsearch
