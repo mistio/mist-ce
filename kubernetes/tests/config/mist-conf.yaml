@@ -12,6 +12,7 @@ data:
     COLLECTD_PORT="25826"
     GRAPHITE_URI="http://graphite.default"
     TELEGRAF_TARGET="http://REPLACE_MIST_URI/ingress"
+    DEFAULT_MONITORING_METHOD="collectd-graphite"
     BROKER_URL="amqp://guest:guest@rabbitmq/"
     MONGO_URI="mongodb:27017"
     MEMCACHED_HOST=["memcached:11211"]
