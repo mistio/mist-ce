@@ -1,21 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -c
-    kompose.version: 1.8.0 (0c0c027)
-  creationTimestamp: null
   labels:
-    io.kompose.service: memcached
+    clearglass.service: memcached
   name: memcached
 spec:
   replicas: 1
-  strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: memcached
+        clearglass.service: memcached
     spec:
       containers:
       - image: memcached
@@ -27,5 +21,3 @@ spec:
           limits:
             memory: 60Mi
             cpu: 100m
-      restartPolicy: Always
-status: {}

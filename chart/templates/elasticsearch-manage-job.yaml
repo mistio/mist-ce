@@ -1,7 +1,6 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  creationTimestamp: null
   name: elasticsearch-manage
 spec:
   backoffLimit: 10

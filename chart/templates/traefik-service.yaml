@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  labels:
+    clearglass.service: traefik
+spec:
+  ports:
+    - name: traefik
+      port: 80
+    - name: traefik-admin
+      port: 8080
+  selector:
+    clearglass.service: traefik
