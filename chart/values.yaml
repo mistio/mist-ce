@@ -1,4 +1,3 @@
-MIST_HOST: localhost
 smtp:
   host: smtp.sendgrid.net
   port: 2525
@@ -13,3 +12,7 @@ image:
   pullPolicy: Always
   secrets:
     - name: gitlab-registry
+
+http:
+  host: localhost
+  tlsSecret: ''

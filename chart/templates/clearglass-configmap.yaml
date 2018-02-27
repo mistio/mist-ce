@@ -4,7 +4,7 @@ metadata:
   name: clearglass-configmap
 data:
   settings.py: |
-    CORE_URI = "http://{{ .Values.MIST_HOST }}"
+    CORE_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"
     JS_BUILD = False
     MAILER_SETTINGS = {
         'mail.host': "{{ .Values.smtp.host }}",
