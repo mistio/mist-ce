@@ -5,8 +5,14 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
+{{- if .Values.http.tlsSecret }}
+  tls:
+    - secretName: {{ .Values.http.tlsSecret }}
+      hosts:
+        - {{ .Values.http.host }}
+{{- end }}
   rules:
-  - host: {{ .Values.MIST_HOST }}
+  - host: {{ .Values.http.host }}
     http:
       paths:
       - backend:

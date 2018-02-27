@@ -5,7 +5,7 @@ stages:
   - undeploy
 
 variables:
-  DEPLOY_DOMAIN: community.env.clear.glass
+  DEPLOY_DOMAIN_SUFFIX: -community.clear.glass
 
 
 discover submodules:
@@ -131,16 +131,12 @@ build nginx:
 .deploy_template: &deploy_template
   stage: deploy
   image: dtzar/helm-kubectl
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_COMMIT_REF_SLUG.$DEPLOY_DOMAIN
-    on_stop: undeploy
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
     - kubectl describe namespace "$name" || kubectl create namespace "$name"
     - |
-        export secret_name=
+        export image_secret_name=
         if [[ "$CI_PROJECT_VISIBILITY" != "public" ]]; then
           kubectl create secret --namespace "$name" \
             docker-registry gitlab-registry \
@@ -150,23 +146,39 @@ build nginx:
             --docker-email=$GITLAB_USER_EMAIL \
             -o yaml --dry-run | \
               kubectl replace --namespace "$name" --force -f -
-          export secret_name=gitlab-registry
+          export image_secret_name=gitlab-registry
+        fi
+    - |
+        export tls_secret_name=
+        if [ -n "$TLS_KEY" ] && [ -n "$TLS_CRT" ]; then
+          tls_tmpdir=$(mktemp -d)
+          echo "$TLS_KEY" > $tls_tmpdir/tls.key
+          echo "$TLS_CRT" > $tls_tmpdir/tls.crt
+          kubectl create secret --namespace "$name" \
+            tls https \
+            --key $tls_tmpdir/tls.key \
+            --cert $tls_tmpdir/tls.crt \
+            -o yaml --dry-run | \
+              kubectl replace --namespace "$name" --force -f -
+          export tls_secret_name=https
+          rm -rf $tls_tmpdir
         fi
     - |
         helm upgrade --install --namespace "$name" \
           --set image.tag="$CI_COMMIT_SHA" \
           --set image.repository="$CI_REGISTRY_IMAGE" \
           --set image.pullPolicy=IfNotPresent \
-          --set image.secrets[0].name="$secret_name" \
-          --set MIST_HOST=$host \
-          --set SMTP_PASSWORD=$SMTP_PASSWORD \
+          --set image.secrets[0].name="$image_secret_name" \
+          --set http.host=$host \
+          --set http.tlsSecret=$tls_secret_name \
+          --set smtp.password=$SMTP_PASSWORD \
           "$name" ./chart/
 
 deploy review:
   <<: *deploy_template
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_COMMIT_REF_SLUG.$DEPLOY_DOMAIN
+    url: http://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy review
   except:
     - master
@@ -175,7 +187,7 @@ deploy master:
   <<: *deploy_template
   environment:
     name: master
-    url: http://master.$DEPLOY_DOMAIN
+    url: http://master$DEPLOY_DOMAIN_SUFFIX
   only:
     - master
 
