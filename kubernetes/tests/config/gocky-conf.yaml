@@ -28,9 +28,9 @@ data:
     drop-unauthorized = true
 
     # Configuration for influxdb
-    #[[http]]
-    #name = "influxdb"
-    #bind-addr = "0.0.0.0:9096"
-    #output = [
-    #    { name="influxdb", location = "http://influxdb:8086/write" },
-    #]
+    [[http]]
+    name = "influxdb"
+    bind-addr = "0.0.0.0:9096"
+    output = [
+        { name="influxdb", location = "http://influxdb.default:8086/write" },
+    ]
