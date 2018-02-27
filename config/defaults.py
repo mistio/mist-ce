@@ -3,6 +3,7 @@ Default configuration options for ClearGLASS Community
 """
 PORTAL_NAME = "ClearGLASS"
 THEME = "clearglass"
+EMAIL_FROM = "ClearGLASS Team <team@clear.glass>"
 
 ENABLE_MONITORING = True
 
