@@ -4,7 +4,7 @@ Default configuration options for ClearGLASS Community
 PORTAL_NAME = "ClearGLASS"
 THEME = "clearglass"
 
-ENABLE_MONITORING = False
+ENABLE_MONITORING = True
 
 LANDING_CATEGORIES = [{
     'href': '/',
@@ -27,7 +27,7 @@ LANDING_CATEGORIES = [{
                 "size" : "24"
             },{
                 "icon" : "linkedin",
-                "href" : "https://www.linkedin.com/company/clearcenter", 
+                "href" : "https://www.linkedin.com/company/clearcenter",
                 "color": "#fff",
                 "size" : "24"
             },{

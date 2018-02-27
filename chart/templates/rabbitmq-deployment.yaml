@@ -1,21 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -c
-    kompose.version: 1.8.0 (0c0c027)
-  creationTimestamp: null
   labels:
-    io.kompose.service: rabbitmq
+    clearglass.service: rabbitmq
   name: rabbitmq
 spec:
   replicas: 1
-  strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: rabbitmq
+        clearglass.service: rabbitmq
     spec:
       containers:
       - image: rabbitmq:3.6.6-management
@@ -27,5 +21,3 @@ spec:
           limits:
             memory: 400Mi
             cpu: 1000m
-      restartPolicy: Always
-status: {}

@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: influxdb
   labels:
-    clearglass.service: clearglass-mongodb
-  name: clearglass-mongodb
+    clearglass.service: influxdb
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
