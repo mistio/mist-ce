@@ -7,10 +7,10 @@ data:
     CORE_URI = "http://{{ .Values.MIST_HOST }}"
     JS_BUILD = False
     MAILER_SETTINGS = {
-        'mail.host': "{{ .Values.SMTP_HOST }}",
-        'mail.port': "{{ .Values.SMTP_PORT }}",
-        'mail.tls': {{ .Values.SMTP_TLS }},
-        'mail.starttls': {{ .Values.SMTP_STARTTLS }},
-        'mail.username': "{{ .Values.SMTP_USERNAME }}",
-        'mail.password': "{{ .Values.SMTP_PASSWORD }}"
+        'mail.host': "{{ .Values.smtp.host }}",
+        'mail.port': "{{ .Values.smtp.port }}",
+        'mail.tls': {{ .Values.smtp.tls }},
+        'mail.starttls': {{ .Values.smtp.starttls }},
+        'mail.username': "{{ .Values.smtp.username }}",
+        'mail.password': "{{ .Values.smtp.password }}"
     }

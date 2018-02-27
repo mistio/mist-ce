@@ -159,7 +159,7 @@ build nginx:
           --set image.pullPolicy=IfNotPresent \
           --set image.secrets[0].name="$secret_name" \
           --set MIST_HOST=$host \
-          --set SMTP_PASSWORD=$SMTP_PASSWORD \
+          --set smtp.password=$SMTP_PASSWORD \
           "$name" ./chart/
 
 deploy review:
