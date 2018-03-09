@@ -4,8 +4,14 @@ Default configuration options for ClearGLASS Community
 PORTAL_NAME = "ClearGLASS"
 THEME = "clearglass"
 EMAIL_FROM = "ClearGLASS Team <team@clear.glass>"
+EMAIL_ALERTS = "alert@clear.glass"
+EMAIL_INFO = "info@clear.glass"
+EMAIL_SALES = "sales@clear.glass"
+EMAIL_SUPPORT = "support@clear.glass"
+EMAIL_NOTIFICATIONS = "notifications@clear.glass"
 
 ENABLE_MONITORING = True
+DOCS_URI = SUPPORT_URI = ''
 
 LANDING_CATEGORIES = [{
     'href': '/',
@@ -222,3 +228,11 @@ The ClearGLASS team
 --
 %s
 """
+
+CTA = {
+    "rbac": {
+        "action": "UPGRADE CLEARGLASS",
+        "uri": "http://clear.glass",
+        "description": "Role based access policies are available in ClearGLASS Buniness."
+    }
+}
