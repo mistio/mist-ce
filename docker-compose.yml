@@ -72,6 +72,11 @@ services:
     image: mist/mailmock
     restart: on-failure:5
 
+  swagger:
+    image: mist/swagger-ui
+    environment:
+      API_URL: /api/v1/spec
+    restart: on-failure:5
 
   celery-prefork: &backend
     image: mist/mist:io-$MIST_TAG
