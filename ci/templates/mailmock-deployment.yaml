@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    clearglass.service: mailmock
+  name: mailmock
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        clearglass.service: mailmock
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+        - name: mailmock
+          image: mist/mailmock
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8025
+              name: smtp
+            - containerPort: 8143
+              name: imap
+          resources:
+            requests:
+              memory: 20Mi
+              cpu: 10m
+            limits:
+              memory: 50Mi
+              cpu: 200m

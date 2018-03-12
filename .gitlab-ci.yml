@@ -2,6 +2,7 @@ stages:
   - discover
   - build
   - deploy
+  - test
   - undeploy
   - release
 
@@ -114,7 +115,7 @@ retag ui:
   script:
     - docker_retag ui mist/ui
 
-.retag tests:
+retag tests:
   <<: *retag_image_template
   script:
     - docker_retag tests mist/tests_base
@@ -206,6 +207,9 @@ compose:
           rm -rf $tls_tmpdir
         fi
     - |
+        if [ "$CI_COMMIT_REF_SLUG" != "master" ]; then
+          cp ./ci/templates/* ./chart/templates/
+        fi
         helm upgrade --install --namespace "$name" \
           --set image.tag="$CI_COMMIT_SHA" \
           --set image.repository="$CI_REGISTRY_IMAGE" \
@@ -215,6 +219,10 @@ compose:
           --set http.tlsSecret=$tls_secret_name \
           --set smtp.password=$SMTP_PASSWORD \
           "$name" ./chart/
+    - |
+        until !( kubectl --namespace "$name" get pods | grep -v NAME | grep -v Running ); do
+          sleep 5 && echo '.'
+        done
   dependencies: []
 
 deploy review:
@@ -231,6 +239,75 @@ deploy master:
   environment:
     name: master
     url: http://master$DEPLOY_DOMAIN_SUFFIX
+  only:
+    - master
+
+.test_template: &test_template
+  stage: test
+  image: $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_SHA
+  variables:
+    GIT_STRATEGY: none
+    MIST_URL: http://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
+    DISPLAY: ":1.0"
+    REGISTER_USER_BEFORE_FEATURE: "True"
+    EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
+  before_script:
+    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
+    - echo "Test argument is $TEST"
+    - echo "Image used is $CI_REGISTRY_IMAGE/tests:$CI_COMMIT_SHA"
+    - echo $TEST_SETTINGS | base64 -d > test_settings.py
+
+.api_test_template: &api_test_template
+  <<: *test_template
+  script:
+    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
+
+.ui_test_template: &ui_test_template
+  <<: *test_template
+  script:
+    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
+  artifacts:
+    paths:
+      - js_console.log
+      - artifacts/error.png
+      - artifacts/output.mp4
+    expire_in: 3 days
+    when: on_failure
+  tags:
+    - shm
+
+API:io:api_token: *api_test_template
+API:io:clouds: *api_test_template
+API:io:dns: *api_test_template
+API:io:keys: *api_test_template
+API:io:images: *api_test_template
+API:io:libcloud_1/2: *api_test_template
+API:io:libcloud_2/2: *api_test_template
+API:io:machines: *api_test_template
+API:io:networks: *api_test_template
+API:io:schedules: *api_test_template
+API:io:scripts: *api_test_template
+API:io:rbac: *api_test_template
+API:io:ip_whitelisting: *api_test_template
+
+UI:clouds-add-1/2: *ui_test_template
+UI:clouds-add-2/2: *ui_test_template
+UI:clouds-actions: *ui_test_template
+UI:keys: *ui_test_template
+UI:machines:
+  <<: *ui_test_template
+  retry: 1
+UI:schedulers-1/2: *ui_test_template
+UI:schedulers-2/2: *ui_test_template
+UI:scripts: *ui_test_template
+UI:images-networks: *ui_test_template
+UI:user-actions: *ui_test_template
+UI:rbac-teams: *ui_test_template
+UI:zones:
+  <<: *ui_test_template
+  retry: 1
+UI:ip-whitelisting:
+  <<: *ui_test_template
   only:
     - master
 
