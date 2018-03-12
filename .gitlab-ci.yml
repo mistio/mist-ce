@@ -3,6 +3,7 @@ stages:
   - build
   - deploy
   - undeploy
+  - release
 
 variables:
   DEPLOY_DOMAIN_SUFFIX: -community.clear.glass
@@ -33,6 +34,22 @@ discover submodules:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - |
+        if [ -n "$EXT_REGISTRY" ]; then
+          if [ -n "$EXT_REGISTRY_USER" ] && [ -n "$EXT_REGISTRY_PASSWORD" ]; then
+            echo "Will log in to $EXT_REGISTRY."
+            docker login -u $EXT_REGISTRY_USER -p $EXT_REGISTRY_PASSWORD $EXT_REGISTRY
+          else
+            echo "EXT_REGISTRY specified without EXT_REGISTRY_USER & EXT_REGISTRY_PASSWORD"
+            /bin/false
+          fi
+          if [ -z "$EXT_REGISTRY_IMAGE" ]; then
+            export EXT_REGISTRY_IMAGE="$EXT_REGISTRY/$CI_PROJECT_NAME"
+          fi
+        else
+          export EXT_REGISTRY_IMAGE=""
+        fi
+        echo "EXT_REGISTRY_IMAGE=$EXT_REGISTRY_IMAGE"
+    - |
         function docker_pull() {
           # docker_pull <img> : Will retry several times to pull image.
           img=$1
@@ -56,7 +73,7 @@ discover submodules:
           # <dest> must be just the image identifier, registry and tag will be
           # added automatically.
           src=$1
-          for pref in $CI_REGISTRY_IMAGE; do
+          for pref in $CI_REGISTRY_IMAGE $EXT_REGISTRY_IMAGE; do
             for suff in $CI_COMMIT_SHA $CI_COMMIT_REF_SLUG; do
               dest=$pref/$2:$suff
               echo "Tagging image $src as $dest..."
@@ -127,6 +144,30 @@ build nginx:
           .
     - docker_push $CI_PROJECT_NAME/nginx:$CI_COMMIT_SHA nginx
 
+compose:
+  stage: build
+  image: python:alpine
+  before_script:
+    - pip install docker-compose
+  script:
+    - mkdir -p artifacts
+    - |
+        if [ -n "$EXT_REGISTRY_IMAGE" ]; then
+          export IMG_REGISTRY=$EXT_REGISTRY_IMAGE
+        elif [ -n "$EXT_REGISTRY" ]; then
+          export IMG_REGISTRY="$EXT_REGISTRY/$CI_PROJECT_NAME"
+        else
+          export IMG_REGISTRY=$CI_REGISTRY_IMAGE
+        fi
+    - export IMG_TAG=$CI_COMMIT_REF_SLUG
+    - echo "IMG_REGISTRY=$IMG_REGISTRY"
+    - echo "IMG_TAG=$IMG_TAG"
+    - docker-compose config > artifacts/docker-compose.yml
+  artifacts:
+    paths:
+      - artifacts/docker-compose.yml
+  dependencies: []
+
 
 .deploy_template: &deploy_template
   stage: deploy
@@ -173,6 +214,7 @@ build nginx:
           --set http.tlsSecret=$tls_secret_name \
           --set smtp.password=$SMTP_PASSWORD \
           "$name" ./chart/
+  dependencies: []
 
 deploy review:
   <<: *deploy_template
@@ -208,3 +250,40 @@ undeploy review:
   allow_failure: true
   except:
     - master
+  dependencies: []
+
+
+release:
+  stage: release
+  image: alpine
+  variables:
+    GIT_STRATEGY: none
+    RELEASE_NOTES: |
+      ## Installation
+
+      To install, please run:
+
+          wget -O docker-compose.yml \
+            '$CI_PROJECT_URL/builds/artifacts/$CI_COMMIT_REF_NAME/raw/artifacts/docker-compose.yml?job=compose'
+          docker-compose up -d
+
+      Also see the [README]($CI_PROJECT_URL/blob/master/README.md) instructions.
+  before_script:
+    - apk add --no-cache curl jq
+  script:
+    - API_URL="https://gitlab.com/api/v4/projects/$CI_PROJECT_ID"
+    - TAG_URL="$API_URL/repository/tags/$CI_COMMIT_TAG"
+    - 'req() { curl -sSLf -H "Private-Token: $GITLAB_API_TOKEN" "$@"; }'
+    - |
+        if [ "$(req $TAG_URL | jq -r '.release')" = "null" ]; then
+          echo "Release doesn't already exist, will create."
+          METHOD=POST
+        else
+          echo "Release already exists, will update."
+          METHOD=PUT
+        fi
+    - req -X $METHOD "$TAG_URL/release" --data-urlencode "description=$RELEASE_NOTES"
+    - echo "Successfully updated gitlab release notes."
+  only:
+    - tags
+  dependencies: []
