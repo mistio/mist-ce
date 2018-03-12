@@ -162,7 +162,7 @@ compose:
     - export IMG_TAG=$CI_COMMIT_REF_SLUG
     - echo "IMG_REGISTRY=$IMG_REGISTRY"
     - echo "IMG_TAG=$IMG_TAG"
-    - docker-compose config > artifacts/docker-compose.yml
+    - docker-compose -f docker-compose.yml config > artifacts/docker-compose.yml
   artifacts:
     paths:
       - artifacts/docker-compose.yml
