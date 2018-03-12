@@ -34,6 +34,22 @@ discover submodules:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - |
+        if [ -n "$EXT_REGISTRY" ]; then
+          if [ -n "$EXT_REGISTRY_USER" ] && [ -n "$EXT_REGISTRY_PASSWORD" ]; then
+            echo "Will log in to $EXT_REGISTRY."
+            docker login -u $EXT_REGISTRY_USER -p $EXT_REGISTRY_PASSWORD $EXT_REGISTRY
+          else
+            echo "EXT_REGISTRY specified without EXT_REGISTRY_USER & EXT_REGISTRY_PASSWORD"
+            /bin/false
+          fi
+          if [ -z "$EXT_REGISTRY_IMAGE" ]; then
+            export EXT_REGISTRY_IMAGE="$EXT_REGISTRY/$CI_PROJECT_NAME"
+          fi
+        else
+          export EXT_REGISTRY_IMAGE=""
+        fi
+        echo "EXT_REGISTRY_IMAGE=$EXT_REGISTRY_IMAGE"
+    - |
         function docker_pull() {
           # docker_pull <img> : Will retry several times to pull image.
           img=$1
@@ -57,7 +73,7 @@ discover submodules:
           # <dest> must be just the image identifier, registry and tag will be
           # added automatically.
           src=$1
-          for pref in $CI_REGISTRY_IMAGE; do
+          for pref in $CI_REGISTRY_IMAGE $EXT_REGISTRY_IMAGE; do
             for suff in $CI_COMMIT_SHA $CI_COMMIT_REF_SLUG; do
               dest=$pref/$2:$suff
               echo "Tagging image $src as $dest..."
@@ -135,8 +151,17 @@ compose:
     - pip install docker-compose
   script:
     - mkdir -p artifacts
-    - export IMG_REGISTRY=$CI_REGISTRY_IMAGE
+    - |
+        if [ -n "$EXT_REGISTRY_IMAGE" ]; then
+          export IMG_REGISTRY=$EXT_REGISTRY_IMAGE
+        elif [ -n "$EXT_REGISTRY" ]; then
+          export IMG_REGISTRY="$EXT_REGISTRY/$CI_PROJECT_NAME"
+        else
+          export IMG_REGISTRY=$CI_REGISTRY_IMAGE
+        fi
     - export IMG_TAG=$CI_COMMIT_REF_SLUG
+    - echo "IMG_REGISTRY=$IMG_REGISTRY"
+    - echo "IMG_TAG=$IMG_TAG"
     - docker-compose config > artifacts/docker-compose.yml
   artifacts:
     paths:
