@@ -70,10 +70,10 @@ services:
       - elasticsearch
       - rabbitmq
     volumes:
-      - ./config:/etc/clearglass
+      - ./settings:/etc/clearglass/settings
     environment:
       DEFAULTS_FILE: /etc/clearglass/defaults.py
-      SETTINGS_FILE: /etc/clearglass/settings.py
+      SETTINGS_FILE: /etc/clearglass/settings/settings.py
     stdin_open: true
     tty: true
     restart: on-failure:5
