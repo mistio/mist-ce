@@ -44,3 +44,7 @@ services:
     volumes:
       - ./keys:/keys
 
+  nginx:
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:rw
+      - ./static:/srv/www/static

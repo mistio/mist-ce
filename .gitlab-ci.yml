@@ -149,6 +149,7 @@ compose:
   image: python:alpine
   before_script:
     - pip install docker-compose
+    - apk add --no-cache gettext
   script:
     - mkdir -p artifacts
     - |
@@ -162,7 +163,7 @@ compose:
     - export IMG_TAG=$CI_COMMIT_REF_SLUG
     - echo "IMG_REGISTRY=$IMG_REGISTRY"
     - echo "IMG_TAG=$IMG_TAG"
-    - docker-compose -f docker-compose.yml config > artifacts/docker-compose.yml
+    - envsubst < docker-compose.yml > artifacts/docker-compose.yml
   artifacts:
     paths:
       - artifacts/docker-compose.yml
@@ -261,7 +262,10 @@ release:
     RELEASE_NOTES: |
       ## Installation
 
-      To install, please run:
+      Download the [docker-compose file]($CI_PROJECT_URL/builds/artifacts/$CI_COMMIT_REF_NAME/raw/artifacts/docker-compose.yml?job=compose),
+      save it as `docker-compose.yml` and and run `docker-compose up -d`.
+
+      In one line (you'll also need to pass auth header):
 
           wget -O docker-compose.yml \
             '$CI_PROJECT_URL/builds/artifacts/$CI_COMMIT_REF_NAME/raw/artifacts/docker-compose.yml?job=compose'
