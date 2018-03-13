@@ -232,7 +232,7 @@ The ClearGLASS team
 CTA = {
     "rbac": {
         "action": "UPGRADE CLEARGLASS",
-        "uri": "http://clear.glass",
-        "description": "Role based access policies are available in ClearGLASS Buniness."
+        "uri": "https://www.clearos.com/resources/documentation/clearos/content:en_us:cg_upgrading-from-clearglass-community-to-clearglass-business",
+        "description": "Role based access policies are available in ClearGLASS Business."
     }
 }

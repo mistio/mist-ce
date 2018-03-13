@@ -19,6 +19,7 @@ services:
 
   celery-prefork: &backend
     volumes:
+      - ./config/defaults.py:/etc/clearglass/defaults.py:ro
       - ./api:/mist.api:rw
       - ./keys:/keys
       - ./elasticsearch:/elasticsearch
@@ -44,3 +45,7 @@ services:
     volumes:
       - ./keys:/keys
 
+  nginx:
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:rw
+      - ./static:/srv/www/static

@@ -4,8 +4,9 @@ FROM $FROM_IMAGE
 
 # Configure product defaults.
 COPY ./config/defaults.py /etc/clearglass/defaults.py
+RUN mkdir -p /etc/clearglass/settings
 ENV DEFAULTS_FILE=/etc/clearglass/defaults.py
-ENV SETTINGS_FILE=/etc/clearglass/settings.py
+ENV SETTINGS_FILE=/etc/clearglass/settings/settings.py
 
 # Pass version info.
 ARG CC_VERSION_SHA
