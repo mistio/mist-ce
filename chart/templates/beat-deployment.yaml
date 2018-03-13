@@ -32,7 +32,7 @@ spec:
               cpu: 50m
         volumeMounts:
         - name: clearglass-config
-          mountPath: /etc/clearglass/settings.py
+          mountPath: /etc/clearglass/settings/settings.py
           subPath: settings.py
       volumes:
       - name: clearglass-config
