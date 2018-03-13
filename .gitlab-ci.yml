@@ -176,7 +176,7 @@ compose:
   script:
     - export name="$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
     - export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
-    - kubectl describe namespace "$name" || kubectl create namespace "$name"
+    - kubectl describe namespace/$name || kubectl create namespace "$name"
     - |
         export image_secret_name=
         if [[ "$CI_PROJECT_VISIBILITY" != "public" ]]; then
