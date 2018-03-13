@@ -265,12 +265,6 @@ release:
       Download the [docker-compose file]($CI_PROJECT_URL/builds/artifacts/$CI_COMMIT_REF_NAME/raw/artifacts/docker-compose.yml?job=compose),
       save it as `docker-compose.yml` and and run `docker-compose up -d`.
 
-      In one line (you'll also need to pass auth header):
-
-          wget -O docker-compose.yml \
-            '$CI_PROJECT_URL/builds/artifacts/$CI_COMMIT_REF_NAME/raw/artifacts/docker-compose.yml?job=compose'
-          docker-compose up -d
-
       Also see the [README]($CI_PROJECT_URL/blob/master/README.md) instructions.
   before_script:
     - apk add --no-cache curl jq
