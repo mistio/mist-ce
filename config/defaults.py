@@ -233,6 +233,6 @@ CTA = {
     "rbac": {
         "action": "UPGRADE CLEARGLASS",
         "uri": "http://clear.glass",
-        "description": "Role based access policies are available in ClearGLASS Buniness."
+        "description": "Role based access policies are available in ClearGLASS Business."
     }
 }
