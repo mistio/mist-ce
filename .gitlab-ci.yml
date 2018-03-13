@@ -149,6 +149,7 @@ compose:
   image: python:alpine
   before_script:
     - pip install docker-compose
+    - apk add --no-cache gettext
   script:
     - mkdir -p artifacts
     - |
@@ -162,7 +163,7 @@ compose:
     - export IMG_TAG=$CI_COMMIT_REF_SLUG
     - echo "IMG_REGISTRY=$IMG_REGISTRY"
     - echo "IMG_TAG=$IMG_TAG"
-    - docker-compose -f docker-compose.yml config > artifacts/docker-compose.yml
+    - envsubst < docker-compose.yml > artifacts/docker-compose.yml
   artifacts:
     paths:
       - artifacts/docker-compose.yml
