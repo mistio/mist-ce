@@ -1,3 +1,4 @@
+{{ if eq .Values.smtp.host "mailmock" -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -11,8 +12,6 @@ spec:
       labels:
         clearglass.service: mailmock
     spec:
-      imagePullSecrets:
-{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
         - name: mailmock
           image: mist/mailmock
@@ -29,3 +28,4 @@ spec:
             limits:
               memory: 50Mi
               cpu: 200m
+{{- end }}
