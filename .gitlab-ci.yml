@@ -339,8 +339,7 @@ UI:user-actions:
   allow_failure: true
 UI:ip-whitelisting:
   <<: *ui_test_template
-  only:
-    - master
+  allow_failure: true
 UI:zones:
   <<: *ui_test_template
   retry: 1
