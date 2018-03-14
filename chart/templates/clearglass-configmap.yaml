@@ -9,8 +9,9 @@ data:
     MAILER_SETTINGS = {
         'mail.host': "{{ .Values.smtp.host }}",
         'mail.port': "{{ .Values.smtp.port }}",
-        'mail.tls': {{ .Values.smtp.tls }},
-        'mail.starttls': {{ .Values.smtp.starttls }},
+        'mail.tls': {{ if .Values.smtp.tls }}True{{ else }}False{{ end }},
+        'mail.starttls': {{ if .Values.smtp.starttls }}True{{ else }}False{{ end }},
         'mail.username': "{{ .Values.smtp.username }}",
         'mail.password': "{{ .Values.smtp.password }}"
     }
+    ENABLE_DEV_USERS = {{ if .Values.clearglass.enableDevUsers }}True{{ else }}False{{ end }}
