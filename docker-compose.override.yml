@@ -47,5 +47,6 @@ services:
 
   nginx:
     volumes:
-      - ./config/nginx.conf:/etc/nginx/nginx.conf:rw
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx-listen.conf:/etc/nginx/nginx-listen.conf:ro
       - ./static:/srv/www/static
