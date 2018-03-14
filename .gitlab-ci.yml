@@ -222,10 +222,13 @@ compose:
             --set http.host=$host \
             --set http.tlsSecret=$tls_secret_name \
             $namespace ./chart/
-
+          apk add --no-cache curl
           echo "Waiting for environment to be ready..."
           while kubectl --namespace $namespace get pods | grep -v NAME | grep -v Running; do
             sleep 5 && echo '.'
+          done
+          while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do
+            sleep 2 && echo 'Environment not ready yet...'
           done
         }
   script:
