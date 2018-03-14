@@ -1,0 +1,18 @@
+{{ if eq .Values.smtp.host "mailmock" -}}
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    clearglass.service: mailmock
+  name: mailmock
+spec:
+  ports:
+    - port: 8143
+      targetPort: 8143
+      name: imap
+    - port: 8025
+      targetPort: 8025
+      name: smtp
+  selector:
+    clearglass.service: mailmock
+{{- end }}
