@@ -10,5 +10,5 @@ output = [
 name = "graphite"
 bind-addr = "0.0.0.0:9097"
 output = [
-    { name="graphite", location="graphite:2003"}
+    { name="graphite", location="carbon:2003"}
 ]
