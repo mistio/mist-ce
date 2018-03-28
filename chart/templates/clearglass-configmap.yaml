@@ -14,3 +14,5 @@ data:
         'mail.password': "{{ .Values.smtp.password }}"
     }
     ENABLE_DEV_USERS = {{ if .Values.clearglass.enableDevUsers }}True{{ else }}False{{ end }}
+    DOCKER_IP = {{ .Values.orchestration.dockerIp }}
+    DOCKER_PORT = {{ .Values.orchestration.dockerHost }}
