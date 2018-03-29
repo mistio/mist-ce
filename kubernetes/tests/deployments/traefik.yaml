@@ -12,11 +12,19 @@ spec:
     spec:
       containers:
         - name: traefik
-          image: traefik:v1.4
+          image: traefik:v1.5
           imagePullPolicy: Always
           args:
-            - --web
-            - --logLevel=INFO
+            # - --logLevel=INFO
+            - --accesslog
+            # - --accesslog.format=json
+            - --api
+            - --api.entrypoint=traefik
+            - --rest
+            - --rest.entrypoint=traefik
+            - --defaultentrypoints=http
+            - --entrypoints=Name:http Address::80
+            - --entrypoints=Name:traefik Address::8080
           ports:
             - containerPort: 80
             - containerPort: 8080
