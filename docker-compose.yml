@@ -172,8 +172,18 @@ services:
       - rabbitmq
 
   traefik:
-    image: traefik:v1.4
-    command: --web --logLevel=DEBUG
+    image: traefik:v1.5
+    command:
+      # - --logLevel=INFO
+      - --accesslog
+      # - --accesslog.format=json
+      - --api
+      - --api.entrypoint=traefik
+      - --rest
+      - --rest.entrypoint=traefik
+      - --defaultentrypoints=http
+      - --entrypoints=Name:http Address::80
+      - --entrypoints=Name:traefik Address::8080
     ports:
       - 8040:80
       - 8041:8080

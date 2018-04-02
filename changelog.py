@@ -98,7 +98,7 @@ def editor(text, tmp_suffix='.tmp'):
     """Spawn $EDITOR (defaults to vim) for user to edit given text"""
     if isinstance(text, unicode):
         text = text.encode('utf8')
-    command = os.getenv('EDITOR', 'vim')
+    command = os.getenv('EDITOR', 'vi')
     with tempfile.NamedTemporaryFile(suffix=tmp_suffix) as tf:
         tf.write(text)
         tf.flush()
