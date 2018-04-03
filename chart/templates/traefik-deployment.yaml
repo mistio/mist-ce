@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: traefik
-          image: traefik:v1.4
+          image: traefik:v1.5
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --web
