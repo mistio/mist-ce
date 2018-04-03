@@ -332,9 +332,10 @@ API:io:ip_whitelisting: *api_test_template
 UI:clouds-actions: *ui_test_template
 # UI:images-networks: *ui_test_template
 UI:keys: *ui_test_template
-UI:machines:
+UI:machines-1/2:
   <<: *ui_test_template
   retry: 1
+UI:machines-2/2: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:schedulers-1/2: *ui_test_template
 UI:schedulers-2/2: *ui_test_template
@@ -348,6 +349,7 @@ UI:ip-whitelisting:
 UI:zones:
   <<: *ui_test_template
   retry: 1
+UI:alert: *ui_test_template
 
 
 .undeploy_template: &undeploy_template
