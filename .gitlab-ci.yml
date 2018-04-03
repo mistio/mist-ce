@@ -347,7 +347,6 @@ UI:ip-whitelisting:
 UI:zones:
   <<: *ui_test_template
   retry: 1
-UI:alert: *ui_test_template
 
 
 .undeploy_template: &undeploy_template
