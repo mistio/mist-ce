@@ -19,7 +19,3 @@ image:
 http:
   host: localhost
   tlsSecret: ''
-
-orchestration:
-  dockerIp: ''
-  dockerHost: ''

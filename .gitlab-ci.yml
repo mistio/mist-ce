@@ -221,8 +221,6 @@ compose:
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host=$host \
             --set http.tlsSecret=$tls_secret_name \
-            --set orchestration.dockerIp=$DOCKER_IP
-            --set orchestration.dockerHost=$DOCKER_PORT
             $namespace ./chart/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
