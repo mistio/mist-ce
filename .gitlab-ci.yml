@@ -310,8 +310,6 @@ UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
-UI:schedulers-1/2: *ui_test_template
-UI:schedulers-2/2: *ui_test_template
 UI:scripts: *ui_test_template
 UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
@@ -327,6 +325,12 @@ UI:alert:
   <<: *ui_test_template
   retry: 1
 UI:monitoring:
+  <<: *ui_test_template
+  retry: 1
+UI:schedulers-1/2:
+  <<: *ui_test_template
+  retry: 1
+UI:schedulers-2/2:
   <<: *ui_test_template
   retry: 1
 UI:ip-whitelisting:
