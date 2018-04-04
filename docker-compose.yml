@@ -160,12 +160,21 @@ services:
     depends_on:
       - rabbitmq
 
-  traefik:
-    image: traefik:v1.5
-    command: --web --logLevel=DEBUG
-    ports:
-      - 8040:80
-      - 8041:8080
+
+  traefik:                                                                                                    
+    command:                                  
+    - --accesslog                                                                                                  
+    - --api
+    - --api.entrypoint=traefik
+    - --rest    
+    - --rest.entrypoint=traefik                                                                                                                                                            
+    - --defaultentrypoints=http
+    - --entrypoints=Name:http Address::80 
+    - --entrypoints=Name:traefik Address::8080
+    image: traefik:1.5
+    ports:      
+    - 8040:80/tcp             
+    - 8041:8080/tcp
 
 
 volumes:
