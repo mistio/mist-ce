@@ -327,7 +327,7 @@ UI:ip-whitelisting:
   <<: *ui_test_template
   only:
     - staging
-UI:alert: *ui_test_template
+
 
 #################### UNDEPLOY STAGE ####################
 
