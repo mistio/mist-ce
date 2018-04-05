@@ -15,7 +15,7 @@ import requests
 
 
 GITLAB_URL = os.getenv('GITLAB_URL', 'https://gitlab.ops.mist.io')
-GITLAB_REPO = os.getenv('GITLAB_REPO', 'mistio/mist.io')
+GITLAB_REPO = os.getenv('GITLAB_REPO', 'mistio/mist-ce')
 
 MONTHS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
