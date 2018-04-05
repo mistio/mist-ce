@@ -143,8 +143,8 @@ same Docker volumes.
 if your Mist.io portal works as expected.
 5. In some cases, it might be necessary to run the latest database migration 
 scripts. Connect to the api container and run the latest scripts in 
-`mist.io/api/migrations`. e.g. `docker-compose exec api ls mist.io/api/migrations`
-and then `docker-compose exec api python mist.io/api/migrations/0005-list-locations.py`
+`mist.io/api/migrations`. e.g. `docker-compose exec api ls migrations`
+and then `docker-compose exec api python migrations/0006-list-locations.py`
 
 ## Staging version
 
