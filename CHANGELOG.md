@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v3.0.0-rc.1 (5 Apr 2018)
+
+### Changes
+
+* Feature: Machine monitoring, using InfluxDB & Telegraf
+* Feature: Alerting and automation rules on machine metrics
+* Feature: Interactive API docs using OpenAPI 3.0 spec & Swagger UI
+* Feature: Poller for cloud locations & sizes
+* Feature: Select network & subnetwork when creating GCE machine
+* Feature: Support ClearCenter SDN as cloud
+* Change: Improved vSphere support
+* Change: UI performance improvements
+* Change: Support for plugins
+* Bugfix: Too many bugfixes to count
+
+
 ## v2.6.0 (10 Dec 2017)
 
 ### Changes
@@ -116,6 +132,7 @@ For more details on the changes also check out the
 
 =======
 >>>>>>> Stashed changes
+
 
 ### Changes
 
