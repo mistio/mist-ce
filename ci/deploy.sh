@@ -12,7 +12,6 @@ TAG=${TAG:-$CI_COMMIT_SHA}
 STACK=${STACK:-io}
 DNS_ZONE=${ZONE:-mist.io}
 JS_BUILD=${JS_BUILD:-True}
-DEFAULT_MONITORING_METHOD=${MONITORING_METHOD:-telegraf-influxdb}
 
 USAGE="Usage: $0 [-h|--help] [<KUBE_DIR> [<KUBE_DIR> .. ]]
 
