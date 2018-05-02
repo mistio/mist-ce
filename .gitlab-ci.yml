@@ -174,45 +174,6 @@ build-gocky:
     IMG: gocky
 
 
-# Manually build images, tag is SHA/branch independant
-
-.docker_manual_build_img_template: &docker_manual_build_img_template
-  stage: build
-  when: manual
-  script:
-    - export TAG="${TAG:-latest}"
-    - echo "Will build img $IMG with tag $TAG."
-    - cd docker/$IMG
-    - docker build --pull -t gcr.io/mist-ops/$IMG:$TAG .
-    - docker tag gcr.io/mist-ops/$IMG:$TAG mist/$IMG:$TAG
-    - docker push gcr.io/mist-ops/$IMG:$TAG
-    - docker push mist/$IMG:$TAG
-  tags:
-    - builder
-  dependencies: []
-
-build-alpine-manual:
-  <<: *docker_manual_build_img_template
-  variables:
-    IMG: alpine
-    TAG: "3.4"
-
-build-socat-manual:
-  <<: *docker_manual_build_img_template
-  variables:
-    IMG: docker-socat
-
-build-mailmock-manual:
-  <<: *docker_manual_build_img_template
-  variables:
-    IMG: mailmock
-
-build-debugger-manual:
-  <<: *docker_manual_build_img_template
-  variables:
-    IMG: debugger
-
-
 #################### DEPLOY STAGE ####################
 
 .deploy_template: &deploy_template
