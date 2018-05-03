@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v3.0.0 (29 Apr 2018)
+
+### Changes
+
+* Feature: Machine monitoring, using InfluxDB & Telegraf
+* Feature: Alerting and automation rules on machine metrics, apply rules on groups of machines
+* Feature: Interactive API docs using OpenAPI 3.0 spec & Swagger UI
+* Feature: Poller for cloud locations & sizes
+* Feature: Select network & subnetwork when creating GCE machine
+* Feature: Support ClearCenter SDN as cloud
+* Change: Improved vSphere support
+* Change: UI performance improvements
+* Change: Support for plugins
+* Bugfix: Too many bugfixes to count
+
+
 ## v2.6.0 (10 Dec 2017)
 
 ### Changes
@@ -104,18 +120,6 @@ new functionality.
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
 
-<<<<<<< Updated upstream
-
-
-
-
-
-
-
-
-
-=======
->>>>>>> Stashed changes
 
 ### Changes
 
