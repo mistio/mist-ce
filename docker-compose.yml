@@ -6,17 +6,6 @@ version: '2.0'
 services:
 
 
-  influxdb:
-    image: influxdb
-    environment:
-      INFLUXDB_DB: telegraf
-    ports:
-      - 8083:8083
-      - 8086:8086
-    volumes:
-      - influxdb:/var/lib/influxdb
-
-
   mongodb:
     image: mongo:3.2
     restart: on-failure:5
@@ -39,14 +28,14 @@ services:
       - elasticsearch:/usr/share/elasticsearch/data:rw
 
   logstash:
-    image: mist/logstash:$MIST_TAG
+    image: $IMG_REGISTRY/logstash:$IMG_TAG
     restart: on-failure:5
     depends_on:
       - elasticsearch
       - rabbitmq
 
   elasticsearch-manage:
-    image: mist/elasticsearch-manage:$MIST_TAG
+    image: $IMG_REGISTRY/elasticsearch-manage:$IMG_TAG
     command: ./scripts/add_templates.py
     restart: on-failure:5
     depends_on:
@@ -78,17 +67,18 @@ services:
       API_URL: /api/v1/spec
     restart: on-failure:5
 
+
   celery-prefork: &backend
-    image: mist/mist:io-$MIST_TAG
+    image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - memcached
       - mongodb
       - elasticsearch
       - rabbitmq
     volumes:
-      - ./config:/etc/mist.io
+      - ./settings:/etc/mist/settings
     environment:
-      SETTINGS_FILE: /etc/mist.io/settings.py
+      SETTINGS_FILE: /etc/mist/settings/settings.py
     stdin_open: true
     tty: true
     restart: on-failure:5
@@ -132,7 +122,7 @@ services:
 
 
   ui:
-    image: mist/ui:io-$MIST_TAG
+    image: $IMG_REGISTRY/ui:$IMG_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -141,7 +131,7 @@ services:
       - 80
 
   landing:
-    image: mist/landing:io-$MIST_TAG
+    image: $IMG_REGISTRY/landing:$IMG_TAG
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -151,7 +141,7 @@ services:
 
 
   nginx:
-    image: mist/nginx:$MIST_TAG
+    image: $IMG_REGISTRY/nginx:$IMG_TAG
     restart: on-failure:5
     ports:
       - 80:80
@@ -162,14 +152,25 @@ services:
       - ui
 
 
+  influxdb:
+    image: influxdb
+    environment:
+      INFLUXDB_DB: telegraf
+    ports:
+      - 8083:8083
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+
   gocky:
-    image: mist/gocky:$MIST_TAG
+    image: $IMG_REGISTRY/gocky:$IMG_TAG
     command: -config /etc/gocky/config.toml
     ports:
       - 9096:9096
       - 9097:9097
     depends_on:
       - rabbitmq
+
 
   traefik:
     image: traefik:v1.5
