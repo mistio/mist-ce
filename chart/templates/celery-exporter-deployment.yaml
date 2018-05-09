@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: celery-exporter
+  name: celery-exporter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: celery-exporter
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "8888"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: celery-exporter
+        args:
+        - --broker
+        - amqp://guest:guest@rabbitmq/
+        - --enable-events
+        image: dimrozakis/celery-exporter
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 200m
+          requests:
+            memory: 25Mi
+            cpu: 3m

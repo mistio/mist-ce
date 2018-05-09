@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.productShortName }}
+data:
+  settings.py: |
+    CORE_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"
+    MAILER_SETTINGS = {
+        'mail.host': "{{ .Values.smtp.host }}",
+        'mail.port': "{{ .Values.smtp.port }}",
+        'mail.tls': {{ if .Values.smtp.tls }}True{{ else }}False{{ end }},
+        'mail.starttls': {{ if .Values.smtp.starttls }}True{{ else }}False{{ end }},
+        'mail.username': "{{ .Values.smtp.username }}",
+        'mail.password': "{{ .Values.smtp.password }}"
+    }
+    ENABLE_DEV_USERS = {{ if .Values.enableDevUsers }}True{{ else }}False{{ end }}

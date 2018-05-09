@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: kibana
+  name: kibana
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: kibana
+    spec:
+      containers:
+      - name: kibana
+        env:
+        - name: ELASTICSEARCH_URL
+          value: http://elasticsearch:9200
+        image: kibana:5.5.2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 1500Mi

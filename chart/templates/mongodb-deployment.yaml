@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    {{ .Values.productShortName }}.service: mongodb
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:3.2
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 100m
+          limits:
+            memory: 200Mi
+            cpu: 1000m
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongodb
+      volumes:
+      - name: mongodb
+        persistentVolumeClaim:
+          claimName: mongodb

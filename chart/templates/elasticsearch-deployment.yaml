@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  labels:
+    {{ .Values.productShortName }}.service: elasticsearch
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: elasticsearch:5.5.2
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: 2500Mi
+            cpu: 50m
+          limits:
+            memory: 4000Mi
+            cpu: 2000m
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: elasticsearch
+      volumes:
+      - name: elasticsearch
+        persistentVolumeClaim:
+          claimName: elasticsearch
