@@ -1,5 +1,5 @@
 apiversion: v1
-kind: service
+kind: Service
 metadata:
   labels:
     {{ .Values.productShortName }}.service: sockjs
@@ -11,7 +11,7 @@ spec:
     {{ .Values.productShortName }}.service: sockjs
 ---
 apiversion: v1
-kind: service
+kind: Service
 metadata:
   labels:
     {{ .Values.productShortName }}.service: sockjs
