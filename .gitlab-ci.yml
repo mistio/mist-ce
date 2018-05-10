@@ -301,14 +301,14 @@ deploy test:
     url: http://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy test
   variables:
-    namespace: test-$CI_PROJECT_SLUG-$CI_COMMIT_REF_SLUG
+    namespace: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |
       enableDevUsers: true
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
   variables:
-    namespace: $CI_PROJECT_SLUG-$CI_COMMIT_REF_SLUG
+    namespace: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |
       enableDevUsers: true
       smtp:
@@ -355,25 +355,11 @@ deploy master:
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
   dependencies: []
 
+
 .api_test_template: &api_test_template
   <<: *test_template
   script:
     - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
-
-.ui_test_template: &ui_test_template
-  <<: *test_template
-  script:
-    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
-  artifacts:
-    paths:
-      - js_console.log
-      - artifacts/error.png
-      - artifacts/output.mp4
-    expire_in: 3 days
-    when: on_failure
-  tags:
-    - shm
-
 
 API:io:api_token: *api_test_template
 API:io:clouds: *api_test_template
@@ -389,6 +375,20 @@ API:io:scripts: *api_test_template
 API:io:rbac: *api_test_template
 API:io:ip_whitelisting: *api_test_template
 
+
+.ui_test_template: &ui_test_template
+  <<: *test_template
+  script:
+    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
+  artifacts:
+    paths:
+      - js_console.log
+      - artifacts/error.png
+      - artifacts/output.mp4
+    expire_in: 3 days
+    when: on_failure
+  tags:
+    - shm
 
 UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
@@ -422,36 +422,44 @@ UI:ip-whitelisting:
   only:
     - staging
 
+
 #################### UNDEPLOY STAGE ####################
 
 .undeploy_template: &undeploy_template
   stage: undeploy
-  image: gcr.io/mist-ops/deployer
-  dependencies: []
-  script:
-    - kubectl delete namespace $NAMESPACE
-    - cli53 rrdelete mist.io $DNS_PREFIX A || echo "Already deleted"
-  tags:
-    - kube-default
-
-undeploy_review_env:
-  <<: *undeploy_template
-  when: manual
-  environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    action: stop
+  image: dtzar/helm-kubectl
   variables:
-    NAMESPACE: io-review-$CI_COMMIT_REF_SLUG
-    DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.review.ops
+    GIT_STRATEGY: none
+  before_script:
+    - |
+        set -e
+        function undeploy() {
+          helm delete --purge "$1" || true
+          kubectl delete namespace "$1" || true
+        }
+  script:
+    - undeploy $namespace
+  allow_failure: true
+  dependencies: []
 
-undeploy_test_env:
+undeploy test:
   <<: *undeploy_template
   environment:
     name: test/$CI_COMMIT_REF_SLUG
     action: stop
   variables:
-    NAMESPACE: io-test-$CI_COMMIT_REF_SLUG
-    DNS_PREFIX: $CI_COMMIT_REF_SLUG.io.test.ops
+    namespace: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+
+undeploy review:
+  <<: *undeploy_template
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  variables:
+    namespace: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+  when: manual
+  except:
+    - master
 
 
 #################### RELEASE STAGE ####################
