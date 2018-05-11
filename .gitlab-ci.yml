@@ -4,7 +4,7 @@ variables:
   TEST_DEPLOY_DOMAIN_SUFFIX: -mist-ce.test.mist.io
 
   # Possible values are CI_REGISTRY, EXT_REGISTRY, DOCKERHUB
-  DOCKERHUB_IMAGE: mist/mist-ce
+  DOCKERHUB_IMAGE: mistce
   COMPOSE_REGISTRY: DOCKERHUB
   DEPLOY_REGISTRY: EXT_REGISTRY
   # Set to empty string '' to disable.
