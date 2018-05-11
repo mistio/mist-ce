@@ -16,7 +16,7 @@ smtp:
 
 # Settings for docker images used in the chart.
 image:
-  registry: mist/mist-ce
+  registry: mistce
   tag: master
   pullPolicy: Always
   secrets:
