@@ -4,13 +4,12 @@ variables:
   TEST_DEPLOY_DOMAIN_SUFFIX: -ce.test.mist.io
 
   # Possible values are CI_REGISTRY, EXT_REGISTRY, DOCKERHUB
-  DOCKERHUB_IMAGE: mistce
   COMPOSE_REGISTRY: DOCKERHUB
   DEPLOY_REGISTRY: EXT_REGISTRY
   # Set to empty string '' to disable.
   DEPLOY_REGISTRY_AUTH: ''
   # API & UI tests image
-  TESTS_IMAGE: $EXT_REGISTRY_IMAGE/tests:$CI_COMMIT_SHA
+  TESTS_IMAGE: $DOCKERHUB_IMAGE/tests:$CI_COMMIT_SHA
 
 stages:
   - discover
