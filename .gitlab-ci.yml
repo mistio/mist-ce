@@ -9,6 +9,8 @@ variables:
   DEPLOY_REGISTRY: EXT_REGISTRY
   # Set to empty string '' to disable.
   DEPLOY_REGISTRY_AUTH: ''
+  # API & UI tests image
+  TESTS_IMAGE: $EXT_REGISTRY_IMAGE/tests:$CI_COMMIT_SHA
 
 stages:
   - discover
@@ -339,7 +341,7 @@ deploy master:
 
 .test_template: &test_template
   stage: test
-  image: $EXT_REGISTRY_IMAGE/tests:$CI_COMMIT_SHA
+  image: $TESTS_IMAGE
   variables:
     GIT_STRATEGY: none
     MIST_URL: http://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
@@ -349,7 +351,7 @@ deploy master:
   before_script:
     - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
     - echo "Test argument is $TEST"
-    - echo "Image used is $EXT_REGISTRY_IMAGE/tests:$CI_COMMIT_SHA"
+    - echo "Image used is $TESTS_IMAGE"
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
   dependencies: []
 
