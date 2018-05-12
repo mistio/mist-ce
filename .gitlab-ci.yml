@@ -1,7 +1,7 @@
 variables:
   GET_SOURCES_ATTEMPTS: 3
-  DEPLOY_DOMAIN_SUFFIX: -mist-ce.review.mist.io
-  TEST_DEPLOY_DOMAIN_SUFFIX: -mist-ce.test.mist.io
+  DEPLOY_DOMAIN_SUFFIX: -ce.review.mist.io
+  TEST_DEPLOY_DOMAIN_SUFFIX: -ce.test.mist.io
 
   # Possible values are CI_REGISTRY, EXT_REGISTRY, DOCKERHUB
   DOCKERHUB_IMAGE: mistce
