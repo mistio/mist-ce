@@ -188,13 +188,11 @@ build elasticsearch-manage: *docker_build_template
     GIT_STRATEGY: none
   script:
     - export submodule=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
-    - export orig_image=$(echo "$CI_JOB_NAME" | cut -d " " -f3)
-    - export orig_image=${orig_image:-$submodule}
-    - docker_retag_submodule $submodule mist/$orig_image
+    - docker_retag_submodule $submodule mist/$submodule
 
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
-retag tests tests_base: *docker_retag_template
+retag tests: *docker_retag_template
 
 
 compose:
@@ -309,13 +307,13 @@ deploy test:
   variables:
     namespace: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |
-      enableDevUsers: true
+      enableDevUsers: false
       smtp:
         host: smtp.sendgrid.net
         port: 2525
         starttls: true
         username: apikey
-        password: $SMTP_PASSWORD
+        password: $SENDGRID_PASSWORD
 
 deploy review:
   <<: *deploy_review_template
@@ -347,6 +345,7 @@ deploy master:
     DISPLAY: ":1.0"
     REGISTER_USER_BEFORE_FEATURE: "True"
     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
+    IMAP_HOST: mailmock.test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
   before_script:
     - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
     - echo "Test argument is $TEST"
