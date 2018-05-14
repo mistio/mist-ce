@@ -279,7 +279,7 @@ compose:
             $namespace ./chart/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
-          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed; do
+          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted; do
             sleep 10 && echo '.'
           done
           while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do

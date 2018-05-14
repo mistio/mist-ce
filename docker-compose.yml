@@ -76,9 +76,9 @@ services:
       - elasticsearch
       - rabbitmq
     volumes:
-      - ./settings:/etc/mist/settings
+      - ./settings:$CONF_DIR/settings
     environment:
-      SETTINGS_FILE: /etc/mist/settings/settings.py
+      SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
     tty: true
     restart: on-failure:5
