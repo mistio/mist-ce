@@ -228,11 +228,9 @@ release: &release_template
   script:
     - mkdir release
     - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
-    - |
-        HEADER=$(sed -n "s/^## \($CI_BUILD_REF_NAME .*\)$/\1/p" CHANGELOG.md)
-        submark --omit-heading --h2="$HEADER" /mnt/CHANGELOG.md | \
-          sed 's/^### Changes/## Changes/' | \
-          tee release.md || true
+    - HEADER=$(sed -n "s/^## \($CI_BUILD_REF_NAME .*\)$/\1/p" CHANGELOG.md)
+    - submark --omit-heading --h2="$HEADER" --out-file=release.md CHANGELOG.md
+    - sed -i 's/^### Changes/## Changes/' release.md
     - echo >> release.md
     - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/mist\.io/g" ci/release.md >> release.md
     - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist-ce $CI_BUILD_REF_NAME
