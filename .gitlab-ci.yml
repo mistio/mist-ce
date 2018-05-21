@@ -466,12 +466,10 @@ release: &release_template
   stage: release
   image: python:2.7-alpine
   before_script:
-    - apk add --update libmagic
+    - apk add --update libmagic openssl
     - pip install requests python-magic
-    - |
-        wget -O /usr/local/bin/submark \
-          https://github.com/dahlia/submark/releases/download/0.2.0/submark-linux-x86_64 && \
-        chmod +x /usr/local/bin/submark
+    - wget -O /usr/local/bin/submark https://github.com/dahlia/submark/releases/download/0.2.0/submark-linux-x86_64
+    - chmod +x /usr/local/bin/submark
   script:
     - mkdir release
     - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
