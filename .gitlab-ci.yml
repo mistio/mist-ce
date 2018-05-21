@@ -386,7 +386,7 @@ API:io:ip_whitelisting: *api_test_template
     expire_in: 3 days
     when: on_failure
   tags:
-    - shm
+    - chrome
 
 UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
