@@ -1,13 +1,11 @@
-# Docker compose overrides for running mist.io in dev mode. This mounts local
-# code in the running containers, defines some extra containers needed for
-# development, etc. This is not a standalone file. It extends
-# docker-compose.yml and requires a local recursive clone of the mist.io git
-# repository.
+# Docker compose overrides for running in dev mode. This mounts local code in
+# the running containers, defines some extra containers needed for development,
+# etc. This is not a standalone file. It extends docker-compose.yml and
+# requires a local recursive clone of the parent git repository.
 
 version: '2.0'
 
 services:
-
 
   elasticsearch:
     ports:
@@ -25,18 +23,16 @@ services:
     volumes:
       - ./docker/elasticsearch-manage:/opt/elasticsearch-manage
 
-
   debugger:
     image: mist/debugger
     volumes:
       - ./keys:/keys
 
-
   celery-prefork: &backend
     volumes:
+      - ./docker/api/defaults.py:$CONF_DIR/defaults.py:ro
       - ./api:/mist.api:rw
       - ./keys:/keys
-      - ./elasticsearch:/elasticsearch
   celery-gevent: *backend
   scheduler: *backend
   poller: *backend
@@ -46,7 +42,6 @@ services:
   api: *backend
   sockjs: *backend
 
-
   ui:
     volumes:
       - ./ui:/ui:rw
@@ -55,11 +50,11 @@ services:
     volumes:
       - ./landing:/landing:rw
 
-
   nginx:
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
-
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/nginx-listen.conf:/etc/nginx/nginx-listen.conf:ro
+      - ./docker/nginx/static:/srv/www/static:ro
 
   gocky:
     volumes:

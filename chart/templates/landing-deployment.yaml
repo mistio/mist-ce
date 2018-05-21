@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: landing
+  name: landing
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: landing
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: landing
+        args:
+        - sh
+        - /entry.sh
+        image: {{ .Values.image.registry }}/landing:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: 20Mi
+            cpu: 10m
+          limits:
+            memory: 50Mi
+            cpu: 200m

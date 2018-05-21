@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gocky
+  labels:
+    {{ .Values.productShortName }}.service: gocky
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: gocky
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: gocky
+        image: {{ .Values.image.registry }}/gocky:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+        - -config
+        - /etc/gocky/config.toml
+        ports:
+        - containerPort: 9096
+        - containerPort: 9097
+        resources:
+          requests:
+            memory: 10Mi
+            cpu: 10m
+          limits:
+            memory: 100Mi
+            cpu: 1000m

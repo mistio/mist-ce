@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: memcached
+  name: memcached
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: memcached
+    spec:
+      containers:
+      - name: memcached
+        image: memcached
+        resources:
+          requests:
+            memory: 30Mi
+            cpu: 1m
+          limits:
+            memory: 60Mi
+            cpu: 100m

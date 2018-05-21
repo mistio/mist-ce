@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elasticsearch-manage
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - args:
+        - ./scripts/add_templates.py
+        image: {{ .Values.image.registry }}/elasticsearch-manage:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: elasticsearch-manage
+        resources: {}
+      restartPolicy: Never
