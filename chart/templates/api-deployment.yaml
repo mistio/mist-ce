@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: api
+  name: api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: api
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: api
+        args:
+        - bin/wait-all
+        - bin/uwsgi
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: 700Mi
+            cpu: 500m
+          limits:
+            memory: 1500Mi
+            cpu: 2000m
+        volumeMounts:
+        - name: {{ .Values.productShortName }}-config
+          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ .Values.productShortName }}-config
+        configMap:
+          name: {{ .Values.productShortName }}

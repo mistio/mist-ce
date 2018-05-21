@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: influxdb
+  labels:
+    {{ .Values.productShortName }}.service: influxdb
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: INFLUXDB_DB
+          value: telegraf
+        volumeMounts:
+        - mountPath: /data/db
+          name: influxdb
+      volumes:
+      - name: influxdb
+        persistentVolumeClaim:
+          claimName: influxdb

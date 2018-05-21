@@ -1,0 +1,28 @@
+# Used to label kubernetes resources. This should only differ between different
+# product/brandings. It shouldn't be overriden when deploying the chart.
+productShortName: mist
+
+# Allow registration of dev users, used for testing purposes.
+enableDevUsers: false
+
+# Email settings.
+smtp:
+  host: mailmock
+  port: 8025
+  tls: false
+  starttls: false
+  username: ""
+  password: ""
+
+# Settings for docker images used in the chart.
+image:
+  registry: mistce
+  tag: master
+  pullPolicy: Always
+  secrets:
+    - name: registry
+
+# HTTP settings for the deployed application.
+http:
+  host: localhost
+  tlsSecret: ''

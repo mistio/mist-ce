@@ -1,0 +1,31 @@
+{{ if eq .Values.smtp.host "mailmock" -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: mailmock
+  name: mailmock
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: mailmock
+    spec:
+      containers:
+      - name: mailmock
+        image: mist/mailmock
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8025
+          name: smtp
+        - containerPort: 8143
+          name: imap
+        resources:
+          requests:
+            memory: 20Mi
+            cpu: 10m
+          limits:
+            memory: 50Mi
+            cpu: 200m
+{{- end }}
