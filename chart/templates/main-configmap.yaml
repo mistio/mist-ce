@@ -5,6 +5,7 @@ metadata:
 data:
   settings.py: |
     CORE_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"
+
     MAILER_SETTINGS = {
         'mail.host': "{{ .Values.smtp.host }}",
         'mail.port': "{{ .Values.smtp.port }}",
@@ -13,4 +14,36 @@ data:
         'mail.username': "{{ .Values.smtp.username }}",
         'mail.password': "{{ .Values.smtp.password }}"
     }
+
     ENABLE_DEV_USERS = {{ if .Values.enableDevUsers }}True{{ else }}False{{ end }}
+    JS_BUILD = {{ if .Values.jsBuild }}True{{ else }}False{{ end }}
+
+    ELASTICSEARCH = {
+        'elastic_host': "{{ .Values.elasticsearch.host }}",
+        'elastic_port': "{{ .Values.elasticsearch.port }}",
+        'elastic_username': "{{ .Values.elasticsearch.username }}",
+        'elastic_password': "{{ .Values.elasticsearch.password }}",
+        'elastic_use_ssl': {{ if .Values.elasticsearch.tls }}True{{ else }}False{{ end }},
+        'elastic_verify_certs': {{ if .Values.elasticsearch.verifyCerts }}True{{ else }}False{{ end }},
+    }
+
+    INFLUX = {
+        'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
+        'db': "{{ .Values.influxdb.db }}",
+    }
+
+    STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
+    STRIPE_PUBLIC_APIKEY = "{{ .Values.stripe.publicApiKey }}"
+
+    AMQP_URI = "{{ .Values.rabbitmq.host }}:{{ .Values.rabbitmq.port }}"
+    BROKER_URL = "amqp://{{ .Values.rabbitmq.username }}:{{ .Values.rabbitmq.password }}@{{ .Values.rabbitmq.host }}:{{ .Values.rabbitmq.port }}/"
+
+    DOCKER_IP = "{{ .Values.docker.host }}"
+    DOCKER_PORT = "{{ .Values.docker.port }}"
+    DOCKER_TLS_KEY = "{{ .Values.docker.key }}"
+    DOCKER_TLS_CERT = "{{ .Values.docker.cert }}"
+    DOCKER_TLS_CA = "{{ .Values.docker.ca }}"
+
+    DEFAULT_MONITORING_METHOD = "{{ .Values.monitoring.defaultMethod }}"
+
+    MONGO_URI = "{{ .Values.mongodb.host }}:{{ .Values.mongodb.port }}"

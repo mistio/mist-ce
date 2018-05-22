@@ -1,3 +1,4 @@
+{{ if and (eq .Values.elasticsearch.host "elasticsearch") (eq (toString .Values.elasticsearch.port) "9200") -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -31,3 +32,4 @@ spec:
       - name: elasticsearch
         persistentVolumeClaim:
           claimName: elasticsearch
+{{- end }}

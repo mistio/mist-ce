@@ -1,3 +1,4 @@
+{{ if and (eq .Values.rabbitmq.host "rabbitmq") (eq (toString .Values.rabbitmq.port) "5672") -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -21,3 +22,4 @@ spec:
           limits:
             memory: 400Mi
             cpu: 1000m
+{{- end }}

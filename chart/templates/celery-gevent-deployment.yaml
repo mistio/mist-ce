@@ -16,7 +16,6 @@ spec:
       containers:
       - name: celery-gevent
         args:
-        - bin/wait-all
         - bin/celery-gevent
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

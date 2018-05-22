@@ -1,3 +1,4 @@
+{{ if and (eq .Values.influxdb.host "influxdb") (eq (toString .Values.influxdb.port) "8086") -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -19,7 +20,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: INFLUXDB_DB
-          value: telegraf
+          value: {{ .Values.influxdb.db }}
         volumeMounts:
         - mountPath: /data/db
           name: influxdb
@@ -27,3 +28,4 @@ spec:
       - name: influxdb
         persistentVolumeClaim:
           claimName: influxdb
+{{- end }}

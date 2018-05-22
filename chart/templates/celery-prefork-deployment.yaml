@@ -16,7 +16,6 @@ spec:
       containers:
       - name: celery-prefork
         args:
-        - bin/wait-all
         - bin/celery-prefork
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

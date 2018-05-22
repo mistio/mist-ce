@@ -18,7 +18,6 @@ spec:
       containers:
       - name: cilia
         args:
-        - bin/wait-all
         - bin/cilia
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

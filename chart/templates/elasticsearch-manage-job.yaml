@@ -2,6 +2,12 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: elasticsearch-manage
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   backoffLimit: 10
   template:
@@ -11,6 +17,19 @@ spec:
       containers:
       - args:
         - ./scripts/add_templates.py
+        env:
+        - name: ELASTIC_HOST
+          value: "{{ .Values.elasticsearch.host }}"
+        - name: ELASTIC_PORT
+          value: "{{ .Values.elasticsearch.port }}"
+        - name: ELASTIC_USER
+          value: "{{ .Values.elasticsearch.username }}"
+        - name: ELASTIC_PASSWORD
+          value: "{{ .Values.elasticsearch.password }}"
+        - name: ELASTIC_SSL
+          value: "{{ if .Values.elasticsearch.tls }}1{{ end }}"
+        - name: ELASTIC_VERIFY_CERTS
+          value: "{{ if .Values.elasticsearch.verifyCerts }}1{{ end }}"
         image: {{ .Values.image.registry }}/elasticsearch-manage:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: elasticsearch-manage

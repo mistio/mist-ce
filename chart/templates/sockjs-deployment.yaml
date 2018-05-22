@@ -16,7 +16,6 @@ spec:
       containers:
       - name: sockjs
         args:
-        - bin/wait-all
         - bin/sockjs
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

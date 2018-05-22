@@ -16,7 +16,6 @@ spec:
       containers:
       - name: hubshell
         args:
-        - bin/wait-all
         - bin/hubshell
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

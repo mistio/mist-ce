@@ -2,18 +2,6 @@
 # product/brandings. It shouldn't be overriden when deploying the chart.
 productShortName: mist
 
-# Allow registration of dev users, used for testing purposes.
-enableDevUsers: false
-
-# Email settings.
-smtp:
-  host: mailmock
-  port: 8025
-  tls: false
-  starttls: false
-  username: ""
-  password: ""
-
 # Settings for docker images used in the chart.
 image:
   registry: mistce
@@ -26,3 +14,63 @@ image:
 http:
   host: localhost
   tlsSecret: ''
+
+# Email settings. Change this to connect to a real SMTP server.
+smtp:
+  host: mailmock
+  port: 8025
+  username: ''
+  password: ''
+  tls: false
+  starttls: false
+
+# Elasticsearch settings. Change this to use a remote elasticsearch cluster.
+elasticsearch:
+  host: elasticsearch
+  port: 9200
+  username: ''
+  password: ''
+  tls: false
+  verifyCerts: false
+
+# InfluxDB settings. Change this to use a remote InfluxDB cluster.
+influxdb:
+  host: influxdb
+  port: 8086
+  db: telegraf
+
+# Rabbitmq settings. Change this to use a remote RabbitMQ cluster.
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  username: guest
+  password: guest
+
+# MongoDB settings. Change this to use a remote MongoDB cluster.
+mongodb:
+  host: mongodb
+  port: 27017
+
+# Docker settings (used by orchestration plugin). This has to be configured for
+# orchestration to work.
+docker:
+  host: api
+  port: 2375
+  key: ''
+  cert: ''
+  ca: ''
+
+# Monitoring settings.
+monitoring:
+  defaultMethod: telegraf-influxdb
+
+# Allow registration of dev users, used for testing purposes.
+enableDevUsers: false
+
+# Set to false to serve raw UI files. Used during development.
+jsBuild: true
+
+# Stripe credentials for billing. Currently only used by the SaaS version.
+stripe:
+  publicApiKey: ''
+  privateApiKey: ''

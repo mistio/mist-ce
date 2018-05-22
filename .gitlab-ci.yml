@@ -222,6 +222,23 @@ compose:
   before_script:
     - |
         set -e
+
+        function set_if_not_empty() {
+          key="$1"
+          val="$2"
+          if [ -n "$val" ]; then
+            echo " --set $key=$val"
+          fi
+        }
+
+        function elasticsearch_params() {
+          set_if_not_empty elasticsearch.host $ELASTICSEARCH_HOST
+          set_if_not_empty elasticsearch.port $ELASTICSEARCH_PORT
+          set_if_not_empty elasticsearch.username $ELASTICSEARCH_USERNAME
+          set_if_not_empty elasticsearch.password $ELASTICSEARCH_PASSWORD
+          set_if_not_empty elasticsearch.tls $ELASTICSEARCH_TLS
+        }
+
         function deploy() {
           export namespace="$1"
           touch values.yaml
@@ -274,8 +291,16 @@ compose:
             --set image.repository="$REGISTRY_IMAGE" \
             --set image.pullPolicy=IfNotPresent \
             --set image.secrets[0].name="$image_secret_name" \
-            --set http.host=$host \
-            --set http.tlsSecret=$tls_secret_name \
+            --set http.host="$host" \
+            --set http.tlsSecret="$tls_secret_name" \
+            --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
+            --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
+            --set docker.host="$DOCKER_HOST" \
+            --set docker.port="$DOCKER_PORT" \
+            --set docker.key="$DOCKER_KEY" \
+            --set docker.cert="$DOCKER_CERT" \
+            --set docker.ca="$DOCKER_CA" \
+            $(elasticsearch_params) \
             $namespace ./chart/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
