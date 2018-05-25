@@ -471,6 +471,7 @@ undeploy test:
     name: test/$CI_COMMIT_REF_SLUG
     action: stop
   variables:
+    GIT_STRATEGY: none
     namespace: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
 
 undeploy review:
@@ -479,6 +480,7 @@ undeploy review:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   variables:
+    GIT_STRATEGY: none
     namespace: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
   when: manual
   except:
