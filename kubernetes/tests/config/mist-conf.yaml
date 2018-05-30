@@ -8,8 +8,6 @@ data:
     CORE_URI="http://REPLACE_MIST_URI"
     AMQP_URI="rabbitmq:5672"
     MONITOR_URI="http://monitor.default"
-    COLLECTD_HOST="bucky.godzilla.ops.mist.io"
-    COLLECTD_PORT="25826"
     GRAPHITE_URI="http://graphite.default"
     TELEGRAF_TARGET="http://REPLACE_MIST_URI/ingress"
     DEFAULT_MONITORING_METHOD="telegraf-influxdb"
