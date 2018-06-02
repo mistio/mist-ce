@@ -12,9 +12,10 @@ Bugfix and cleanup release. Adds polling for networks. Improves KVM machine crea
 3. Bring everything back up by running `docker-compose up -d`. Check the status by running `docker-compose ps`.
 4. Once all services are running, execute the following migration steps:
 
-docker-compose exec api python api/migrations/0011-migrate-networks.py
-docker-compose exec api python api/migrations/0012-add-metering-schedules.py
-
+```
+    docker-compose exec api python api/migrations/0011-migrate-networks.py
+    docker-compose exec api python api/migrations/0012-add-metering-schedules.py
+```
 
 
 ### Changes
@@ -31,6 +32,15 @@ docker-compose exec api python api/migrations/0012-add-metering-schedules.py
 
 
 ## v3.0.0 (29 Apr 2018)
+
+Major new release of the Mist Cloud Management Platform, Community Edition. 
+
+The Community Edition now integrates with Telegraf & InfluxDB to provide a fully open source infrastructure management & monitoring stack. It also includes a revamped alerting & automation engine that will apply your rules to any group of machines. We enhanced the support of many clouds, most notably vSphere, GCE & OpenStack. It's now possible to bring together machines into a single virtual "Cloud". The usability and performance of the UI was greatly improved. At the same time we've remorselessly eliminated more than a few bugs.
+
+A new plugin system was introduced, which is currently used by the Enterprise Edition and the Hosted Service to provide add-on functionality like i) Role Based Access Control, ii) Cost Insights, iii) VPN tunnels, iv) Orchestration of multi-tier architectures like Kubernetes clusters, as well as v) metering & billing extensions.
+
+You can purchase the Mist Enterprise Edition and the Mist Hosted Service at https://mist.io
+
 
 ### Changes
 
