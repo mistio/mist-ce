@@ -1,6 +1,35 @@
 # Changelog
 
 
+## v3.0.1 (2 Jun 2018)
+
+Bugfix and cleanup release. Adds polling for networks. Improves KVM machine creation. Improves DB query performance.
+
+### Upgrading from v3.0.0
+
+1. Bring down your existing installation by running `docker-compose down` within the directory where the docker-compose.yml file resides.
+2. Replace docker-compose.yaml with the one available in the assets of the current release right above.
+3. Bring everything back up by running `docker-compose up -d`. Check the status by running `docker-compose ps`.
+4. Once all services are running, execute the following migration steps:
+
+docker-compose exec api python api/migrations/0011-migrate-networks.py
+docker-compose exec api python api/migrations/0012-add-metering-schedules.py
+
+
+
+### Changes
+
+* Feature: Support custom sizes when creating KVM machines.
+* Bugfix: Fix KVM networks upon machine creation.
+* Feature: Support multiple interfaces and attaching to more than one networks when creating KVM machines.
+* Feature: Poller for networks.
+* Change: Sharding of polling tasks.
+* Change: Deprecate collectd support.
+* Change: Support metering of datapoints.
+* Change: Add owner index, improves performance of DB queries.
+* Bugfix: Fix internal server error when editing some rules.
+
+
 ## v3.0.0 (29 Apr 2018)
 
 ### Changes
@@ -119,6 +148,7 @@ new functionality.
 
 For more details on the changes also check out the
 [blog post](http://blog.mist.io/post/162083041316/our-biggest-mistio-open-source-release-yet).
+
 
 
 ### Changes
