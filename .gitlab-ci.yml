@@ -7,7 +7,7 @@ variables:
   COMPOSE_REGISTRY: DOCKERHUB
   DEPLOY_REGISTRY: EXT_REGISTRY
   # Set to empty string '' to disable.
-  DEPLOY_REGISTRY_AUTH: ''
+  DEPLOY_REGISTRY_AUTH: '1'
   # API & UI tests image
   TESTS_IMAGE: $DOCKERHUB_IMAGE/tests:$CI_COMMIT_SHA
 
