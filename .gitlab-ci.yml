@@ -163,7 +163,7 @@ build api:
           --build-arg FROM_IMAGE=$SRC_IMG \
           --build-arg MIST_VERSION_SHA=$CI_COMMIT_SHA \
           --build-arg MIST_VERSION_NAME=$CI_COMMIT_REF_NAME \
-          docker/api
+          .
     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
 

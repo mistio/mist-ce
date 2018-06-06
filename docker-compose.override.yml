@@ -30,7 +30,7 @@ services:
 
   celery-prefork: &backend
     volumes:
-      - ./docker/api/defaults.py:$CONF_DIR/defaults.py:ro
+      - ./defaults.py:$CONF_DIR/defaults.py:ro
       - ./api:/mist.api:rw
       - ./keys:/keys
   celery-gevent: *backend

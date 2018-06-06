@@ -1,12 +1,12 @@
 [submodule "api"]
 	path = api
-	url = ../../mistio/mist.api.git
+	url = ../mist.api.git
 [submodule "ui"]
 	path = ui
-	url = ../../mistio/mist.ui.git
+	url = ../mist.ui.git
 [submodule "landing"]
 	path = landing
-	url = ../../mistio/mist.landing.git
+	url = ../mist.landing.git
 [submodule "tests"]
 	path = tests
-	url = ../../mistio/mist.tests.git
+	url = ../mist.tests.git
