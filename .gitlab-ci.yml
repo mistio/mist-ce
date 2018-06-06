@@ -288,7 +288,7 @@ compose:
           helm upgrade --install --namespace $namespace \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
-            --set image.repository="$REGISTRY_IMAGE" \
+            --set image.registry="$REGISTRY_IMAGE" \
             --set image.pullPolicy=IfNotPresent \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
