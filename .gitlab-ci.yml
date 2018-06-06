@@ -398,6 +398,9 @@ API:io:scripts: *api_test_template
 API:io:rbac: *api_test_template
 API:io:ip_whitelisting: *api_test_template
 
+.API:core:orchestration: *api_test_template
+.API:core:tunnels: *api_test_template
+
 
 .ui_test_template: &ui_test_template
   <<: *test_template
@@ -444,6 +447,15 @@ UI:ip-whitelisting:
   <<: *ui_test_template
   only:
     - staging
+
+.UI:rbac-rules-1/4: *ui_test_template
+.UI:rbac-rules-2/4: *ui_test_template
+.UI:rbac-rules-3/4: *ui_test_template
+.UI:rbac-rules-4/4: *ui_test_template
+.UI:orchestration: *ui_test_template
+.UI:insights:
+  <<: *ui_test_template
+  retry: 1
 
 
 #################### UNDEPLOY STAGE ####################
