@@ -249,7 +249,7 @@ compose:
           export image_secret_name=
           export REGISTRY_IMAGE="$(eval echo \$${DEPLOY_REGISTRY}_IMAGE)"
           export REGISTRY_USER="$(eval echo \$${DEPLOY_REGISTRY}_USER)"
-          export REGISTRY_PASSWORD="$(eval echo \$${DEPLOY_REGISTRY}_PASSWORD)"
+          export REGISTRY_PASSWORD="$(eval echo \"\$${DEPLOY_REGISTRY}_PASSWORD\")"
           if [ "$DEPLOY_REGISTRY" = "CI_REGISTRY" ]; then
             if [ "$CI_PROJECT_VISIBILITY" = "public" ]; then
               export DEPLOY_REGISTRY_AUTH=
@@ -264,7 +264,7 @@ compose:
               docker-registry $image_secret_name \
               --docker-server=$REGISTRY_IMAGE \
               --docker-username=$REGISTRY_USER \
-              --docker-password=$REGISTRY_PASSWORD \
+              --docker-password="$REGISTRY_PASSWORD" \
               --docker-email=$GITLAB_USER_EMAIL \
               -o yaml --dry-run | \
                 kubectl replace --namespace $namespace --force -f -
