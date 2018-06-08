@@ -5,7 +5,7 @@ metadata:
     {{ .Values.productShortName }}.service: sockjs
   name: sockjs
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.sockjs.replicas | default "1" }}
   template:
     metadata:
       labels:
@@ -21,11 +21,11 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 100Mi
-            cpu: 100m
+            memory: {{ .Values.deployment.sockjs.resources.requests.memory | default "100Mi" }}
+            cpu: {{ .Values.deployment.sockjs.resources.requests.cpu | default "100m" }}
           limits:
-            memory: 200Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.sockjs.resources.limits.memory | default "200Mi" }}
+            cpu: {{ .Values.deployment.sockjs.resources.limits.cpu | default "1000m" }}
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py

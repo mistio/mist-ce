@@ -234,3 +234,58 @@ deployment:
           cpu: 1000m
       queues:
         - rules
+
+  # Api deployment settings.
+  api:
+    replicas: 1
+    resources:
+      requests:
+        memory: 700Mi
+        cpu: 500m
+      limits:
+        memory: 1500Mi
+        cpu: 2000m
+
+  # Sockjs deployment settings.
+  sockjs:
+    replicas: 1
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 200Mi
+        cpu: 1000m
+
+  # UI deployment settings.
+  ui:
+    replicas: 1
+    resources:
+      requests:
+        memory: 20Mi
+        cpu: 10m
+      limits:
+        memory: 40Mi
+        cpu: 100m
+
+  # Nginx deployment settings.
+  nginx:
+    replicas: 1
+    resources:
+      requests:
+        memory: 30Mi
+        cpu: 10m
+      limits:
+        memory: 60Mi
+        cpu: 1000m
+
+  # Landing deployment settings.
+  landing:
+    replicas: 1
+    resources:
+      requests:
+        memory: 20Mi
+        cpu: 10m
+      limits:
+        memory: 50Mi
+        cpu: 200m

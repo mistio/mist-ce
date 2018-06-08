@@ -5,7 +5,7 @@ metadata:
     {{ .Values.productShortName }}.service: ui
   name: ui
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.ui.replicas | default "1" }}
   template:
     metadata:
       labels:
@@ -22,8 +22,8 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 20Mi
-            cpu: 10m
+            memory: {{ .Values.deployment.ui.resources.requests.memory | default "20Mi" }}
+            cpu: {{ .Values.deployment.ui.resources.requests.cpu | default "10m" }}
           limits:
-            memory: 40Mi
-            cpu: 100m
+            memory: {{ .Values.deployment.ui.resources.limits.memory | default "40Mi" }}
+            cpu: {{ .Values.deployment.ui.resources.limits.cpu | default "100m" }}

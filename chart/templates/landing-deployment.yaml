@@ -5,7 +5,7 @@ metadata:
     {{ .Values.productShortName }}.service: landing
   name: landing
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.landing.replicas | default "1" }}
   template:
     metadata:
       labels:
@@ -22,8 +22,8 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 20Mi
-            cpu: 10m
+            memory: {{ .Values.deployment.landing.resources.requests.memory | default "20Mi" }}
+            cpu: {{ .Values.deployment.landing.resources.requests.cpu | default "10m" }}
           limits:
-            memory: 50Mi
-            cpu: 200m
+            memory: {{ .Values.deployment.landing.resources.limits.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.landing.resources.limits.cpu | default "200m" }}

@@ -5,7 +5,7 @@ metadata:
     {{ .Values.productShortName }}.service: api
   name: api
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.api.replicas | default "1" }}
   template:
     metadata:
       labels:
@@ -21,11 +21,11 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 700Mi
-            cpu: 500m
+            memory: {{ .Values.deployment.api.resources.requests.memory | default "700Mi" }}
+            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "500m" }}
           limits:
-            memory: 1500Mi
-            cpu: 2000m
+            memory: {{ .Values.deployment.api.resources.limits.memory | default "1500Mi" }}
+            cpu: {{ .Values.deployment.api.resources.limits.cpu | default "2000m" }}
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py

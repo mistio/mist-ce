@@ -5,7 +5,7 @@ metadata:
     {{ .Values.productShortName }}.service: nginx
   name: nginx
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.nginx.replicas | default "1" }}
   template:
     metadata:
       labels:
@@ -25,11 +25,11 @@ spec:
           subPath: nginx.conf
         resources:
           requests:
-            memory: 30Mi
-            cpu: 10m
+            memory: {{ .Values.deployment.nginx.resources.requests.memory | default "30Mi" }}
+            cpu: {{ .Values.deployment.nginx.resources.requests.cpu | default "10m" }}
           limits:
-            memory: 60Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.nginx.resources.limits.memory | default "60Mi" }}
+            cpu: {{ .Values.deployment.nginx.resources.limits.cpu | default "1000m" }}
       volumes:
       - name: nginx-config
         configMap:
