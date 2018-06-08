@@ -74,3 +74,160 @@ jsBuild: true
 stripe:
   publicApiKey: ''
   privateApiKey: ''
+
+# Settings for celery worker deployments.
+celery:
+
+  # Generic runners. On by default.
+  prefork:
+    enabled: true
+    pool: prefork
+    replicas: 1
+    resources:
+      requests:
+        memory: 1000Mi
+        cpu: 400m
+      limits:
+        memory: 2000Mi
+        cpu: 2000m
+    queues:
+      - celery
+      - machines
+      - command
+      - deployments
+      - mappings
+  gevent:
+    enabled: true
+    replicas: 1
+    pool: gevent
+    resources:
+      requests:
+        memory: 150Mi
+        cpu: 60m
+      limits:
+        memory: 1000Mi
+        cpu: 1000m
+    queues:
+      - scripts
+      - probe
+      - ping
+      - rules
+
+  # Queue-specific runners. Off by default.
+  celery:
+    enabled: false
+    pool: prefork
+    replicas: 1
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+    queues:
+      - celery
+  machines:
+    enabled: false
+    pool: prefork
+    replicas: 1
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+    queues:
+      - mappings
+  command:
+    enabled: false
+    pool: prefork
+    replicas: 1
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+    queues:
+      - command
+  deployments:
+    enabled: false
+    pool: prefork
+    replicas: 1
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+    queues:
+      - deployments
+  mappings:
+    enabled: false
+    pool: prefork
+    replicas: 1
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+    queues:
+      - mappings
+  scripts:
+    enabled: false
+    pool: gevent
+    replicas: 1
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+    queues:
+      - scripts
+  probe:
+    enabled: false
+    pool: gevent
+    replicas: 1
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 2000Mi
+        cpu: 1000m
+    queues:
+      - probe
+  ping:
+    enabled: false
+    pool: gevent
+    replicas: 1
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 2000Mi
+        cpu: 1000m
+    queues:
+      - ping
+  rules:
+    enabled: false
+    pool: gevent
+    replicas: 1
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 2000Mi
+        cpu: 1000m
+    queues:
+      - rules
