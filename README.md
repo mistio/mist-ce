@@ -7,6 +7,7 @@ License.
 The Enterprise Edition and the Hosted Service that include Role Based Access, VPN tunnels and
 Insights for cost optimization are available at https://mist.io
 
+<img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768">
 
 ## Hardware requirements
 
