@@ -23,10 +23,10 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 100Mi
+            memory: 500Mi
             cpu: 500m
           limits:
-            memory: 200Mi
+            memory: 700Mi
             cpu: 2000m
         volumeMounts:
         - name: {{ .Values.productShortName }}-config

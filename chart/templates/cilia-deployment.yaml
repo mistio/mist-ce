@@ -22,13 +22,12 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
-          resources:
-            limits:
-              memory: 150Mi
-              cpu: 500m
-            requests:
-              memory: 80Mi
-              cpu: 70m
+          limits:
+            memory: 300Mi
+            cpu: 500m
+          requests:
+            memory: 150Mi
+            cpu: 70m
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
