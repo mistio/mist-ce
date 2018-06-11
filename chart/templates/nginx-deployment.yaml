@@ -34,3 +34,7 @@ spec:
       - name: nginx-config
         configMap:
           name: nginx-configmap
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

@@ -27,3 +27,7 @@ spec:
           limits:
             memory: {{ .Values.deployment.landing.resources.limits.memory | default "50Mi" }}
             cpu: {{ .Values.deployment.landing.resources.limits.cpu | default "200m" }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

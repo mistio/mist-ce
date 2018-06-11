@@ -75,6 +75,9 @@ stripe:
   publicApiKey: ''
   privateApiKey: ''
 
+# Node selector will be applied to all pods for all deployments.
+nodeSelector: {}
+
 # Deployment options (replicas, resource quotas etc).
 deployment:
 

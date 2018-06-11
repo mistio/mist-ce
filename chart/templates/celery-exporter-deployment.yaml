@@ -30,3 +30,7 @@ spec:
           requests:
             memory: 25Mi
             cpu: 50m
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

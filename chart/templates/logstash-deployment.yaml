@@ -24,3 +24,7 @@ spec:
           limits:
             memory: 700Mi
             cpu: 1000m
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

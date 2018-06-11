@@ -34,3 +34,7 @@ spec:
       - name: {{ .Values.productShortName }}-config
         configMap:
           name: {{ .Values.productShortName }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
