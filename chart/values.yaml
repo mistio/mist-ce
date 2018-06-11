@@ -89,9 +89,9 @@ deployment:
       resources:
         requests:
           memory: 1000Mi
-          cpu: 400m
+          cpu: 600m
         limits:
-          memory: 2000Mi
+          memory: 1200Mi
           cpu: 2000m
       queues:
         - celery
@@ -106,9 +106,9 @@ deployment:
       resources:
         requests:
           memory: 150Mi
-          cpu: 60m
+          cpu: 500m
         limits:
-          memory: 1000Mi
+          memory: 250Mi
           cpu: 1000m
       queues:
         - scripts
@@ -240,10 +240,10 @@ deployment:
     replicas: 1
     resources:
       requests:
-        memory: 700Mi
-        cpu: 500m
+        memory: 800Mi
+        cpu: 600m
       limits:
-        memory: 1500Mi
+        memory: 1000Mi
         cpu: 2000m
 
   # Sockjs deployment settings.

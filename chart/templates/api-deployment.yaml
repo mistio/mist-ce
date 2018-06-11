@@ -21,10 +21,10 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: {{ .Values.deployment.api.resources.requests.memory | default "700Mi" }}
-            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "500m" }}
+            memory: {{ .Values.deployment.api.resources.requests.memory | default "800Mi" }}
+            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "600m" }}
           limits:
-            memory: {{ .Values.deployment.api.resources.limits.memory | default "1500Mi" }}
+            memory: {{ .Values.deployment.api.resources.limits.memory | default "1000Mi" }}
             cpu: {{ .Values.deployment.api.resources.limits.cpu | default "2000m" }}
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
