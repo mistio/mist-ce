@@ -85,20 +85,20 @@ spec:
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  name: celery-beat
+  name: celery-scheduler
   namespace: REPLACE_NAMESPACE
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: celery-beat
+        app: celery-scheduler
         component: REPLACE_STACK
     spec:
       imagePullSecrets:
         - name: mistopskey
       containers:
-        - name: celery-beat
+        - name: celery-scheduler
           image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
           imagePullPolicy: Always
           env:
@@ -163,6 +163,49 @@ spec:
       - name: config-volume
         configMap:
           name: mist-config
+
+---
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: celery-cilia
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: celery-cilia
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: celery-cilia
+          image: gcr.io/mist-ops/mist:REPLACE_STACK-REPLACE_TAG
+          imagePullPolicy: Always
+          env:
+            - name: SETTINGS_FILE
+              value: "/etc/config/mist.config"
+          args:
+            - "bin/cilia"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 150Mi
+            requests:
+              cpu: 70m
+              memory: 80Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: mist-config
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic
 
 ---
 

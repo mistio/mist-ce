@@ -6,6 +6,17 @@ version: '2.0'
 services:
 
 
+  influxdb:
+    image: influxdb
+    environment:
+      INFLUXDB_DB: telegraf
+    ports:
+      - 8083:8083
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+
+
   mongodb:
     image: mongo:3.2
     restart: on-failure:5
@@ -61,6 +72,11 @@ services:
     image: mist/mailmock
     restart: on-failure:5
 
+  swagger:
+    image: mist/swagger-ui
+    environment:
+      API_URL: /api/v1/spec
+    restart: on-failure:5
 
   celery-prefork: &backend
     image: mist/mist:io-$MIST_TAG
@@ -89,6 +105,10 @@ services:
   poller:
     <<: *backend
     command: bin/wait-all bin/poller
+
+  cilia:
+    <<: *backend
+    command: bin/wait-all bin/cilia
 
   beat:
     <<: *backend
@@ -141,6 +161,35 @@ services:
       - landing
       - ui
 
+
+  gocky:
+    image: mist/gocky:$MIST_TAG
+    command: -config /etc/gocky/config.toml
+    ports:
+      - 9096:9096
+      - 9097:9097
+    depends_on:
+      - rabbitmq
+
+  traefik:
+    image: traefik:v1.5
+    command:
+      # - --logLevel=INFO
+      - --accesslog
+      # - --accesslog.format=json
+      - --api
+      - --api.entrypoint=traefik
+      - --rest
+      - --rest.entrypoint=traefik
+      - --defaultentrypoints=http
+      - --entrypoints=Name:http Address::80
+      - --entrypoints=Name:traefik Address::8080
+    ports:
+      - 8040:80
+      - 8041:8080
+
+
 volumes:
   elasticsearch: {}
+  influxdb: {}
   mongodb: {}

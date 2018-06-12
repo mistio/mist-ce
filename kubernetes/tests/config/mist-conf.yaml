@@ -8,18 +8,19 @@ data:
     CORE_URI="http://REPLACE_MIST_URI"
     AMQP_URI="rabbitmq:5672"
     MONITOR_URI="http://monitor.default"
-    COLLECTD_HOST="bucky.godzilla.ops.mist.io"
-    COLLECTD_PORT="25826"
+    GRAPHITE_URI="http://graphite.default"
+    TELEGRAF_TARGET="http://REPLACE_MIST_URI/ingress"
+    DEFAULT_MONITORING_METHOD="telegraf-influxdb"
     BROKER_URL="amqp://guest:guest@rabbitmq/"
     MONGO_URI="mongodb:27017"
     MEMCACHED_HOST=["memcached:11211"]
     MAILER_SETTINGS = {
-        'mail.host': "smtp.sendgrid.net",
-        'mail.port': "2525",
+        'mail.host': "mailmock",
+        'mail.port': "8025",
         'mail.tls': False,
-        'mail.starttls': True,
-        'mail.username': "REPLACE_SENDGRID_USERNAME",
-        'mail.password': "REPLACE_SENDGRID_PASSWORD"
+        'mail.starttls': False,
+        'mail.username': "",
+        'mail.password': "",
     }
     ELASTICSEARCH = {
         'elastic_host': 'REPLACE_ELASTIC_URI',
@@ -29,10 +30,12 @@ data:
         'elastic_use_ssl': True,
         'elastic_verify_certs': False
     }
+    INFLUX = {
+        "host": "http://influxdb.default:8086", "db": "telegraf"
+    }
     ENABLE_DEV_USERS=True
     DOCKER_IP="10.128.0.4"
     DOCKER_PORT="2376"
     JS_BUILD=REPLACE_JS_BUILD
     STRIPE_SECRET_APIKEY="REPLACE_STRIPE_SECRET_APIKEY"
     STRIPE_PUBLIC_APIKEY="REPLACE_STRIPE_PUBLIC_APIKEY"
-

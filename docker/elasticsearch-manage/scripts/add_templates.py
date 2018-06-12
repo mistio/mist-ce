@@ -63,7 +63,7 @@ def add_templates(force=False):
                 print 'Applying "%s" template...' % tname,
                 if not es.indices.exists_template(tname) or force:
                     es.indices.put_template(name=tname, body=template)
-            except Exception as exc:
+            except Exception:
                 print 'ERROR'
                 traceback.print_exc()
                 err = True

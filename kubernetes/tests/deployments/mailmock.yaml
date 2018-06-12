@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mailmock
+  namespace: REPLACE_NAMESPACE
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mailmock
+        component: REPLACE_STACK
+    spec:
+      imagePullSecrets:
+        - name: mistopskey
+      containers:
+        - name: mailmock
+          image: gcr.io/mist-ops/mailmock-test
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8025
+              name: smtp
+            - containerPort: 8143
+              name: imap
+          resources:
+            requests:
+              memory: 20Mi
+              cpu: 10m
+            limits:
+              memory: 50Mi
+              cpu: 200m
+      nodeSelector:
+        cloud.google.com/gke-nodepool: generic

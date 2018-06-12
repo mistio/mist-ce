@@ -44,7 +44,7 @@ def delete_indices(index):
             print 'Wrong answer!'
     try:
         es.indices.delete(index=index)
-    except Exception as exc:
+    except Exception:
         print 'ERROR'
         traceback.print_exc()
     else:

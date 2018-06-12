@@ -15,7 +15,7 @@ import requests
 
 
 GITLAB_URL = os.getenv('GITLAB_URL', 'https://gitlab.ops.mist.io')
-GITLAB_REPO = os.getenv('GITLAB_REPO', 'mistio/mist.io')
+GITLAB_REPO = os.getenv('GITLAB_REPO', 'mistio/mist-ce')
 
 MONTHS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
@@ -98,7 +98,7 @@ def editor(text, tmp_suffix='.tmp'):
     """Spawn $EDITOR (defaults to vim) for user to edit given text"""
     if isinstance(text, unicode):
         text = text.encode('utf8')
-    command = os.getenv('EDITOR', 'vim')
+    command = os.getenv('EDITOR', 'vi')
     with tempfile.NamedTemporaryFile(suffix=tmp_suffix) as tf:
         tf.write(text)
         tf.flush()
@@ -243,7 +243,7 @@ class Version(object):
             else:
                 break
         notes = '\n'.join(notes)
-        lines = filter(None, crop_line_padding(lines[i+1:]))
+        lines = filter(None, crop_line_padding(lines[i + 1:]))
 
         version = cls(name, int(day), month, int(year), notes)
         for line in lines:

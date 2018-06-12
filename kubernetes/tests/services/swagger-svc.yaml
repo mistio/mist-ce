@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: swagger
+  namespace: REPLACE_NAMESPACE
+  labels:
+    name: swagger
+    component: REPLACE_STACK
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: swagger
+  selector:
+    app: swagger
+    component: REPLACE_STACK

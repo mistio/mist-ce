@@ -168,6 +168,11 @@ build-elasticsearch-manage:
   variables:
     IMG: elasticsearch-manage
 
+build-gocky:
+  <<: *docker_build_img_template
+  variables:
+    IMG: gocky
+
 
 # Manually build images, tag is SHA/branch independant
 
@@ -265,7 +270,7 @@ deploy_test_env:
 .api_test_template: &api_test_template
   <<: *test_template
   script:
-    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/api/$TEST.py || export FAILED=1
+    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   tags:
     - kube-default
@@ -273,7 +278,7 @@ deploy_test_env:
 .ui_test_template: &ui_test_template
   <<: *test_template
   script:
-    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/gui/core/pr/features || export FAILED=1
+    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features || export FAILED=1
     - ./update-pipelines -n io:$CI_JOB_NAME result
   artifacts:
     paths:
@@ -301,29 +306,37 @@ API:io:rbac: *api_test_template
 API:io:ip_whitelisting: *api_test_template
 
 
-UI:clouds-add-1/3: *ui_test_template
-UI:clouds-add-2/3: *ui_test_template
-UI:clouds-add-3/3: *ui_test_template
+UI:clouds-add-1/2: *ui_test_template
+UI:clouds-add-2/2: *ui_test_template
 UI:clouds-actions: *ui_test_template
 UI:keys: *ui_test_template
-UI:machines:
-  <<: *ui_test_template
-  retry: 1
-UI:schedulers-1/2: *ui_test_template
-UI:schedulers-2/2: *ui_test_template
 UI:scripts: *ui_test_template
-UI:scripts-actions: *ui_test_template
 UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
-UI:zones:
+UI:zones: *ui_test_template
+UI:machines-1/2:
+  <<: *ui_test_template
+  retry: 1
+UI:machines-2/2:
+  <<: *ui_test_template
+  retry: 1
+UI:alert:
+  <<: *ui_test_template
+  retry: 1
+UI:monitoring:
+  <<: *ui_test_template
+  retry: 1
+UI:schedulers-1/2:
+  <<: *ui_test_template
+  retry: 1
+UI:schedulers-2/2:
   <<: *ui_test_template
   retry: 1
 UI:ip-whitelisting:
   <<: *ui_test_template
   only:
     - staging
-
 
 #################### UNDEPLOY STAGE ####################
 
@@ -371,7 +384,7 @@ release: &release_template
     - ./changelog.py extract $CI_BUILD_REF_NAME > release.md || true
     - echo >> release.md
     - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/mist\.io/g" ci/release.md >> release.md
-    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist.io $CI_BUILD_REF_NAME
+    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist-ce $CI_BUILD_REF_NAME
   only:
     # only for references that match a version string (v1.2.3)
     - /^v\d+\.\d+\.\d+$/
