@@ -88,7 +88,7 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 1
+      replicas: 2
       resources:
         requests:
           memory: 1000Mi
@@ -104,7 +104,7 @@ deployment:
         - mappings
     gevent:
       enabled: true
-      replicas: 1
+      replicas: 2
       pool: gevent
       resources:
         requests:
@@ -240,7 +240,7 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 1
+    replicas: 2
     resources:
       requests:
         memory: 800Mi
@@ -251,7 +251,7 @@ deployment:
 
   # Sockjs deployment settings.
   sockjs:
-    replicas: 1
+    replicas: 2
     resources:
       requests:
         memory: 100Mi
