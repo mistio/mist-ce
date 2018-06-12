@@ -88,7 +88,7 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 2
+      replicas: 4
       resources:
         requests:
           memory: 1000Mi
