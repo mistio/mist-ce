@@ -55,23 +55,27 @@ data:
             client_max_body_size 4096m;
 
             location / {
-                    proxy_pass http://api;
-                    proxy_set_header  X-Real-IP  $remote_addr;
-                    proxy_set_header Host $http_host;
-                    proxy_read_timeout 600s;
-                    proxy_connect_timeout 200s;
-                    proxy_buffering off;
+                proxy_pass http://api;
+                proxy_set_header  X-Real-IP  $remote_addr;
+                proxy_set_header Host $http_host;
+                proxy_read_timeout 600s;
+                proxy_connect_timeout 200s;
+                proxy_buffering off;
+            }
+
+            location /static/ {
+                root /srv/www;
             }
 
             location /socket/ {
-                    proxy_pass http://sockjs:8081;
-                    proxy_set_header  X-Real-IP  $remote_addr;
-                    proxy_read_timeout 600;
-                    proxy_connect_timeout 200;
-                    proxy_buffering off;
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade $http_upgrade;
-                    proxy_set_header Connection "upgrade";
+                proxy_pass http://sockjs:8081;
+                proxy_set_header  X-Real-IP  $remote_addr;
+                proxy_read_timeout 600;
+                proxy_connect_timeout 200;
+                proxy_buffering off;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
             }
 
             location /ui/ {
@@ -102,8 +106,14 @@ data:
                 proxy_pass http://traefik/;
                 proxy_set_header  X-Real-IP  $remote_addr;
             }
-            location /static/ {
-                root /srv/www;
-            }
+
+            # location /manage/ui/ {
+            #     proxy_pass http://manage/;
+            #     proxy_set_header  X-Real-IP  $remote_addr;
+            #     proxy_read_timeout 600s;
+            #     proxy_connect_timeout 200s;
+            #     proxy_buffering off;
+            # }
+
         }
     }
