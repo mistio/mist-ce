@@ -10,6 +10,7 @@ variables:
   DEPLOY_REGISTRY_AUTH: '1'
   # API & UI tests image
   TESTS_IMAGE: $DOCKERHUB_IMAGE/tests:$CI_COMMIT_SHA
+  SUBMODULES_IMAGE: mist
 
 stages:
   - discover
@@ -35,7 +36,7 @@ discover submodules:
     - apk add --no-cache git
   script:
     - |
-        git submodule status | \
+        git submodule status --recursive | \
           sed 's/^[ +-]\([0-9a-f]*\) \([^ ]*\).*$/\1,\2/' > submodules.csv
   artifacts:
     paths:
@@ -162,7 +163,7 @@ discover submodules:
 build api:
   <<: *docker_template
   script:
-    - SRC_IMG="mist/mist:$(get_submodule_sha api)"
+    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha api)"
     - docker_pull $SRC_IMG
     - |
         docker build \
@@ -194,8 +195,12 @@ build elasticsearch-manage: *docker_build_template
     <<: *docker_variables
     GIT_STRATEGY: none
   script:
-    - export submodule=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
-    - docker_retag_submodule $submodule mist/$submodule
+    - export arg1=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
+    - export arg2=$(echo "$CI_JOB_NAME" | cut -d " " -f3)
+    - export img="${SUBMODULES_IMAGE:-mist}/${arg1}"
+    - export submodule="${arg2:-$arg1}"
+    - echo "Will retag image $img from submodule $submodule."
+    - docker_retag_submodule $submodule $img
 
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
@@ -211,7 +216,7 @@ compose:
     - apk add --no-cache gettext
   script:
     - mkdir -p artifacts
-    - export IMG_REGISTRY=$(eval \$${COMPOSE_REGISTRY}_IMAGE)
+    - export IMG_REGISTRY=$(eval echo \$${COMPOSE_REGISTRY}_IMAGE)
     - echo "IMG_REGISTRY=$IMG_REGISTRY"
     - export IMG_TAG=$CI_COMMIT_REF_SLUG
     - echo "IMG_TAG=$IMG_TAG"
