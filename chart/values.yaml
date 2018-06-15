@@ -1,0 +1,294 @@
+# Used to label kubernetes resources. This should only differ between different
+# product/brandings. It shouldn't be overriden when deploying the chart.
+productShortName: mist
+
+# Settings for docker images used in the chart.
+image:
+  registry: mistce
+  tag: master
+  pullPolicy: Always
+  secrets:
+    - name: registry
+
+# HTTP settings for the deployed application.
+http:
+  host: localhost
+  tlsSecret: ''
+
+# Email settings. Change this to connect to a real SMTP server.
+smtp:
+  host: mailmock
+  port: 8025
+  username: ''
+  password: ''
+  tls: false
+  starttls: false
+
+# Elasticsearch settings. Change this to use a remote elasticsearch cluster.
+elasticsearch:
+  host: elasticsearch
+  port: 9200
+  username: ''
+  password: ''
+  tls: false
+  verifyCerts: false
+
+# InfluxDB settings. Change this to use a remote InfluxDB cluster.
+influxdb:
+  host: influxdb
+  port: 8086
+  db: telegraf
+
+# Rabbitmq settings. Change this to use a remote RabbitMQ cluster.
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  username: guest
+  password: guest
+
+# MongoDB settings. Change this to use a remote MongoDB cluster.
+mongodb:
+  host: mongodb
+  port: 27017
+
+# Docker settings (used by orchestration plugin). This has to be configured for
+# orchestration to work.
+docker:
+  host: api
+  port: 2375
+  key: ''
+  cert: ''
+  ca: ''
+
+# Monitoring settings.
+monitoring:
+  defaultMethod: telegraf-influxdb
+
+# Allow registration of dev users, used for testing purposes.
+enableDevUsers: false
+
+# Set to false to serve raw UI files. Used during development.
+jsBuild: true
+
+# Stripe credentials for billing. Currently only used by the SaaS version.
+stripe:
+  publicApiKey: ''
+  privateApiKey: ''
+
+# Node selector will be applied to all pods for all deployments.
+nodeSelector: {}
+
+# Deployment options (replicas, resource quotas etc).
+deployment:
+
+  # Settings for celery worker deployments.
+  celery:
+
+    # Generic runners. On by default.
+    prefork:
+      enabled: true
+      pool: prefork
+      replicas: 4
+      resources:
+        requests:
+          memory: 1000Mi
+          cpu: 600m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      queues:
+        - celery
+        - machines
+        - command
+        - deployments
+        - mappings
+    gevent:
+      enabled: true
+      replicas: 2
+      pool: gevent
+      resources:
+        requests:
+          memory: 150Mi
+          cpu: 500m
+        limits:
+          memory: 250Mi
+          cpu: 1000m
+      queues:
+        - scripts
+        - probe
+        - ping
+        - rules
+
+    # Queue-specific runners. Off by default.
+    celery:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - celery
+    machines:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - mappings
+    command:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - command
+    deployments:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - deployments
+    mappings:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - mappings
+    scripts:
+      enabled: false
+      pool: gevent
+      replicas: 1
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - scripts
+    probe:
+      enabled: false
+      pool: gevent
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 2000Mi
+          cpu: 1000m
+      queues:
+        - probe
+    ping:
+      enabled: false
+      pool: gevent
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 2000Mi
+          cpu: 1000m
+      queues:
+        - ping
+    rules:
+      enabled: false
+      pool: gevent
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 2000Mi
+          cpu: 1000m
+      queues:
+        - rules
+
+  # Api deployment settings.
+  api:
+    replicas: 2
+    resources:
+      requests:
+        memory: 800Mi
+        cpu: 600m
+      limits:
+        memory: 1000Mi
+        cpu: 2000m
+
+  # Sockjs deployment settings.
+  sockjs:
+    replicas: 2
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 200Mi
+        cpu: 1000m
+
+  # UI deployment settings.
+  ui:
+    replicas: 1
+    resources:
+      requests:
+        memory: 30Mi
+        cpu: 10m
+      limits:
+        memory: 50Mi
+        cpu: 100m
+
+  # Nginx deployment settings.
+  nginx:
+    replicas: 1
+    resources:
+      requests:
+        memory: 30Mi
+        cpu: 10m
+      limits:
+        memory: 60Mi
+        cpu: 1000m
+
+  # Landing deployment settings.
+  landing:
+    replicas: 1
+    resources:
+      requests:
+        memory: 20Mi
+        cpu: 10m
+      limits:
+        memory: 50Mi
+        cpu: 200m

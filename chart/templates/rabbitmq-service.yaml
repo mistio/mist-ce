@@ -1,0 +1,13 @@
+{{ if and (eq .Values.rabbitmq.host "rabbitmq") (eq (toString .Values.rabbitmq.port) "5672") -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: rabbitmq
+  name: rabbitmq
+spec:
+  ports:
+  - port: 5672
+  selector:
+    {{ .Values.productShortName }}.service: rabbitmq
+{{- end }}

@@ -1,0 +1,49 @@
+{{ $values := .Values -}}
+{{ range $name, $settings := $values.deployment.celery -}}
+{{ if $settings.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ $values.productShortName }}.service: celery-{{ $name }}
+  name: celery-{{ $name }}
+spec:
+  replicas: {{ $settings.replicas | default "1" }}
+  template:
+    metadata:
+      labels:
+        {{ $values.productShortName }}.service: celery-{{ $name }}
+    spec:
+      imagePullSecrets:
+{{ toYaml $values.image.secrets | indent 8 }}
+      containers:
+      - name: celery-{{ $name }}
+        args:
+        - bin/celery-{{ $settings.pool | default "prefork" }}
+        image: {{ $values.image.registry }}/api:{{ $values.image.tag }}
+        imagePullPolicy: {{ $values.image.pullPolicy }}
+        env:
+        - name: QUEUES
+          value: "{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
+        resources:
+          requests:
+            memory: {{ $settings.resources.requests.memory | default "1000Mi" }}
+            cpu: {{ $settings.resources.requests.cpu | default "400m" }}
+          limits:
+            memory: {{ $settings.resources.limits.memory | default "1000Mi" }}
+            cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
+        volumeMounts:
+        - name: {{ $values.productShortName }}-config
+          mountPath: /etc/{{ $values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ $values.productShortName }}-config
+        configMap:
+          name: {{ $values.productShortName }}
+{{- if $values.nodeSelector }}
+      nodeSelector:
+{{ toYaml $values.nodeSelector | indent 8 }}
+{{- end }}
+---
+{{ end }}
+{{- end }}

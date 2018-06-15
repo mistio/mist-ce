@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: sockjs
+  name: sockjs
+spec:
+  replicas: {{ .Values.deployment.sockjs.replicas | default "1" }}
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: sockjs
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: sockjs
+        args:
+        - bin/sockjs
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.deployment.sockjs.resources.requests.memory | default "100Mi" }}
+            cpu: {{ .Values.deployment.sockjs.resources.requests.cpu | default "100m" }}
+          limits:
+            memory: {{ .Values.deployment.sockjs.resources.limits.memory | default "200Mi" }}
+            cpu: {{ .Values.deployment.sockjs.resources.limits.cpu | default "1000m" }}
+        volumeMounts:
+        - name: {{ .Values.productShortName }}-config
+          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ .Values.productShortName }}-config
+        configMap:
+          name: {{ .Values.productShortName }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
