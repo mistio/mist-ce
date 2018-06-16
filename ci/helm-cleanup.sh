@@ -49,11 +49,12 @@ shift $((OPTIND-1))
 echo "Listing helm releases..."
 echo
 releases="$(helm list -d -r $PREFIX)"
+echo "$releases"
+releases=$(echo "$releases" | tail -n +2)
 if [ -z "$releases" ]; then
     echo "No releases found, exiting."
     exit 0
 fi
-echo "$releases"
 echo
 echo "Filtering old releases..."
 echo
@@ -71,7 +72,7 @@ while read -r line; do
         echo "Will keep release $name ($age minutes old)."
     fi
 done <<EOF
-$(echo "$releases" | tail -n +2)
+$releases
 EOF
 echo
 
