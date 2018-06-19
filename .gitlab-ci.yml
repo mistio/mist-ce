@@ -419,8 +419,8 @@ API:ce:scripts: *api_test_template
 API:ce:rbac: *api_test_template
 API:ce:ip_whitelisting: *api_test_template
 
-.API:ee-hs:orchestration: *api_test_template
-.API:ee-hs:tunnels: *api_test_template
+.API:ee_hs:orchestration: *api_test_template
+.API:ee_hs:tunnels: *api_test_template
 
 
 .ui_test_template: &ui_test_template
