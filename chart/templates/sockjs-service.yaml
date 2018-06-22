@@ -1,0 +1,24 @@
+apiversion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: sockjs
+  name: sockjs
+spec:
+  ports:
+  - port: 8081
+  selector:
+    {{ .Values.productShortName }}.service: sockjs
+---
+apiversion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: sockjs
+  name: sockjs-headless
+spec:
+  clusterIP: None
+  ports:
+  - port: 8081
+  selector:
+    {{ .Values.productShortName }}.service: sockjs

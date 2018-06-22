@@ -1,0 +1,29 @@
+{{ if and (eq .Values.rabbitmq.host "rabbitmq") (eq (toString .Values.rabbitmq.port) "5672") -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: rabbitmq
+  name: rabbitmq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.6.6-management
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 350m
+          limits:
+            memory: 400Mi
+            cpu: 1000m
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+{{- end }}

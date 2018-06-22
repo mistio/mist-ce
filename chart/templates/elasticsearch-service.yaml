@@ -1,0 +1,13 @@
+{{ if and (eq .Values.elasticsearch.host "elasticsearch") (eq (toString .Values.elasticsearch.port) "9200") -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.productShortName }}.service: elasticsearch
+  name: elasticsearch
+spec:
+  ports:
+  - port: 9200
+  selector:
+    {{ .Values.productShortName }}.service: elasticsearch
+{{- end }}

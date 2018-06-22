@@ -1,4 +1,4 @@
-FROM gcr.io/mist-ops/gocky:v0.5.1
+FROM mist/gocky:v0.5.1
 
 COPY ./config.toml /etc/gocky/config.toml
 

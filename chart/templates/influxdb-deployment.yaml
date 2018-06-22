@@ -1,0 +1,42 @@
+{{ if and (eq .Values.influxdb.host "influxdb") (eq (toString .Values.influxdb.port) "8086") -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: influxdb
+  labels:
+    {{ .Values.productShortName }}.service: influxdb
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{ .Values.productShortName }}.service: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: INFLUXDB_DB
+          value: {{ .Values.influxdb.db }}
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 50m
+          limits:
+            memory: 200Mi
+            cpu: 1000m
+        volumeMounts:
+        - mountPath: /data/db
+          name: influxdb
+      volumes:
+      - name: influxdb
+        persistentVolumeClaim:
+          claimName: influxdb
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+{{- end }}
