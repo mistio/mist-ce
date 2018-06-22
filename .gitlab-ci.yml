@@ -19,17 +19,11 @@ stages:
   - deploy
   - test
   - undeploy
-  - jobs
-
-.except: &except
-  variables:
-    - $CI_ACTION
 
 
 #################### DISCOVER STAGE ####################
 
 discover submodules:
-  except: *except
   stage: discover
   image: alpine
   before_script:
@@ -48,7 +42,6 @@ discover submodules:
 #################### BUILD STAGE ####################
 
 .dind_template: &docker_template
-  except: *except
   stage: build
   image: docker:git
   services:
@@ -208,7 +201,6 @@ retag tests: *docker_retag_template
 
 
 compose:
-  except: *except
   stage: build
   image: python:alpine
   before_script:
@@ -230,7 +222,6 @@ compose:
 #################### DEPLOY STAGE ####################
 
 .deploy_template: &deploy_template
-  except: *except
   stage: deploy
   image: dtzar/helm-kubectl
   before_script:
@@ -365,9 +356,7 @@ deploy review:
     url: http://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy review
   except:
-    <<: *except
-    refs:
-      - master
+    - master
   when: manual
 
 deploy master:
@@ -382,7 +371,6 @@ deploy master:
 #################### TEST STAGE ####################
 
 .test_template: &test_template
-  except: *except
   stage: test
   image: $TESTS_IMAGE
   variables:
@@ -482,7 +470,6 @@ UI:ip-whitelisting:
 #################### UNDEPLOY STAGE ####################
 
 .undeploy_template: &undeploy_template
-  except: *except
   stage: undeploy
   image: dtzar/helm-kubectl
   variables:
@@ -518,16 +505,13 @@ undeploy review:
     namespace: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
   when: manual
   except:
-    <<: *except
-    refs:
-      - master
+    - master
 
 
 #################### RELEASE STAGE ####################
 
 release: &release_template
   when: manual
-  except: *except
   stage: release
   image: python:2.7-alpine
   before_script:
@@ -558,23 +542,3 @@ prerelease:
   only:
     # only for references that match a prelease version string (v1.2.3-beta)
     - /^v\d+\.\d+\.\d+-.+$/
-
-
-#################### JOBS STAGE ####################
-
-cleanup test envs: &undeploy_template
-  stage: jobs
-  image: dtzar/helm-kubectl
-  before_script:
-    # Required for proper `date` command used by the script.
-    - apk add --no-cache coreutils
-  script:
-    - ./ci/helm-cleanup.sh -y -m90 -p test-$CI_PROJECT_NAME
-  allow_failure: true
-  dependencies: []
-  only:
-    variables:
-      - $CI_ACTION == "cleanup-test-envs"
-    #refs:
-    #  - master
-    #  - staging
