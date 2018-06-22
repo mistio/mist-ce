@@ -393,22 +393,22 @@ deploy master:
   script:
     - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
 
-API:ce:api_token: *api_test_template
-API:ce:clouds: *api_test_template
-API:ce:dns: *api_test_template
-API:ce:keys: *api_test_template
-API:ce:images: *api_test_template
-API:ce:libcloud_1/2: *api_test_template
-API:ce:libcloud_2/2: *api_test_template
-API:ce:machines: *api_test_template
-API:ce:networks: *api_test_template
-API:ce:schedules: *api_test_template
-API:ce:scripts: *api_test_template
-API:ce:rbac: *api_test_template
-API:ce:ip_whitelisting: *api_test_template
+API:main:api_token: *api_test_template
+API:main:clouds: *api_test_template
+API:main:dns: *api_test_template
+API:main:keys: *api_test_template
+API:main:images: *api_test_template
+API:main:libcloud_1/2: *api_test_template
+API:main:libcloud_2/2: *api_test_template
+API:main:machines: *api_test_template
+API:main:networks: *api_test_template
+API:main:schedules: *api_test_template
+API:main:scripts: *api_test_template
+API:main:rbac: *api_test_template
+API:main:ip_whitelisting: *api_test_template
 
-.API:ee_hs:orchestration: *api_test_template
-.API:ee_hs:tunnels: *api_test_template
+.API:plugin:orchestration: *api_test_template
+.API:plugin:tunnels: *api_test_template
 
 
 .ui_test_template: &ui_test_template
