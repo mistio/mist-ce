@@ -16,7 +16,7 @@ spec:
         env:
         - name: ELASTICSEARCH_URL
           value: http://elasticsearch:9200
-        image: kibana:5.5.2
+        image: kibana:5.6.10
         resources:
           requests:
             cpu: 100m
