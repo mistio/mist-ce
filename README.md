@@ -112,9 +112,9 @@ version: '2.0'
 services:
   nginx:
     volumes:
-      - ./docker/nginx/nginx-listen.conf:/etc/nginx/nginx-listen.conf:ro
-      - ./docker/nginx/cert.pem:/etc/nginx/cert.pem:ro
-      - ./docker/nginx/key.pem:/etc/nginx/key.pem:ro
+      - ./nginx-listen.conf:/etc/nginx/nginx-listen.conf:ro
+      - ./cert.pem:/etc/nginx/cert.pem:ro
+      - ./key.pem:/etc/nginx/key.pem:ro
     ports:
       - 443:80
 ```
@@ -122,7 +122,6 @@ services:
 Create a `nginx-listen.conf` in the directory of `docker-compose.yml`, with the
 following contents:
 ```
-server {
     listen              80 ssl;
     server_name         www.example.com;
     ssl_certificate     /etc/nginx/cert.pem;
