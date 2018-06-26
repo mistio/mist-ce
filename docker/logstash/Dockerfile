@@ -1,4 +1,4 @@
-FROM logstash:5.5.2
+FROM logstash:5.6.10
 
 CMD ["logstash", "-f", "/config-dir"]
 
