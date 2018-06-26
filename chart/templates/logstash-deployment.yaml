@@ -15,6 +15,13 @@ spec:
 {{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - name: logstash
+        env:
+        - name: ELASTIC_URI
+          value: http{{ if .Values.elasticsearch.tls }}s{{end}}://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}
+        - name: ELASTIC_USERNAME
+          value: {{ .Values.elasticsearch.username | default "admin" }}
+        - name: ELASTIC_PASSWORD
+          value: {{ .Values.elasticsearch.password | default "admin" }}
         image: {{ .Values.image.registry }}/logstash:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
