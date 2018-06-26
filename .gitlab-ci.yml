@@ -212,6 +212,7 @@ compose:
     - echo "IMG_REGISTRY=$IMG_REGISTRY"
     - export IMG_TAG=$CI_COMMIT_REF_SLUG
     - echo "IMG_TAG=$IMG_TAG"
+    - export CONF_DIR=/etc/mist
     - envsubst < docker-compose.yml > artifacts/docker-compose.yml
   artifacts:
     paths:
@@ -521,7 +522,7 @@ release: &release_template
     - chmod +x /usr/local/bin/submark
   script:
     - mkdir release
-    - sed "s/\$MIST_TAG/$CI_BUILD_REF_SLUG/g" docker-compose.yml > release/docker-compose.yml
+    - cp artifacts/docker-compose.yml release/docker-compose.yml
     - HEADER=$(sed -n "s/^## \($CI_BUILD_REF_NAME .*\)$/\1/p" CHANGELOG.md)
     - submark --omit-heading --h2="$HEADER" --out-file=release.md CHANGELOG.md
     - sed -i 's/^### Changes/## Changes/' release.md
@@ -534,6 +535,8 @@ release: &release_template
   except:
     # Except branches, meaning it'll only apply to git tags
     - branches
+  dependencies:
+    - compose
 
 prerelease:
   <<: *release_template
