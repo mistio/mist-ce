@@ -25,7 +25,7 @@ in order to run it, one needs to install a recent version of
 [docker](https://docs.docker.com/engine/installation/) and
 [docker-compose](https://docs.docker.com/compose/install/).
 
-To install the latest stable release, head over to 
+To install the latest stable release, head over to
 [releases](https://github.com/mistio/mist-ce/releases) and follow the
 instructions there.
 
@@ -98,6 +98,42 @@ If you wish to use a real SMTP server, edit `./config/settings.py` and modify
 Don't forget to restart docker-compose for changes to take effect.
 
 
+### TLS settings
+
+This section applies if you've installed mist by using the `docker-compose.yml`
+file of a mist release.
+
+Assuming a certificate `cert.pem` and private key file `key.pem` in the same
+directory as the `docker-compose.yml` file:
+
+Create a `docker-compose.override.yml` file with the following contents:
+```yaml
+version: '2.0'
+services:
+  nginx:
+    volumes:
+      - ./docker/nginx/nginx-listen.conf:/etc/nginx/nginx-listen.conf:ro
+      - ./docker/nginx/cert.pem:/etc/nginx/cert.pem:ro
+      - ./docker/nginx/key.pem:/etc/nginx/key.pem:ro
+    ports:
+      - 443:80
+```
+
+Create a `nginx-listen.conf` in the directory of `docker-compose.yml`, with the
+following contents:
+```
+server {
+    listen              80 ssl;
+    server_name         www.example.com;
+    ssl_certificate     /etc/nginx/cert.pem;
+    ssl_certificate_key /etc/nginx/key.pem;
+```
+
+Update `CORE_URI` in mist's settings (see URL section above).
+
+Run `docker-compose up -d`.
+
+
 ## Managing Mist.io
 
 Mist.io is managed using `docker-compose`. Look that up for details. Some
@@ -137,13 +173,13 @@ directory containing the `docker-compose.yml` file:
 
 1. Bring down your current installation by running `docker-compose down`.
 2. Download the docker-compose.yml file of the latest release and place it
-within the same directory as before. This way the new installation will use the 
+within the same directory as before. This way the new installation will use the
 same Docker volumes.
 3. Run `docker-compose up -d` to bring up the new version.
 4. Check that everything is in order by running `docker-compose ps`. Also check
 if your Mist.io portal works as expected.
-5. In some cases, it might be necessary to run the latest database migration 
-scripts. Connect to the api container and run the latest scripts in 
+5. In some cases, it might be necessary to run the latest database migration
+scripts. Connect to the api container and run the latest scripts in
 `mist.io/api/migrations`. e.g. `docker-compose exec api ls migrations`
 and then `docker-compose exec api python migrations/0006-list-locations.py`
 

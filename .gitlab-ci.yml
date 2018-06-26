@@ -526,7 +526,7 @@ release: &release_template
     - submark --omit-heading --h2="$HEADER" --out-file=release.md CHANGELOG.md
     - sed -i 's/^### Changes/## Changes/' release.md
     - echo >> release.md
-    - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/mist\.io/g" ci/release.md >> release.md
+    - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/$CI_PROJECT_NAME/g" ci/release.md >> release.md
     - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist-ce $CI_BUILD_REF_NAME
   only:
     # only for references that match a version string (v1.2.3)
