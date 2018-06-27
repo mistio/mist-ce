@@ -116,16 +116,20 @@ services:
       - ./cert.pem:/etc/nginx/cert.pem:ro
       - ./key.pem:/etc/nginx/key.pem:ro
     ports:
-      - 443:80
+      - 443:443
 ```
 
 Create a `nginx-listen.conf` in the directory of `docker-compose.yml`, with the
 following contents:
 ```
-    listen              80 ssl;
-    server_name         www.example.com;
+    listen 80;
+    listen 443 ssl;
+    server_name www.example.com;
     ssl_certificate     /etc/nginx/cert.pem;
     ssl_certificate_key /etc/nginx/key.pem;
+    if ($scheme != "https") {
+        rewrite ^ https://$host$uri permanent;
+    }
 ```
 
 Update `CORE_URI` in mist's settings (see URL section above).
