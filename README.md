@@ -68,8 +68,8 @@ Welcome to Mist.io! Enjoy!
 ## Configuring Mist.io
 
 After the initial `docker-compose up -d`, you'll see that a configuration file
-is created in `./config/settings.py`. Edit this file to modify configuration.
-Any changes to the `./config/settings.py` require a restart to take effect:
+is created in `./settings/settings.py`. Edit this file to modify configuration.
+Any changes to the `./settings/settings.py` require a restart to take effect:
 
     docker-compose restart
 
@@ -79,7 +79,7 @@ Any changes to the `./config/settings.py` require a restart to take effect:
 #### URL
 
 If running on anything other than `localhost`, you'll need to set the
-`CORE_URI` setting in `./config/settings.py`. Example:
+`CORE_URI` setting in `./settings/settings.py`. Example:
 
     CORE_URI = "http://198.51.100.12"
 
@@ -92,7 +92,7 @@ mock mailer. To see logs sent by mist.io, run
 
     docker-compose logs -f mailmock
 
-If you wish to use a real SMTP server, edit `./config/settings.py` and modify
+If you wish to use a real SMTP server, edit `./settings/settings.py` and modify
 `MAILER_SETTINGS`.
 
 Don't forget to restart docker-compose for changes to take effect.
