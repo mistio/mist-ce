@@ -528,7 +528,7 @@ release: &release_template
     - sed -i 's/^### Changes/## Changes/' release.md
     - echo >> release.md
     - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/$CI_PROJECT_NAME/g" ci/release.md >> release.md
-    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist-ce $CI_BUILD_REF_NAME
+    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio $CI_PROJECT_NAME $CI_BUILD_REF_NAME
   only:
     # only for references that match a version string (v1.2.3)
     - /^v\d+\.\d+\.\d+$/
