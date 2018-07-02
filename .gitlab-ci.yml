@@ -367,6 +367,7 @@ deploy master:
     url: http://master$DEPLOY_DOMAIN_SUFFIX
   only:
     - master
+  when: manual
 
 
 #################### TEST STAGE ####################
