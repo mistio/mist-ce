@@ -25,7 +25,7 @@ stages:
 
 discover submodules:
   stage: discover
-  image: alpine
+  image: alpine:3.7
   before_script:
     - apk add --no-cache git
   script:
