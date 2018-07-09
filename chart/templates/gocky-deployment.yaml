@@ -23,6 +23,10 @@ spec:
         ports:
         - containerPort: 9096
         - containerPort: 9097
+        volumeMounts:
+        - name: gocky-config
+          mountPath: /etc/gocky/config.toml
+          subPath: config.toml
         resources:
           requests:
             memory: 10Mi
@@ -30,6 +34,10 @@ spec:
           limits:
             memory: 50Mi
             cpu: 1000m
+      volumes:
+      - name: gocky-config
+        configMap:
+          name: gocky-configmap
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
