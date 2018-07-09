@@ -22,6 +22,18 @@ spec:
           value: {{ .Values.elasticsearch.username | default "admin" }}
         - name: ELASTIC_PASSWORD
           value: {{ .Values.elasticsearch.password | default "admin" }}
+        - name: RABBITMQ_HOST
+          value: {{ .Values.rabbitmq.host }}
+        - name: RABBITMQ_PORT
+          value: "{{ .Values.rabbitmq.port }}"
+        - name: RABBITMQ_USERNAME
+          value: {{ .Values.rabbitmq.username }}
+        - name: RABBITMQ_PASSWORD
+          value: {{ .Values.rabbitmq.password }}
+        - name: INFLUXDB_HOST
+          value: {{ .Values.influxdb.host }}
+        - name: INFLUXDB_PORT
+          value: "{{ .Values.influxdb.port }}"
         image: {{ .Values.image.registry }}/logstash:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
