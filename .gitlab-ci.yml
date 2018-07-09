@@ -25,7 +25,7 @@ stages:
 
 discover submodules:
   stage: discover
-  image: alpine
+  image: alpine:3.7
   before_script:
     - apk add --no-cache git
   script:
@@ -50,6 +50,8 @@ discover submodules:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: "tcp://localhost:2375"
   retry: 2
+  tags:
+    - cpu
   before_script:
     # Configure registries.
     - |
@@ -310,7 +312,7 @@ compose:
             $namespace ./chart/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
-          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted; do
+          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
             sleep 10 && echo '.'
           done
           while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do
