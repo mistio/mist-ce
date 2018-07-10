@@ -25,7 +25,7 @@ stages:
 
 discover submodules:
   stage: discover
-  image: alpine
+  image: alpine:3.7
   before_script:
     - apk add --no-cache git
   script:
@@ -50,6 +50,8 @@ discover submodules:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: "tcp://localhost:2375"
   retry: 2
+  tags:
+    - cpu
   before_script:
     # Configure registries.
     - |
@@ -310,7 +312,7 @@ compose:
             $namespace ./chart/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
-          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted; do
+          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
             sleep 10 && echo '.'
           done
           while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do
@@ -367,6 +369,7 @@ deploy master:
     url: http://master$DEPLOY_DOMAIN_SUFFIX
   only:
     - master
+  when: manual
 
 
 #################### TEST STAGE ####################
@@ -528,7 +531,7 @@ release: &release_template
     - sed -i 's/^### Changes/## Changes/' release.md
     - echo >> release.md
     - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/$CI_PROJECT_NAME/g" ci/release.md >> release.md
-    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio mist-ce $CI_BUILD_REF_NAME
+    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio $CI_PROJECT_NAME $CI_BUILD_REF_NAME
   only:
     # only for references that match a version string (v1.2.3)
     - /^v\d+\.\d+\.\d+$/
