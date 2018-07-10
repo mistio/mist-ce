@@ -40,9 +40,15 @@ data:
 
     DOCKER_IP = "{{ .Values.docker.host }}"
     DOCKER_PORT = "{{ .Values.docker.port }}"
-    DOCKER_TLS_KEY = "{{ .Values.docker.key }}"
-    DOCKER_TLS_CERT = "{{ .Values.docker.cert }}"
-    DOCKER_TLS_CA = "{{ .Values.docker.ca }}"
+    DOCKER_TLS_KEY = """
+{{ .Values.docker.key | indent 4 }}
+    """.strip()
+    DOCKER_TLS_CERT = """
+{{ .Values.docker.cert | indent 4 }}
+    """.strip()
+    DOCKER_TLS_CA = """
+{{ .Values.docker.ca | indent 4}}
+    """.strip()
 
     DEFAULT_MONITORING_METHOD = "{{ .Values.monitoring.defaultMethod }}"
 
