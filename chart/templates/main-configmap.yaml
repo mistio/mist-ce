@@ -52,7 +52,7 @@ data:
 
     DEFAULT_MONITORING_METHOD = "{{ .Values.monitoring.defaultMethod }}"
 
-    MONGO_URI = "{{ .Values.mongodb.host }}:{{ .Values.mongodb.port }}"
+    MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
 
