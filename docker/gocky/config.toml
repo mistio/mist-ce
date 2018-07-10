@@ -4,11 +4,3 @@ bind-addr = "0.0.0.0:9096"
 output = [
     { name="influxdb", location = "http://influxdb:8086/write" },
 ]
-
-
-[[graphite]]
-name = "graphite"
-bind-addr = "0.0.0.0:9097"
-output = [
-    { name="graphite", location="carbon:2003"}
-]

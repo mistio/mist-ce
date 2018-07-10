@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gocky-configmap
+data:
+  config.toml: |
+    [[http]]
+    name = "influxdb"
+    bind-addr = "0.0.0.0:9096"
+    output = [
+        { name="influxdb", location = "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}/write" },
+    ]
