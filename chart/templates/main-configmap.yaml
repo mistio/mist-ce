@@ -47,9 +47,37 @@ data:
 {{ .Values.docker.cert | indent 4 }}
     """.strip()
     DOCKER_TLS_CA = """
-{{ .Values.docker.ca | indent 4}}
+{{ .Values.docker.ca | indent 4 }}
     """.strip()
 
     DEFAULT_MONITORING_METHOD = "{{ .Values.monitoring.defaultMethod }}"
 
     MONGO_URI = "{{ .Values.mongodb.host }}:{{ .Values.mongodb.port }}"
+
+    GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
+
+    SIGN_KEY = "{{ .Values.internalKeys.sign }}"
+    SECRET = "{{ .Values.internalKeys.secret }}"
+    CILIA_SECRET_KEY = "{{ .Values.internalKeys.cilia }}"
+
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "{{ .Values.auth.google.key }}"
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "{{ .Values.auth.google.secret }}"
+    SOCIAL_AUTH_GITHUB_KEY = "{{ .Values.auth.github.key }}"
+    SOCIAL_AUTH_GITHUB_SECRET = "{{ .Values.auth.github.secret }}"
+    ALLOW_SIGNUP_EMAIL = {{ if .Values.auth.email.signup }}True{{ else }}False{{ end }}
+    ALLOW_SIGNIN_EMAIL = {{ if .Values.auth.email.signin }}True{{ else }}False{{ end }}
+    ALLOW_SIGNUP_GOOGLE = {{ if .Values.auth.google.signup }}True{{ else }}False{{ end }}
+    ALLOW_SIGNIN_GOOGLE = {{ if .Values.auth.google.signin }}True{{ else }}False{{ end }}
+    ALLOW_SIGNUP_GITHUB = {{ if .Values.auth.github.signup }}True{{ else }}False{{ end }}
+    ALLOW_SIGNIN_GITHUB = {{ if .Values.auth.github.signin }}True{{ else }}False{{ end }}
+
+    GITLAB_TOKEN = "{{ .Values.gitlabToken }}"
+    BILLING_NOTIFICATIONS_WEBHOOK = "{{ .Values.slackWebhooks.billing }}"
+    MIXPANEL_TOKEN = "{{ .Values.mixpanelToken }}"
+    CUSTOMERIO_SITEID = "{{ .Values.customerio.siteId }}"
+    CUSTOMERIO_APIKEY = "{{ .Values.customerio.apiKey }}"
+    GOOGLE_ANALYTICS_ID = "{{ .Values.googleAnalyticsId }}"
+    OLARK_ID = "{{ .Values.olarkId }}"
+    SENDGRID_EMAIL_NOTIFICATIONS_KEY = "{{ .Values.sendgridEmailNotificationsKey }}"
+
+{{ .Values.extraSettings | indent 4 }}
