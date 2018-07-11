@@ -70,10 +70,48 @@ enableDevUsers: false
 # Set to false to serve raw UI files. Used during development.
 jsBuild: true
 
-# Stripe credentials for billing. Currently only used by the SaaS version.
+# Internal authentication, encryption, signing keys.
+internalKeys:
+  sign: ''
+  secret: ''
+  cilia: ''
+
+# Authentication configuration.
+auth:
+  email:
+    signup: true
+    signin: true
+  google:
+    signup: false
+    signin: false
+    key: ''
+    secret: ''
+  github:
+    key: ''
+    secret: ''
+
+# Used to clone repos.
+githubBotToken: ''
+
+# Currently only used by the SaaS version.
+gitlabToken: ''
+slackWebhooks:
+  billing: ''
+mixpanelToken: ''
+customerio:
+  sideId: ''
+  apiKey: ''
+googleAnalyticsId: ''
+olarkId: ''
 stripe:
   publicApiKey: ''
-  privateApiKey: ''
+  secretApiKey: ''
+sendgridEmailNotificationsKey: ''
+
+# The (possibly multi-line) string given here, will be appended, as is, to the
+# `settings.py` file. This is a quick and dirty way of overriding options not
+# directly exposed in this file.
+extraSettings: ''
 
 # Node selector will be applied to all pods for all deployments.
 nodeSelector: {}
