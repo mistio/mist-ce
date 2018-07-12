@@ -72,9 +72,9 @@ jsBuild: true
 
 # Internal authentication, encryption, signing keys.
 internalKeys:
-  sign: ''
-  secret: ''
-  cilia: ''
+  sign: CHANGEME
+  secret: CHANGEME
+  cilia: CHANGEME
 
 # Authentication configuration.
 auth:
