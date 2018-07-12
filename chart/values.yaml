@@ -183,7 +183,7 @@ deployment:
           memory: 1000Mi
           cpu: 2000m
       queues:
-        - mappings
+        - machines
     command:
       enabled: false
       pool: prefork
