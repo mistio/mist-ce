@@ -1,34 +1,28 @@
 # Changelog
 
 
-## v3.0.1 (2 Jun 2018)
+## v3.1.0 (16 Jul 2018)
 
-Bugfix and cleanup release. Adds polling for networks. Improves KVM machine creation. Improves DB query performance.
-
-### Upgrading from v3.0.0
-
-1. Bring down your existing installation by running `docker-compose down` within the directory where the docker-compose.yml file resides.
-2. Replace docker-compose.yaml with the one available in the assets of the current release right above.
-3. Bring everything back up by running `docker-compose up -d`. Check the status by running `docker-compose ps`.
-4. Once all services are running, execute the following migration steps:
-
-```
-    docker-compose exec api python api/migrations/0011-migrate-networks.py
-    docker-compose exec api python api/migrations/0012-add-metering-schedules.py
-```
-
+Adds polling for networks. Improves KVM machine creation & networking. Optimize vSphere API queries. Improves DB query performance. Upgrades ELK which lowers RAM requirements.
 
 ### Changes
 
 * Feature: Support custom sizes when creating KVM machines.
-* Bugfix: Fix KVM networks upon machine creation.
+* Feature: Store & display resource creator & owner
+* Feature: Allow to undefine a KVM domain, if it is not active
 * Feature: Support multiple interfaces and attaching to more than one networks when creating KVM machines.
 * Feature: Poller for networks.
 * Change: Sharding of polling tasks.
 * Change: Deprecate collectd support.
 * Change: Support metering of datapoints.
 * Change: Add owner index, improves performance of DB queries.
+* Change: Upgrade ELK to 5.6.10
+* Change: Get vm properties in batches in vSphere driver
 * Bugfix: Fix internal server error when editing some rules.
+* Bugfix: Fix KVM networks upon machine creation.
+* Bugfix: Prevent setting telegraf deployment error to "None"
+* Bugfix: Do not schedule MeteringPollingSchedule task immediately, since that would result in the task being scheduled every time the Organization instance is saved
+* Bugfix: Fix bug regarding incidents not closing when disabling monitoring
 
 
 ## v3.0.0 (29 Apr 2018)
