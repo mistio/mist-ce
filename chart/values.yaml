@@ -276,6 +276,53 @@ deployment:
       queues:
         - rules
 
+  # Poller deployment settings.
+  poller:
+    generic:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          memory: 500Mi
+          cpu: 1000m
+        limits:
+          memory: 700Mi
+          cpu: 2000m
+      scheduler: mist.api.poller.schedulers.PollingScheduler
+    owners:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 150Mi
+          cpu: 250m
+        limits:
+          memory: 300Mi
+          cpu: 1000m
+      scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
+    clouds:
+      enabled: false
+      replicas: 5
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 500m
+        limits:
+          memory: 500Mi
+          cpu: 1000m
+      scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
+    machines:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 250Mi
+          cpu: 700m
+        limits:
+          memory: 500Mi
+          cpu: 1000m
+      scheduler: mist.api.poller.schedulers.MachinePollingScheduler
+
   # Api deployment settings.
   api:
     replicas: 2
