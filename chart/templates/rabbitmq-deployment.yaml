@@ -22,6 +22,12 @@ spec:
           limits:
             memory: 400Mi
             cpu: 1000m
+          requests:
+            memory: {{ .Values.deployment.rabbitmq.resources.requests.memory | default "200Mi" }}
+            cpu: {{ .Values.deployment.rabbitmq.resources.requests.cpu | default "350m" }}
+          limits:
+            memory: {{ .Values.deployment.rabbitmq.resources.limits.memory | default "400Mi" }}
+            cpu: {{ .Values.deployment.rabbitmq.resources.limits.cpu | default "1000m" }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
