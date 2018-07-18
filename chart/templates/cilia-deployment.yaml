@@ -5,7 +5,7 @@ metadata:
     {{ .Values.productShortName }}.service: cilia
   name: cilia
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.cilia.replicas | default "1" }}
   strategy:
     type: Recreate
   template:
@@ -25,12 +25,12 @@ spec:
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
-          limits:
-            memory: 300Mi
-            cpu: 500m
           requests:
-            memory: 150Mi
-            cpu: 70m
+            memory: {{ .Values.deployment.cilia.resources.requests.memory | default "150Mi" }}
+            cpu: {{ .Values.deployment.cilia.resources.requests.cpu | default "70m" }}
+          limits:
+            memory: {{ .Values.deployment.cilia.resources.limits.memory | default "300Mi" }}
+            cpu: {{ .Values.deployment.cilia.resources.limits.cpu | default "500m" }}
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py

@@ -5,7 +5,7 @@ metadata:
   labels:
     {{ .Values.productShortName }}.service: gocky
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.gocky.replicas | default "1" }}
   template:
     metadata:
       labels:
@@ -32,11 +32,11 @@ spec:
           subPath: config.toml
         resources:
           requests:
-            memory: 10Mi
-            cpu: 50m
+            memory: {{ .Values.deployment.gocky.resources.requests.memory | default "10Mi" }}
+            cpu: {{ .Values.deployment.gocky.resources.requests.cpu | default "50m" }}
           limits:
-            memory: 50Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.gocky.resources.limits.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.gocky.resources.limits.cpu | default "1000m" }}
       volumes:
       - name: gocky-config
         configMap:
