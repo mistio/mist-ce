@@ -323,6 +323,29 @@ deployment:
           cpu: 1000m
       scheduler: mist.api.poller.schedulers.MachinePollingScheduler
 
+  # Cilia deployment settings. Set replicas to 0 to disable.
+  cilia:
+    replicas: 1
+    resources:
+      requests:
+        memory: 150Mi
+        cpu: 70m
+      limits:
+        memory: 300Mi
+        cpu: 500m
+
+  # Gocky deployment settings. Doesn't currently properly support multiple
+  # replicas.
+  gocky:
+    replicas: 1
+    resources:
+      requests:
+        memory: 10Mi
+        cpu: 50m
+      limits:
+        memory: 50Mi
+        cpu: 1000m
+
   # Api deployment settings.
   api:
     replicas: 2
@@ -377,3 +400,13 @@ deployment:
       limits:
         memory: 50Mi
         cpu: 200m
+
+  # RabbitMQ deployment settings. Temporary, will switch to subchart.
+  rabbitmq:
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 350m
+      limits:
+        memory: 400Mi
+        cpu: 1000m

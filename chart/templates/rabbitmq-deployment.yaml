@@ -17,11 +17,11 @@ spec:
         image: rabbitmq:3.6.6-management
         resources:
           requests:
-            memory: 200Mi
-            cpu: 350m
+            memory: {{ .Values.deployment.rabbitmq.resources.requests.memory | default "200Mi" }}
+            cpu: {{ .Values.deployment.rabbitmq.resources.requests.cpu | default "350m" }}
           limits:
-            memory: 400Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.rabbitmq.resources.limits.memory | default "400Mi" }}
+            cpu: {{ .Values.deployment.rabbitmq.resources.limits.cpu | default "1000m" }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
