@@ -29,7 +29,7 @@ spec:
             memory: 200Mi
             cpu: 1000m
         volumeMounts:
-        - mountPath: /data/db
+        - mountPath: /var/lib/influxdb
           name: influxdb
       volumes:
       - name: influxdb
