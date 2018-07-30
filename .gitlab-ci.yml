@@ -308,6 +308,8 @@ compose:
             --set docker.key="$DOCKER_KEY" \
             --set docker.cert="$DOCKER_CERT" \
             --set docker.ca="$DOCKER_CA" \
+            --set awsAccessKey="$AWS_ACCESS_KEY" \
+            --set awsSecretKey="$AWS_SECRET_KEY" \
             $(elasticsearch_params) \
             $namespace ./chart/
           apk add --no-cache curl
