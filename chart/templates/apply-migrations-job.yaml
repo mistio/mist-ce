@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-    name: apply-migrations
+  name: apply-migrations
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
