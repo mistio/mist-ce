@@ -8,6 +8,7 @@ metadata:
 spec:
   ports:
     - port: 8086
+    - port: 8088
   selector:
     {{ .Values.productShortName }}.service: influxdb
 {{- end }}
