@@ -293,6 +293,10 @@ compose:
             rm -rf $tls_tmpdir
           fi
 
+          helm init --client-only
+          helm repo update
+          helm dependency update ./chart/
+
           helm upgrade --install --namespace $namespace \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
