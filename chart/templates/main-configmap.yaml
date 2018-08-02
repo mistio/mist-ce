@@ -35,8 +35,13 @@ data:
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
     STRIPE_PUBLIC_APIKEY = "{{ .Values.stripe.publicApiKey }}"
 
-    AMQP_URI = "{{ .Values.rabbitmq.host }}:{{ .Values.rabbitmq.port }}"
-    BROKER_URL = "amqp://{{ .Values.rabbitmq.username }}:{{ .Values.rabbitmq.password }}@{{ .Values.rabbitmq.host }}:{{ .Values.rabbitmq.port }}/"
+    {{ if .Values.rabbitmq.enabled -}}
+    AMQP_URI = "{{ .Release.Name }}-rabbitmq:5672"
+    BROKER_URL = "amqp://{{ .Values.rabbitmq.rabbitmq.username }}:{{ .Values.rabbitmq.rabbitmq.password }}@{{ .Release.Name }}-rabbitmq:5672/"
+    {{- else -}}
+    AMQP_URI = "{{ .Values.rabbitmqExternal.host }}:{{ .Values.rabbitmqExternal.port }}"
+    BROKER_URL = "amqp://{{ .Values.rabbitmqExternal.username }}:{{ .Values.rabbitmqExternal.password }}@{{ .Values.rabbitmqExternal.host }}:{{ .Values.rabbitmqExternal.port }}/"
+    {{- end }}
 
     DOCKER_IP = "{{ .Values.docker.host }}"
     DOCKER_PORT = "{{ .Values.docker.port }}"
