@@ -1,5 +1,27 @@
 # Changelog
 
+## v3.2.0 (6 Aug 2018)
+
+Performance optimizations, preliminary support for Alibaba Cloud (Aliyun ECS), minor bugfixes
+
+* Feature: Initial support for Alibaba Cloud
+* Feature: Configure default post deploy steps for selected clouds
+* Feature: Support VNC console action on OpenStack
+* Bugfix: Fix influxdb mountpath in helm chart
+* Bugfix: Fix VCloud OS detection
+* Bugfix: Fix vSphere machine listing issue
+* Bugfix: Fix load graph for many machines
+* Change: Expose more settings for rabbitmq, gocky, cilia in helm chart
+* Change: Upgrade gocky images
+* Change: Configurable pollers in helm chart
+* Change: Add flag to disable machine polling acceleration
+* Change: Optimize tag query when calculating machine cost
+* Change: Re-implement metering for checks and datapoints based on rate/sec
+* Change: Dont probe stopped machines or localhost
+* Change: Dont run update_poller task if not necessary
+* Change: Import middleware chains from plugins, if defined
+* Change: Make scheduler configurable in bin/poller
+
 
 ## v3.1.0 (16 Jul 2018)
 
