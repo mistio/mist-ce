@@ -419,13 +419,3 @@ deployment:
       limits:
         memory: 50Mi
         cpu: 200m
-
-  # RabbitMQ deployment settings. Temporary, will switch to subchart.
-  rabbitmq:
-    resources:
-      requests:
-        memory: 200Mi
-        cpu: 350m
-      limits:
-        memory: 400Mi
-        cpu: 1000m
