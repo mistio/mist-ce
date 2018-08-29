@@ -1,4 +1,4 @@
-FROM nginx
+FROM nginx:stable-alpine
 
 COPY ./static /srv/www/static
 
