@@ -3,6 +3,7 @@
 ## v3.2.1 (unreleased)
 
 * Change: Reduce poller update threshold to 90 secs
+* Change: Add k8s deployment specific script that displays online portal users
 
 
 ## v3.2.0 (6 Aug 2018)
