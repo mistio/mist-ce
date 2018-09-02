@@ -293,6 +293,10 @@ compose:
             rm -rf $tls_tmpdir
           fi
 
+          helm init --client-only
+          helm repo update
+          helm dependency update ./chart/
+
           helm upgrade --install --namespace $namespace \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
@@ -336,6 +340,9 @@ deploy test:
       enableDevUsers: true
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
+      rabbitmq:
+        nodeSelector:
+          cloud.google.com/gke-nodepool: generic
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
@@ -351,6 +358,9 @@ deploy test:
         password: $SENDGRID_PASSWORD
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
+      rabbitmq:
+        nodeSelector:
+          cloud.google.com/gke-nodepool: generic
 
 deploy review:
   <<: *deploy_review_template
