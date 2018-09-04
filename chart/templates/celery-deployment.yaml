@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         {{ $values.productShortName }}.service: celery-{{ $name }}
+      annotations:
+        # Trigger modification of deployment & restart of pods if config changes.
+        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") $ | sha256sum }}
     spec:
       imagePullSecrets:
 {{ toYaml $values.image.secrets | indent 8 }}

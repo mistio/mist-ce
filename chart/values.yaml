@@ -39,8 +39,26 @@ influxdb:
   port: 8086
   db: telegraf
 
-# Rabbitmq settings. Change this to use a remote RabbitMQ cluster.
+# Options for rabbitmq subchart.
 rabbitmq:
+  enabled: true
+  rabbitmqUsername: guest
+  rabbitmqPassword: guest
+  replicaCount: 1
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 350m
+    limits:
+      memory: 400Mi
+      cpu: 1000m
+  service:
+    clusterIP: ''
+  nodeSelector: {}
+
+# Use an external rabbitmq. This will only be used
+# if `rabbitmq.enabled` is false.
+rabbitmqExternal:
   host: rabbitmq
   port: 5672
   username: guest
@@ -70,12 +88,51 @@ enableDevUsers: false
 # Set to false to serve raw UI files. Used during development.
 jsBuild: true
 
-# Stripe credentials for billing. Currently only used by the SaaS version.
+# Internal authentication, encryption, signing keys.
+internalKeys:
+  sign: CHANGEME
+  secret: ''
+  cilia: ''
+
+# Authentication configuration.
+auth:
+  email:
+    signup: true
+    signin: true
+  google:
+    signup: false
+    signin: false
+    key: ''
+    secret: ''
+  github:
+    key: ''
+    secret: ''
+
+# Used to clone repos.
+githubBotToken: ''
+
+# Currently only used by the SaaS version.
+gitlabToken: ''
+slackWebhooks:
+  billing: ''
+mixpanelToken: ''
+customerio:
+  sideId: ''
+  apiKey: ''
+googleAnalyticsId: ''
+olarkId: ''
 stripe:
   publicApiKey: ''
-  privateApiKey: ''
+  secretApiKey: ''
+sendgridEmailNotificationsKey: ''
 
-# Node selector will be applied to all pods for all deployments.
+# The (possibly multi-line) string given here, will be appended, as is, to the
+# `settings.py` file. This is a quick and dirty way of overriding options not
+# directly exposed in this file.
+extraSettings: ''
+
+# Node selector will be applied to all pods for all deployments, excluding
+# subcharts.
 nodeSelector: {}
 
 # Deployment options (replicas, resource quotas etc).
@@ -145,7 +202,7 @@ deployment:
           memory: 1000Mi
           cpu: 2000m
       queues:
-        - mappings
+        - machines
     command:
       enabled: false
       pool: prefork
@@ -237,6 +294,76 @@ deployment:
           cpu: 1000m
       queues:
         - rules
+
+  # Poller deployment settings.
+  poller:
+    generic:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          memory: 500Mi
+          cpu: 1000m
+        limits:
+          memory: 700Mi
+          cpu: 2000m
+      scheduler: mist.api.poller.schedulers.PollingScheduler
+    owners:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 150Mi
+          cpu: 250m
+        limits:
+          memory: 300Mi
+          cpu: 1000m
+      scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
+    clouds:
+      enabled: false
+      replicas: 5
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 500m
+        limits:
+          memory: 500Mi
+          cpu: 1000m
+      scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
+    machines:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 250Mi
+          cpu: 700m
+        limits:
+          memory: 500Mi
+          cpu: 1000m
+      scheduler: mist.api.poller.schedulers.MachinePollingScheduler
+
+  # Cilia deployment settings. Set replicas to 0 to disable.
+  cilia:
+    replicas: 1
+    resources:
+      requests:
+        memory: 150Mi
+        cpu: 70m
+      limits:
+        memory: 300Mi
+        cpu: 500m
+
+  # Gocky deployment settings. Doesn't currently properly support multiple
+  # replicas.
+  gocky:
+    replicas: 1
+    resources:
+      requests:
+        memory: 10Mi
+        cpu: 50m
+      limits:
+        memory: 50Mi
+        cpu: 1000m
 
   # Api deployment settings.
   api:

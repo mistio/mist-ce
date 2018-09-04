@@ -19,7 +19,11 @@ spec:
       - name: celery-exporter
         args:
         - --broker
-        - amqp://guest:guest@rabbitmq/
+        {{ if .Values.rabbitmq.enabled -}}
+        - "amqp://{{ .Values.rabbitmq.rabbitmqUsername }}:{{ .Values.rabbitmq.rabbitmqPassword }}@{{ .Release.Name }}-rabbitmq:5672/"
+        {{- else -}}
+        - "amqp://{{ .Values.rabbitmqExternal.username }}:{{ .Values.rabbitmqExternal.password }}@{{ .Values.rabbitmqExternal.host }}:{{ .Values.rabbitmqExternal.port }}/"
+        {{- end }}
         - --enable-events
         image: dimrozakis/celery-exporter
         imagePullPolicy: {{ .Values.image.pullPolicy }}

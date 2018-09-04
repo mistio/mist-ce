@@ -25,7 +25,7 @@ stages:
 
 discover submodules:
   stage: discover
-  image: alpine
+  image: alpine:3.7
   before_script:
     - apk add --no-cache git
   script:
@@ -50,6 +50,8 @@ discover submodules:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: "tcp://localhost:2375"
   retry: 2
+  tags:
+    - cpu
   before_script:
     # Configure registries.
     - |
@@ -291,6 +293,10 @@ compose:
             rm -rf $tls_tmpdir
           fi
 
+          helm init --client-only
+          helm repo update
+          helm dependency update ./chart/
+
           helm upgrade --install --namespace $namespace \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
@@ -310,7 +316,7 @@ compose:
             $namespace ./chart/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
-          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted; do
+          while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
             sleep 10 && echo '.'
           done
           while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do
@@ -334,6 +340,9 @@ deploy test:
       enableDevUsers: true
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
+      rabbitmq:
+        nodeSelector:
+          cloud.google.com/gke-nodepool: generic
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
@@ -349,6 +358,9 @@ deploy test:
         password: $SENDGRID_PASSWORD
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
+      rabbitmq:
+        nodeSelector:
+          cloud.google.com/gke-nodepool: generic
 
 deploy review:
   <<: *deploy_review_template
@@ -436,13 +448,12 @@ UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:rbac-teams: *ui_test_template
 UI:zones: *ui_test_template
+UI:rules-1/2: *ui_test_template
+UI:rules-2/2: *ui_test_template
 UI:machines-1/2:
   <<: *ui_test_template
   retry: 1
 UI:machines-2/2:
-  <<: *ui_test_template
-  retry: 1
-UI:alert:
   <<: *ui_test_template
   retry: 1
 UI:monitoring:

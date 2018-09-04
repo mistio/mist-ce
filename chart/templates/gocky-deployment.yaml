@@ -5,11 +5,14 @@ metadata:
   labels:
     {{ .Values.productShortName }}.service: gocky
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.gocky.replicas | default "1" }}
   template:
     metadata:
       labels:
         {{ .Values.productShortName }}.service: gocky
+      annotations:
+        # Trigger modification of deployment & restart of pods if config changes.
+        checksum/config: {{ include (print $.Template.BasePath "/gocky-configmap.yaml") . | sha256sum }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
@@ -23,13 +26,21 @@ spec:
         ports:
         - containerPort: 9096
         - containerPort: 9097
+        volumeMounts:
+        - name: gocky-config
+          mountPath: /etc/gocky/config.toml
+          subPath: config.toml
         resources:
           requests:
-            memory: 10Mi
-            cpu: 50m
+            memory: {{ .Values.deployment.gocky.resources.requests.memory | default "10Mi" }}
+            cpu: {{ .Values.deployment.gocky.resources.requests.cpu | default "50m" }}
           limits:
-            memory: 50Mi
-            cpu: 1000m
+            memory: {{ .Values.deployment.gocky.resources.limits.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.gocky.resources.limits.cpu | default "1000m" }}
+      volumes:
+      - name: gocky-config
+        configMap:
+          name: gocky-configmap
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
