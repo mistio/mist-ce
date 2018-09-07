@@ -145,7 +145,13 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 4
+      replicas: 1
+      autoscaling: &autoscaling
+        enabled: true
+        minReplicas: 1
+        maxReplicas: 20
+        targetCPUUtilizationPercentage: 80
+        targetMemoryUtilizationPercentage: 80
       resources:
         requests:
           memory: 1000Mi
@@ -161,7 +167,8 @@ deployment:
         - mappings
     gevent:
       enabled: true
-      replicas: 2
+      replicas: 1
+      autoscaling: *autoscaling
       pool: gevent
       resources:
         requests:
@@ -181,6 +188,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -194,6 +202,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -207,6 +216,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -220,6 +230,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -233,6 +244,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -246,6 +258,7 @@ deployment:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -259,6 +272,7 @@ deployment:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
@@ -272,6 +286,7 @@ deployment:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
@@ -285,6 +300,7 @@ deployment:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
@@ -300,6 +316,7 @@ deployment:
     generic:
       enabled: true
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 500Mi
@@ -311,6 +328,7 @@ deployment:
     owners:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 150Mi
@@ -321,7 +339,8 @@ deployment:
       scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
     clouds:
       enabled: false
-      replicas: 5
+      replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -333,6 +352,7 @@ deployment:
     machines:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 250Mi
@@ -345,6 +365,7 @@ deployment:
   # Cilia deployment settings. Set replicas to 0 to disable.
   cilia:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 150Mi
@@ -353,10 +374,10 @@ deployment:
         memory: 300Mi
         cpu: 500m
 
-  # Gocky deployment settings. Doesn't currently properly support multiple
-  # replicas.
+  # Gocky deployment settings.
   gocky:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 10Mi
@@ -367,7 +388,8 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 2
+    replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 800Mi
@@ -378,7 +400,8 @@ deployment:
 
   # Sockjs deployment settings.
   sockjs:
-    replicas: 2
+    replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 100Mi
@@ -390,6 +413,7 @@ deployment:
   # UI deployment settings.
   ui:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 30Mi
@@ -401,6 +425,7 @@ deployment:
   # Nginx deployment settings.
   nginx:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 30Mi
@@ -412,6 +437,7 @@ deployment:
   # Landing deployment settings.
   landing:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 20Mi
