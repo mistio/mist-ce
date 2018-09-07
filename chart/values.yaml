@@ -39,8 +39,26 @@ influxdb:
   port: 8086
   db: telegraf
 
-# Rabbitmq settings. Change this to use a remote RabbitMQ cluster.
+# Options for rabbitmq subchart.
 rabbitmq:
+  enabled: true
+  rabbitmqUsername: guest
+  rabbitmqPassword: guest
+  replicaCount: 1
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 350m
+    limits:
+      memory: 400Mi
+      cpu: 1000m
+  service:
+    clusterIP: ''
+  nodeSelector: {}
+
+# Use an external rabbitmq. This will only be used
+# if `rabbitmq.enabled` is false.
+rabbitmqExternal:
   host: rabbitmq
   port: 5672
   username: guest
@@ -113,7 +131,8 @@ sendgridEmailNotificationsKey: ''
 # directly exposed in this file.
 extraSettings: ''
 
-# Node selector will be applied to all pods for all deployments.
+# Node selector will be applied to all pods for all deployments, excluding
+# subcharts.
 nodeSelector: {}
 
 # Deployment options (replicas, resource quotas etc).
@@ -400,13 +419,3 @@ deployment:
       limits:
         memory: 50Mi
         cpu: 200m
-
-  # RabbitMQ deployment settings. Temporary, will switch to subchart.
-  rabbitmq:
-    resources:
-      requests:
-        memory: 200Mi
-        cpu: 350m
-      limits:
-        memory: 400Mi
-        cpu: 1000m
