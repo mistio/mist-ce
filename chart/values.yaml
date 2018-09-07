@@ -47,8 +47,8 @@ rabbitmq:
   replicaCount: 1
   resources:
     requests:
-      memory: 200Mi
-      cpu: 350m
+      memory: 250Mi
+      cpu: 800m
     limits:
       memory: 400Mi
       cpu: 1000m
@@ -429,7 +429,7 @@ deployment:
     resources:
       requests:
         memory: 30Mi
-        cpu: 10m
+        cpu: 20m
       limits:
         memory: 60Mi
         cpu: 1000m
