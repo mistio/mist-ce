@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: celery
+  name: {{ .Release.Name }}-celery
   namespace: {{ .Values.prometheus.operator.serviceMonitor.namespace }}
   labels:
 {{- if .Values.prometheus.operator.serviceMonitor.selector }}
