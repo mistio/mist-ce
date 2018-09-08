@@ -298,6 +298,7 @@ compose:
           helm dependency update ./chart/
 
           helm upgrade --install --namespace $namespace \
+            --wait --timeout=600 \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
             --set image.registry="$REGISTRY_IMAGE" \
