@@ -16,5 +16,6 @@ spec:
   - port: exporter
     interval: {{ .Values.prometheus.operator.serviceMonitor.interval }}
   namespaceSelector:
-    any: true
+    matchNames:
+    - {{ .Release.Namespace }}
 {{ end }}
