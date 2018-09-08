@@ -298,6 +298,7 @@ compose:
           helm dependency update ./chart/
 
           helm upgrade --install --namespace $namespace \
+            --wait --timeout=600 \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
             --set image.registry="$REGISTRY_IMAGE" \
@@ -319,7 +320,7 @@ compose:
           while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
             sleep 10 && echo '.'
           done
-          while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do
+          while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
             sleep 5 && echo 'Environment not ready yet...'
           done
         }
