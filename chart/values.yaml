@@ -55,6 +55,11 @@ rabbitmq:
   service:
     clusterIP: ''
   nodeSelector: {}
+  prometheus:
+    exporter:
+      enabled: true
+    operator:
+      enabled: true
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.enabled` is false.
@@ -134,6 +139,25 @@ extraSettings: ''
 # Node selector will be applied to all pods for all deployments, excluding
 # subcharts.
 nodeSelector: {}
+
+# Configure prometheus exporters. Subcharts may require separate configuration.
+prometheus:
+  enabled: true
+  operator:
+    enabled: true
+    serviceMonitor:
+      ## Interval at which Prometheus scrapes exporters.
+      interval: 20s
+
+      # Namespace Prometheus is installed in
+      namespace: monitoring
+
+      # Defaults to whats used if you follow CoreOS
+      # [Prometheus Install Instructions](https://github.com/coreos/prometheus-operator/tree/master/helm#tldr)
+      # [Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/prometheus/templates/prometheus.yaml#L65)
+      # [Kube Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/kube-prometheus/values.yaml#L298)
+      selector:
+        prometheus: kube-prometheus
 
 # Deployment options (replicas, resource quotas etc).
 deployment:
