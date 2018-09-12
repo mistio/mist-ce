@@ -173,6 +173,7 @@ deployment:
         maxReplicas: 20
         targetCPUUtilizationPercentage: 80
         # targetMemoryUtilizationPercentage: 80
+      gracePeriod: 3600
       resources:
         requests:
           memory: 1000Mi
@@ -198,6 +199,7 @@ deployment:
         limits:
           memory: 250Mi
           cpu: 1000m
+      gracePeriod: 3600
       queues:
         - scripts
         - probe
@@ -259,6 +261,7 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      gracePeriod: 3600
       queues:
         - deployments
     mappings:
@@ -287,6 +290,7 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      gracePeriod: 3600
       queues:
         - scripts
     probe:

@@ -35,6 +35,7 @@ spec:
           limits:
             memory: {{ $settings.resources.limits.memory | default "1000Mi" }}
             cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
+        terminationGracePeriodSeconds: {{ $settings.gracePeriod | default 300 }}
         volumeMounts:
         - name: {{ $values.productShortName }}-config
           mountPath: /etc/{{ $values.productShortName }}/settings/settings.py
