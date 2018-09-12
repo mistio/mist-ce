@@ -208,7 +208,7 @@ deployment:
 
     # Queue-specific runners. Off by default.
     celery:
-      enabled: true
+      enabled: false
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -222,7 +222,7 @@ deployment:
       queues:
         - celery
     machines:
-      enabled: true
+      enabled: false
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -241,7 +241,7 @@ deployment:
       queues:
         - machines
     command:
-      enabled: true
+      enabled: false
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -255,7 +255,7 @@ deployment:
       queues:
         - command
     deployments:
-      enabled: true
+      enabled: false
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -270,7 +270,7 @@ deployment:
       queues:
         - deployments
     mappings:
-      enabled: true
+      enabled: false
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -284,7 +284,7 @@ deployment:
       queues:
         - mappings
     scripts:
-      enabled: true
+      enabled: false
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -299,7 +299,7 @@ deployment:
       queues:
         - scripts
     probe:
-      enabled: true
+      enabled: false
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -314,7 +314,7 @@ deployment:
       queues:
         - probe
     ping:
-      enabled: true
+      enabled: false
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -329,7 +329,7 @@ deployment:
       queues:
         - ping
     rules:
-      enabled: true
+      enabled: false
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -360,7 +360,7 @@ deployment:
       tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.PollingScheduler
     owners:
-      enabled: true
+      enabled: false
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -373,7 +373,7 @@ deployment:
       tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
     clouds:
-      enabled: true
+      enabled: false
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -386,7 +386,7 @@ deployment:
       tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
     machines:
-      enabled: true
+      enabled: false
       replicas: 1
       autoscaling: *autoscaling
       resources:
