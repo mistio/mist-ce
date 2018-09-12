@@ -208,7 +208,7 @@ deployment:
 
     # Queue-specific runners. Off by default.
     celery:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -222,7 +222,7 @@ deployment:
       queues:
         - celery
     machines:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -233,10 +233,15 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      tolerations: &tolerations
+        - key: "preemptible"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
       queues:
         - machines
     command:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -250,7 +255,7 @@ deployment:
       queues:
         - command
     deployments:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -265,7 +270,7 @@ deployment:
       queues:
         - deployments
     mappings:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -279,7 +284,7 @@ deployment:
       queues:
         - mappings
     scripts:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -294,7 +299,7 @@ deployment:
       queues:
         - scripts
     probe:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -305,10 +310,11 @@ deployment:
         limits:
           memory: 2000Mi
           cpu: 1000m
+      tolerations: *tolerations
       queues:
         - probe
     ping:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -319,10 +325,11 @@ deployment:
         limits:
           memory: 2000Mi
           cpu: 1000m
+      tolerations: *tolerations
       queues:
         - ping
     rules:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -333,6 +340,7 @@ deployment:
         limits:
           memory: 2000Mi
           cpu: 1000m
+      tolerations: *tolerations
       queues:
         - rules
 
@@ -349,9 +357,10 @@ deployment:
         limits:
           memory: 700Mi
           cpu: 2000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.PollingScheduler
     owners:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -361,9 +370,10 @@ deployment:
         limits:
           memory: 300Mi
           cpu: 1000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
     clouds:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -373,9 +383,10 @@ deployment:
         limits:
           memory: 500Mi
           cpu: 1000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
     machines:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -385,6 +396,7 @@ deployment:
         limits:
           memory: 500Mi
           cpu: 1000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.MachinePollingScheduler
 
   # Cilia deployment settings. Set replicas to 0 to disable.
@@ -453,7 +465,7 @@ deployment:
     resources:
       requests:
         memory: 30Mi
-        cpu: 20m
+        cpu: 50m
       limits:
         memory: 60Mi
         cpu: 1000m
