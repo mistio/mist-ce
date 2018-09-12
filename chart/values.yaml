@@ -386,7 +386,6 @@ deployment:
   # Cilia deployment settings. Set replicas to 0 to disable.
   cilia:
     replicas: 1
-    autoscaling: *autoscaling
     resources:
       requests:
         memory: 150Mi
