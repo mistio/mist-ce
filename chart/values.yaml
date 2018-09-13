@@ -47,11 +47,11 @@ rabbitmq:
   replicaCount: 1
   resources:
     requests:
-      memory: 200Mi
-      cpu: 350m
-    limits:
-      memory: 400Mi
+      memory: 250Mi
       cpu: 1000m
+    limits:
+      memory: 500Mi
+      cpu: 2000m
   service:
     clusterIP: ''
   nodeSelector: {}
@@ -146,16 +146,13 @@ prometheus:
   operator:
     enabled: true
     serviceMonitor:
-      ## Interval at which Prometheus scrapes exporters.
       interval: 20s
-
-      # Namespace Prometheus is installed in
       namespace: monitoring
-
-      # Defaults to whats used if you follow CoreOS
-      # [Prometheus Install Instructions](https://github.com/coreos/prometheus-operator/tree/master/helm#tldr)
-      # [Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/prometheus/templates/prometheus.yaml#L65)
-      # [Kube Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/kube-prometheus/values.yaml#L298)
+      selector:
+        prometheus: kube-prometheus
+    rules:
+      interval: 20s
+      namespace: monitoring
       selector:
         prometheus: kube-prometheus
 
@@ -169,7 +166,14 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 4
+      replicas: 1
+      autoscaling: &autoscaling
+        enabled: true
+        minReplicas: 1
+        maxReplicas: 20
+        targetCPUUtilizationPercentage: 80
+        # targetMemoryUtilizationPercentage: 80
+      gracePeriod: 3600
       resources:
         requests:
           memory: 1000Mi
@@ -185,7 +189,8 @@ deployment:
         - mappings
     gevent:
       enabled: true
-      replicas: 2
+      replicas: 1
+      autoscaling: *autoscaling
       pool: gevent
       resources:
         requests:
@@ -194,6 +199,7 @@ deployment:
         limits:
           memory: 250Mi
           cpu: 1000m
+      gracePeriod: 3600
       queues:
         - scripts
         - probe
@@ -205,6 +211,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -218,6 +225,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -225,12 +233,18 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      tolerations: &tolerations
+        - key: "preemptible"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
       queues:
         - machines
     command:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -244,6 +258,7 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -251,12 +266,14 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      gracePeriod: 3600
       queues:
         - deployments
     mappings:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -270,6 +287,7 @@ deployment:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -277,12 +295,14 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      gracePeriod: 3600
       queues:
         - scripts
     probe:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
@@ -290,12 +310,14 @@ deployment:
         limits:
           memory: 2000Mi
           cpu: 1000m
+      tolerations: *tolerations
       queues:
         - probe
     ping:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
@@ -303,12 +325,14 @@ deployment:
         limits:
           memory: 2000Mi
           cpu: 1000m
+      tolerations: *tolerations
       queues:
         - ping
     rules:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
@@ -316,6 +340,7 @@ deployment:
         limits:
           memory: 2000Mi
           cpu: 1000m
+      tolerations: *tolerations
       queues:
         - rules
 
@@ -324,6 +349,7 @@ deployment:
     generic:
       enabled: true
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 500Mi
@@ -331,10 +357,12 @@ deployment:
         limits:
           memory: 700Mi
           cpu: 2000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.PollingScheduler
     owners:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 150Mi
@@ -342,10 +370,12 @@ deployment:
         limits:
           memory: 300Mi
           cpu: 1000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
     clouds:
       enabled: false
-      replicas: 5
+      replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -353,10 +383,12 @@ deployment:
         limits:
           memory: 500Mi
           cpu: 1000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
     machines:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 250Mi
@@ -364,6 +396,7 @@ deployment:
         limits:
           memory: 500Mi
           cpu: 1000m
+      tolerations: *tolerations
       scheduler: mist.api.poller.schedulers.MachinePollingScheduler
 
   # Cilia deployment settings. Set replicas to 0 to disable.
@@ -377,10 +410,10 @@ deployment:
         memory: 300Mi
         cpu: 500m
 
-  # Gocky deployment settings. Doesn't currently properly support multiple
-  # replicas.
+  # Gocky deployment settings.
   gocky:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 10Mi
@@ -391,7 +424,8 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 2
+    replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 800Mi
@@ -402,7 +436,8 @@ deployment:
 
   # Sockjs deployment settings.
   sockjs:
-    replicas: 2
+    replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 100Mi
@@ -414,6 +449,7 @@ deployment:
   # UI deployment settings.
   ui:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 30Mi
@@ -425,10 +461,11 @@ deployment:
   # Nginx deployment settings.
   nginx:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 30Mi
-        cpu: 10m
+        cpu: 50m
       limits:
         memory: 60Mi
         cpu: 1000m
@@ -436,6 +473,7 @@ deployment:
   # Landing deployment settings.
   landing:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 20Mi
