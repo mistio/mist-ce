@@ -41,6 +41,7 @@ services:
   hubshell: *backend
   api: *backend
   sockjs: *backend
+  apply-migrations: *backend
 
   ui:
     volumes:
