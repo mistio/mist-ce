@@ -27,6 +27,11 @@ spec:
           limits:
             memory: {{ .Values.deployment.landing.resources.limits.memory | default "50Mi" }}
             cpu: {{ .Values.deployment.landing.resources.limits.cpu | default "200m" }}
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; gracefully terminate instead
+              command: ["/usr/sbin/nginx","-s","quit"]
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
