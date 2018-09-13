@@ -29,6 +29,7 @@ spec:
           limits:
             memory: {{ .Values.deployment.sockjs.resources.limits.memory | default "200Mi" }}
             cpu: {{ .Values.deployment.sockjs.resources.limits.cpu | default "1000m" }}
+        terminationGracePeriodSeconds: 3600
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
