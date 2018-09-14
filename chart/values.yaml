@@ -195,7 +195,7 @@ deployment:
       resources:
         requests:
           memory: 150Mi
-          cpu: 500m
+          cpu: 200m
         limits:
           memory: 250Mi
           cpu: 1000m
@@ -214,11 +214,11 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 600Mi
           cpu: 100m
         limits:
           memory: 1000Mi
-          cpu: 2000m
+          cpu: 1000m
       queues:
         - celery
     machines:
@@ -228,10 +228,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
-          cpu: 100m
+          memory: 800Mi
+          cpu: 200m
         limits:
-          memory: 1000Mi
+          memory: 1200Mi
           cpu: 2000m
       tolerations: &tolerations
         - key: "preemptible"
@@ -247,10 +247,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 400Mi
           cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 800Mi
           cpu: 2000m
       queues:
         - command
@@ -261,10 +261,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 400Mi
           cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 800Mi
           cpu: 2000m
       gracePeriod: 3600
       queues:
@@ -276,10 +276,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 400Mi
           cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 800Mi
           cpu: 2000m
       queues:
         - mappings
@@ -308,7 +308,7 @@ deployment:
           memory: 100Mi
           cpu: 100m
         limits:
-          memory: 2000Mi
+          memory: 200Mi
           cpu: 1000m
       tolerations: *tolerations
       queues:
@@ -323,7 +323,7 @@ deployment:
           memory: 100Mi
           cpu: 100m
         limits:
-          memory: 2000Mi
+          memory: 200Mi
           cpu: 1000m
       tolerations: *tolerations
       queues:
@@ -338,7 +338,7 @@ deployment:
           memory: 100Mi
           cpu: 100m
         limits:
-          memory: 2000Mi
+          memory: 400Mi
           cpu: 1000m
       tolerations: *tolerations
       queues:
@@ -365,7 +365,7 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 150Mi
+          memory: 50Mi
           cpu: 250m
         limits:
           memory: 300Mi
@@ -379,7 +379,7 @@ deployment:
       resources:
         requests:
           memory: 200Mi
-          cpu: 500m
+          cpu: 100m
         limits:
           memory: 500Mi
           cpu: 1000m
@@ -392,7 +392,7 @@ deployment:
       resources:
         requests:
           memory: 250Mi
-          cpu: 700m
+          cpu: 500m
         limits:
           memory: 500Mi
           cpu: 1000m
