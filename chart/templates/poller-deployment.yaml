@@ -36,14 +36,14 @@ spec:
           limits:
             memory: {{ $settings.resources.limits.memory | default "1000Mi" }}
             cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
-{{ if $settings.tolerations }}
-        tolerations:
-{{ toYaml $settings.tolerations | indent 8 }}
-{{ end }}
         volumeMounts:
         - name: {{ $values.productShortName }}-config
           mountPath: /etc/{{ $values.productShortName }}/settings/settings.py
           subPath: settings.py
+{{ if $settings.tolerations }}
+      tolerations:
+{{ toYaml $settings.tolerations | indent 8 }}
+{{ end }}
       volumes:
       - name: {{ $values.productShortName }}-config
         configMap:

@@ -35,15 +35,15 @@ spec:
           limits:
             memory: {{ $settings.resources.limits.memory | default "1000Mi" }}
             cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
-{{ if $settings.tolerations }}
-        tolerations:
-{{ toYaml $settings.tolerations | indent 8 }}
-{{ end }}
-        terminationGracePeriodSeconds: {{ $settings.gracePeriod | default 300 }}
         volumeMounts:
         - name: {{ $values.productShortName }}-config
           mountPath: /etc/{{ $values.productShortName }}/settings/settings.py
           subPath: settings.py
+{{ if $settings.tolerations }}
+      tolerations:
+{{ toYaml $settings.tolerations | indent 8 }}
+{{ end }}
+      terminationGracePeriodSeconds: {{ $settings.gracePeriod | default 300 }}
       volumes:
       - name: {{ $values.productShortName }}-config
         configMap:

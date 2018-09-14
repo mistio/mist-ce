@@ -33,12 +33,12 @@ spec:
           limits:
             memory: {{ .Values.deployment.nginx.resources.limits.memory | default "60Mi" }}
             cpu: {{ .Values.deployment.nginx.resources.limits.cpu | default "1000m" }}
-        terminationGracePeriodSeconds: 600
         lifecycle:
           preStop:
             exec:
               # SIGTERM triggers a quick exit; gracefully terminate instead
               command: ["/usr/sbin/nginx","-s","quit"]
+      terminationGracePeriodSeconds: 600
       volumes:
       - name: nginx-config
         configMap:
