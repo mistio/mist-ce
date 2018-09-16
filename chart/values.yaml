@@ -140,6 +140,29 @@ extraSettings: ''
 # subcharts.
 nodeSelector: {}
 
+preemptible:
+  tolerations:
+  - key: "preemptible"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  nodeAffinity:
+    # requiredDuringSchedulingIgnoredDuringExecution:
+    #   nodeSelectorTerms:
+    #   - matchExpressions:
+    #     - key: "preemptible"
+    #       operator: "In"
+    #       values:
+    #       - "true"
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 1
+      preference:
+        matchExpressions:
+        - key: "preemptible"
+          operator: "In"
+          values:
+          - "true"
+
 # Configure prometheus exporters. Subcharts may require separate configuration.
 prometheus:
   enabled: true
@@ -233,11 +256,7 @@ deployment:
         limits:
           memory: 1200Mi
           cpu: 2000m
-      tolerations: &tolerations
-        - key: "preemptible"
-          operator: "Equal"
-          value: "true"
-          effect: "NoSchedule"
+      preemptible: true
       queues:
         - machines
     command:
@@ -310,7 +329,7 @@ deployment:
         limits:
           memory: 200Mi
           cpu: 1000m
-      tolerations: *tolerations
+      preemptible: true
       queues:
         - probe
     ping:
@@ -325,7 +344,7 @@ deployment:
         limits:
           memory: 200Mi
           cpu: 1000m
-      tolerations: *tolerations
+      preemptible: true
       queues:
         - ping
     rules:
@@ -340,7 +359,7 @@ deployment:
         limits:
           memory: 400Mi
           cpu: 1000m
-      tolerations: *tolerations
+      preemptible: true
       queues:
         - rules
 
@@ -357,7 +376,7 @@ deployment:
         limits:
           memory: 700Mi
           cpu: 2000m
-      tolerations: *tolerations
+      preemptible: true
       scheduler: mist.api.poller.schedulers.PollingScheduler
     owners:
       enabled: false
@@ -370,7 +389,7 @@ deployment:
         limits:
           memory: 300Mi
           cpu: 1000m
-      tolerations: *tolerations
+      preemptible: true
       scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
     clouds:
       enabled: false
@@ -383,7 +402,7 @@ deployment:
         limits:
           memory: 500Mi
           cpu: 1000m
-      tolerations: *tolerations
+      preemptible: true
       scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
     machines:
       enabled: false
@@ -396,7 +415,7 @@ deployment:
         limits:
           memory: 500Mi
           cpu: 1000m
-      tolerations: *tolerations
+      preemptible: true
       scheduler: mist.api.poller.schedulers.MachinePollingScheduler
 
   # Cilia deployment settings. Set replicas to 0 to disable.
