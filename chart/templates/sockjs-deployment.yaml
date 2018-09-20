@@ -33,6 +33,7 @@ spec:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
           subPath: settings.py
+      terminationGracePeriodSeconds: 3600
       volumes:
       - name: {{ .Values.productShortName }}-config
         configMap:

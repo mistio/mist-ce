@@ -1,0 +1,32 @@
+{{ $values := .Values -}}
+{{ range $name, $settings := $values.deployment.poller -}}
+{{ if and $settings.enabled $settings.autoscaling.enabled -}}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    {{ $values.productShortName }}.service: poller-{{ $name }}
+  name: poller-{{ $name }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: poller-{{ $name }}
+  minReplicas: {{ $settings.autoscaling.minReplicas }}
+  maxReplicas: {{ $settings.autoscaling.maxReplicas }}
+  metrics:
+{{- if $settings.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ $settings.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}
+{{- if $settings.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ $settings.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}
+---
+{{ end }}
+{{- end }}
