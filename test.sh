@@ -1,5 +1,5 @@
 #!/bin/bash
-MIST_URI=${MIST_URI:-$(python settings/settings.py)}
+MIST_URI=${MIST_URI:-$(echo $"$(cat settings/settings.py)" $'\nprint(globals().get("CORE_URI"))'|python)}
 CID=$(docker ps |grep api_|cut -d " " -f1)
 DOCKER_NETWORK=$(docker ps --format "{{.ID}} {{.Networks}}"|grep $CID|cut -d ' ' -f2)
 docker run -p 5900:5900 -p 8222:8222 --rm -it \

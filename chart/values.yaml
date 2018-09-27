@@ -60,6 +60,40 @@ rabbitmq:
       enabled: true
     operator:
       enabled: true
+  updateStrategy: RollingUpdate
+  extraConfig: |-
+    tcp_listen_options.keepalive = true
+  policies: |
+    {
+      "name": "ha-all",
+      "pattern": ".*",
+      "vhost": "/",
+      "priority": 0,
+      "definition": {
+        "ha-mode": "exactly",
+        "ha-params": 2
+      }
+    },
+    {
+      "name": "autoexpire-celeryev-queues",
+      "pattern": "celeryev\\..*",
+      "vhost": "/",
+      "priority": 10,
+      "apply-to": "queues",
+      "definition": {
+        "expires": 300000
+      }
+    },
+    {
+      "name": "autoexpire-celerypidbox-queues",
+      "pattern": ".*\\.celery\\.pidbox",
+      "vhost": "/",
+      "priority": 10,
+      "apply-to": "queues",
+      "definition": {
+        "expires": 300000
+      }
+    }
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.enabled` is false.

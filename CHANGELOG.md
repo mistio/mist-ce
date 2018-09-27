@@ -1,10 +1,17 @@
 # Changelog
 
-## v3.2.1 (unreleased)
+## v3.3.0 (unreleased)
 
+* Feature: Support for block storage volumes in GCE, EC2, Openstack, DigitalOcean
+* Feature: Automatic db migrations
+* Feature: Display org logo in user menu
+* Feature: Resize GCE machines
+* Change: Use html5 date & time inputs
+* Change: Improve performance when applying patches to the model over websocket
 * Change: Reduce poller update threshold to 90 secs
 * Change: Add k8s deployment specific script that displays online portal users
-
+* Bugfix: Properly pass params when running scheduled scripts
+* Bugfix: Display prices in resize dialog correctly for DigitalOcean
 
 ## v3.2.0 (6 Aug 2018)
 
