@@ -226,7 +226,7 @@ compose:
 
 .deploy_template: &deploy_template
   stage: deploy
-  image: dtzar/helm-kubectl
+  image: dtzar/helm-kubectl:2.10.0
   before_script:
     - |
         set -e
@@ -486,7 +486,7 @@ UI:ip-whitelisting:
 
 .undeploy_template: &undeploy_template
   stage: undeploy
-  image: dtzar/helm-kubectl
+  image: dtzar/helm-kubectl:2.10.0
   variables:
     GIT_STRATEGY: none
   before_script:
