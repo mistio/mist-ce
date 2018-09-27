@@ -221,7 +221,7 @@ deployment:
 
     # Generic runners. On by default.
     prefork:
-      enabled: true
+      enabled: false
       pool: prefork
       replicas: 1
       autoscaling: &autoscaling
@@ -247,7 +247,7 @@ deployment:
         - networks
         - volumes
     gevent:
-      enabled: true
+      enabled: false
       replicas: 1
       autoscaling: *autoscaling
       pool: gevent
@@ -267,7 +267,7 @@ deployment:
 
     # Queue-specific runners. Off by default.
     celery:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -281,7 +281,7 @@ deployment:
       queues:
         - celery
     machines:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -296,7 +296,7 @@ deployment:
       queues:
         - machines
     command:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -310,7 +310,7 @@ deployment:
       queues:
         - command
     deployments:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -325,7 +325,7 @@ deployment:
       queues:
         - deployments
     mappings:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -339,7 +339,7 @@ deployment:
       queues:
         - mappings
     scripts:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -354,7 +354,7 @@ deployment:
       queues:
         - scripts
     probe:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -369,7 +369,7 @@ deployment:
       queues:
         - probe
     ping:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -384,7 +384,7 @@ deployment:
       queues:
         - ping
     rules:
-      enabled: false
+      enabled: true
       pool: gevent
       replicas: 1
       autoscaling: *autoscaling
@@ -399,7 +399,7 @@ deployment:
       queues:
         - rules
     networks:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -414,7 +414,7 @@ deployment:
       queues:
         - networks
     volumes:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
