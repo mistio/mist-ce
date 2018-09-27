@@ -424,7 +424,7 @@ deployment:
           memory: 300Mi
           cpu: 1000m
       preemptible: true
-      scheduler: mist.api.poller.schedulers.OwnerPollingScheduler
+      scheduler: mist.api.poller.schedulers.ShardedOwnerScheduler
     clouds:
       enabled: false
       replicas: 1
@@ -450,7 +450,7 @@ deployment:
           memory: 500Mi
           cpu: 1000m
       preemptible: true
-      scheduler: mist.api.poller.schedulers.MachinePollingScheduler
+      scheduler: mist.api.poller.schedulers.ShardedMachineScheduler
 
   # Cilia deployment settings. Set replicas to 0 to disable.
   cilia:
