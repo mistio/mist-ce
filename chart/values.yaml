@@ -244,6 +244,8 @@ deployment:
         - command
         - deployments
         - mappings
+        - networks
+        - volumes
     gevent:
       enabled: true
       replicas: 1
@@ -396,6 +398,36 @@ deployment:
       preemptible: true
       queues:
         - rules
+    networks:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 800Mi
+          cpu: 200m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - networks
+    volumes:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 800Mi
+          cpu: 200m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - volumes
 
   # Poller deployment settings.
   poller:
