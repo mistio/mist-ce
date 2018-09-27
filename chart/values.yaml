@@ -61,6 +61,8 @@ rabbitmq:
     operator:
       enabled: true
   updateStrategy: RollingUpdate
+  extraConfig: |-
+    tcp_listen_options.keepalive = true
   policies: |
     {
       "name": "ha-all",
