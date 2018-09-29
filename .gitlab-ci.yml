@@ -295,7 +295,7 @@ compose:
 
           helm init --client-only
           helm repo update
-          helm dependency update ./chart/
+          helm dependency update ./chart/mist/
 
           helm upgrade --install --namespace $namespace \
             --wait --timeout=600 \
@@ -314,7 +314,7 @@ compose:
             --set docker.cert="$DOCKER_CERT" \
             --set docker.ca="$DOCKER_CA" \
             $(elasticsearch_params) \
-            $namespace ./chart/
+            $namespace ./chart/mist/
           apk add --no-cache curl
           echo "Waiting for environment to be ready..."
           while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
