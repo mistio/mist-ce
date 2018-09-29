@@ -2,9 +2,12 @@
 kind: Service
 apiVersion: v1
 metadata:
+  name: {{ include "chart.fullname" . }}-mailmock
   labels:
-    {{ .Values.productShortName }}.service: mailmock
-  name: mailmock
+    app: mailmock
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
     - port: 8143
@@ -14,5 +17,6 @@ spec:
       targetPort: 8025
       name: smtp
   selector:
-    {{ .Values.productShortName }}.service: mailmock
+    app: mailmock
+    release: {{ .Release.Name }}
 {{- end }}

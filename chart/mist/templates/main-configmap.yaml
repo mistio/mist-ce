@@ -1,7 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.productShortName }}
+  name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
+  labels:
+    app: {{ .Values.productShortName }}
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
   settings.py: |
     CORE_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"

@@ -2,15 +2,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-mailmock
   labels:
-    {{ .Values.productShortName }}.service: mailmock
-  name: mailmock
+    app: mailmock
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: mailmock
+        app: mailmock
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: mailmock

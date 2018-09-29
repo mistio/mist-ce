@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-memcached
   labels:
-    {{ .Values.productShortName }}.service: memcached
-  name: memcached
+    app: memcached
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: memcached
+        app: memcached
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: memcached

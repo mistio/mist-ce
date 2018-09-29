@@ -2,9 +2,12 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: mongodb
+  name: {{ include "chart.fullname" . }}-mongodb
   labels:
-    {{ .Values.productShortName }}.service: mongodb
+    app: mongodb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   strategy:
@@ -12,7 +15,8 @@ spec:
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: mongodb
+        app: mongodb
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: mongodb
@@ -31,7 +35,7 @@ spec:
       volumes:
       - name: mongodb
         persistentVolumeClaim:
-          claimName: mongodb
+          claimName: {{ include "chart.fullname" . }}-mongodb
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

@@ -2,9 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mongodb
+  name: {{ include "chart.fullname" . }}-mongodb
   labels:
-    {{ .Values.productShortName }}.service: mongodb
+    app: mongodb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   accessModes:
   - ReadWriteOnce

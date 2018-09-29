@@ -2,6 +2,12 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: elasticsearch-manage
+  name: {{ include "chart.fullname" . }}-elasticsearch-manage
+  labels:
+    app: elasticsearch-manage
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -11,6 +17,10 @@ metadata:
 spec:
   backoffLimit: 10
   template:
+    metadata:
+      labels:
+        app: elasticsearch-manage
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}

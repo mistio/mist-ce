@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: {{ include "chart.fullname" . }}-landing
   labels:
-    {{ .Values.productShortName }}.service: landing
-  name: landing
+    app: landing
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
   - port: 80
   selector:
-    {{ .Values.productShortName }}.service: landing
+    app: landing
+    release: {{ .Release.Name }}

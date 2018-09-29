@@ -2,9 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: elasticsearch
+  name: {{ include "chart.fullname" . }}-elasticsearch
   labels:
-    {{ .Values.productShortName }}.service: elasticsearch
+    app: elasticsearch
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   accessModes:
   - ReadWriteOnce

@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-kibana
   labels:
-    {{ .Values.productShortName }}.service: kibana
-  name: kibana
+    app: kibana
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: kibana
+        app: kibana
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: kibana
