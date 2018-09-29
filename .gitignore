@@ -11,5 +11,5 @@ bower_components
 .cache
 pip-selfcheck.json
 keys
-/chart/charts
-/chart/requirements.lock
+/chart/mist/charts
+/chart/mist/requirements.lock
