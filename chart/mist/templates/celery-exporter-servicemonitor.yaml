@@ -2,16 +2,21 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Release.Name }}-celery
+  name: {{ include "chart.fullname" . }}-celery
   namespace: {{ .Values.prometheus.operator.serviceMonitor.namespace }}
   labels:
+    app: celery-exporter
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 {{- if .Values.prometheus.operator.serviceMonitor.selector }}
 {{ toYaml .Values.prometheus.operator.serviceMonitor.selector | indent 4 }}
 {{- end }}
 spec:
   selector:
     matchLabels:
-      {{ .Values.productShortName }}.service: celery-exporter
+      app: celery-exporter
+      release: {{ .Release.Name }}
   endpoints:
   - port: exporter
     interval: {{ .Values.prometheus.operator.serviceMonitor.interval }}

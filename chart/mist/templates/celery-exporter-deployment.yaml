@@ -2,15 +2,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-celery-exporter
   labels:
-    {{ .Values.productShortName }}.service: celery-exporter
-  name: celery-exporter
+    app: celery-exporter
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: celery-exporter
+        app: celery-exporter
+        release: {{ .Release.Name }}
       annotations:
         prometheus.io/path: /
         prometheus.io/port: "8888"

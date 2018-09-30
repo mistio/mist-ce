@@ -1,35 +1,63 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.productShortName }}
+  name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
+  labels:
+    app: {{ .Values.productShortName }}
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 data:
   settings.py: |
     CORE_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"
 
     MAILER_SETTINGS = {
+      {{- if .Values.smtp.host }}
         'mail.host': "{{ .Values.smtp.host }}",
         'mail.port': "{{ .Values.smtp.port }}",
         'mail.tls': {{ if .Values.smtp.tls }}True{{ else }}False{{ end }},
         'mail.starttls': {{ if .Values.smtp.starttls }}True{{ else }}False{{ end }},
         'mail.username': "{{ .Values.smtp.username }}",
         'mail.password': "{{ .Values.smtp.password }}"
+      {{- else }}
+        'mail.host': "{{ include "chart.fullname" . }}-mailmock",
+        'mail.port': "8025",
+        'mail.tls': False,
+        'mail.starttls': False,
+        'mail.username': "",
+        'mail.password': ""
+      {{- end }}
     }
 
     ENABLE_DEV_USERS = {{ if .Values.enableDevUsers }}True{{ else }}False{{ end }}
     JS_BUILD = {{ if .Values.jsBuild }}True{{ else }}False{{ end }}
 
     ELASTICSEARCH = {
+      {{- if .Values.elasticsearch.host }}
         'elastic_host': "{{ .Values.elasticsearch.host }}",
         'elastic_port': "{{ .Values.elasticsearch.port }}",
         'elastic_username': "{{ .Values.elasticsearch.username }}",
         'elastic_password': "{{ .Values.elasticsearch.password }}",
         'elastic_use_ssl': {{ if .Values.elasticsearch.tls }}True{{ else }}False{{ end }},
         'elastic_verify_certs': {{ if .Values.elasticsearch.verifyCerts }}True{{ else }}False{{ end }},
+      {{- else }}
+        'elastic_host': "{{ include "chart.fullname" . }}-elasticsearch",
+        'elastic_port': "9200",
+        'elastic_username': "",
+        'elastic_password': "",
+        'elastic_use_ssl': False,
+        'elastic_verify_certs': False,
+      {{- end }}
     }
 
     INFLUX = {
+      {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
         'db': "{{ .Values.influxdb.db }}",
+      {{- else }}
+        'host': "http://{{ include "chart.fullname" . }}-influxdb:8086",
+        'db': "telegraf",
+      {{- end }}
     }
 
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
@@ -57,7 +85,11 @@ data:
 
     DEFAULT_MONITORING_METHOD = "{{ .Values.monitoring.defaultMethod }}"
 
+  {{- if .Values.mongodb.host }}
     MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
+  {{- else }}
+    MONGO_URI = "{{ include "chart.fullname" . }}-mongodb:27017"
+  {{- end }}
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
 
@@ -84,5 +116,12 @@ data:
     GOOGLE_ANALYTICS_ID = "{{ .Values.googleAnalyticsId }}"
     OLARK_ID = "{{ .Values.olarkId }}"
     SENDGRID_EMAIL_NOTIFICATIONS_KEY = "{{ .Values.sendgridEmailNotificationsKey }}"
+
+    INTERNAL_API_URL = "http://{{ include "chart.fullname" . }}-api"
+    UI_TEMPLATE_URL = "http://{{ include "chart.fullname" . }}-ui"
+    LANDING_TEMPLATE_URL = "http://{{ include "chart.fullname" . }}-landing"
+    TRAEFIK_API = "http://{{ include "chart.fullname" . }}-traefik:8080"
+    CILIA_TRIGGER_API = "http://{{ include "chart.fullname" . }}-api"
+    GOCKY_HOST = "{{ include "chart.fullname" . }}-gocky"
 
 {{ .Values.extraSettings | indent 4 }}
