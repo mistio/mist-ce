@@ -26,7 +26,7 @@ smtp:
 
 # Elasticsearch settings. Change this to use a remote elasticsearch cluster.
 elasticsearch:
-  host: elasticsearch
+  host: ''
   port: 9200
   username: ''
   password: ''
