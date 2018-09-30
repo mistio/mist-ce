@@ -1,13 +1,17 @@
-{{ if and (eq .Values.influxdb.host "influxdb") (eq (toString .Values.influxdb.port) "8086") -}}
+{{ if eq .Values.influxdb.host "" -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: influxdb
+  name: {{ include "chart.fullname" . }}-influxdb
   labels:
-    {{ .Values.productShortName }}.service: influxdb
+    app: influxdb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
     - port: 8086
   selector:
-    {{ .Values.productShortName }}.service: influxdb
+    app: influxdb
+    release: {{ .Release.Name }}
 {{- end }}

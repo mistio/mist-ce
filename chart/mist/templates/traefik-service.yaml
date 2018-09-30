@@ -1,9 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: traefik
+  name: {{ include "chart.fullname" . }}-traefik
   labels:
-    {{ .Values.productShortName }}.service: traefik
+    app: traefik
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
     - name: traefik
@@ -11,4 +14,5 @@ spec:
     - name: traefik-admin
       port: 8080
   selector:
-    {{ .Values.productShortName }}.service: traefik
+    app: traefik
+    release: {{ .Release.Name }}

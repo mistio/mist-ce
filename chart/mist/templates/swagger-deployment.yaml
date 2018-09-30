@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-swagger
   labels:
-    {{ .Values.productShortName }}.service: swagger
-  name: swagger
+    app: swagger
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: swagger
+        app: swagger
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: swagger
