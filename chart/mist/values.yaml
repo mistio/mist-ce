@@ -15,6 +15,7 @@ http:
   host: localhost
   tlsSecret: ''
   tlsHosts: []
+  tlsAnnotations: {}
 
 # Email settings. Change this to connect to a real SMTP server.
 smtp:
