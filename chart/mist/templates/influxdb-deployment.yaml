@@ -1,4 +1,4 @@
-{{ if and (eq .Values.influxdb.host "influxdb") (eq (toString .Values.influxdb.port) "8086") -}}
+{{ if eq .Values.influxdb.host "" -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -24,7 +24,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: INFLUXDB_DB
-          value: {{ .Values.influxdb.db }}
+          value: telegraf
         resources:
           requests:
             memory: 100Mi

@@ -20,12 +20,21 @@ spec:
       containers:
       - name: logstash
         env:
+      {{- if .Values.elasticsearch.host }}
         - name: ELASTIC_URI
           value: http{{ if .Values.elasticsearch.tls }}s{{end}}://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}
         - name: ELASTIC_USERNAME
           value: {{ .Values.elasticsearch.username | default "admin" }}
         - name: ELASTIC_PASSWORD
           value: {{ .Values.elasticsearch.password | default "admin" }}
+      {{- else }}
+        - name: ELASTIC_URI
+          value: http://{{ include "chart.fullname" . }}-elasticsearch:9200
+        - name: ELASTIC_USERNAME
+          value: ''
+        - name: ELASTIC_PASSWORD
+          value: ''
+      {{- end }}
         - name: RABBITMQ_HOST
           value: {{ if .Values.rabbitmq.enabled }}{{ .Release.Name }}-rabbitmq{{ else }}{{ .Values.rabbitmqExternal.host }}{{ end }}
         - name: RABBITMQ_PORT
@@ -35,9 +44,10 @@ spec:
         - name: RABBITMQ_PASSWORD
           value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.rabbitmqPassword }}{{ else }}{{ .Values.rabbitmqExternal.password }}{{ end }}
         - name: INFLUXDB_HOST
-          value: {{ .Values.influxdb.host }}
+          value: {{ if .Values.influxdb.host }}{{ .Values.influxdb.host }}{{ else }}{{ include "chart.fullname" . }}-influxdb{{ end }}
         - name: INFLUXDB_PORT
           value: "{{ .Values.influxdb.port }}"
+          value: {{ if .Values.influxdb.host }}{{ .Values.influxdb.port }}{{ else }}80806{{ end }}
         image: {{ .Values.image.registry }}/logstash:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
