@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: {{ include "chart.fullname" . }}-memcached
   labels:
-    {{ .Values.productShortName }}.service: memcached
-  name: memcached
+    app: memcached
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
   - port: 11211
   selector:
-    {{ .Values.productShortName }}.service: memcached
+    app: memcached
+    release: {{ .Release.Name }}

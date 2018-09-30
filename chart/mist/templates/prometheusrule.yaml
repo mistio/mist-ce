@@ -2,9 +2,13 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ .Release.Name }}-hpa-custom-metrics-celery
+  name: {{ include "chart.fullname" . }}-hpa-custom-metrics-celery
   namespace: {{ .Values.prometheus.operator.rules.namespace }}
   labels:
+    app: celery
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 {{- if .Values.prometheus.operator.rules.selector }}
 {{ toYaml .Values.prometheus.operator.rules.selector | indent 4 }}
 {{- end }}
@@ -15,7 +19,7 @@ spec:
     rules:
   {{- range $name, $settings := .Values.deployment.celery }}
   {{- if and $settings.enabled $settings.autoscaling.enabled }}
-    - expr: 'label_replace(sum(max(rabbitmq_queue_messages{namespace="{{ $.Release.Namespace }}", queue=~"{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }}|{{ end }}{{ $q }}{{ end }}"}) by (namespace, queue)) by (namespace), "deployment", "celery-{{ $name }}", "", "")'
+    - expr: 'label_replace(sum(max(rabbitmq_queue_messages{job="{{ $.Release.Name }}-rabbitmq", namespace="{{ $.Release.Namespace }}", queue=~"{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }}|{{ end }}{{ $q }}{{ end }}"}) by (namespace, queue)) by (namespace), "deployment", "{{ include "chart.fullname" $ }}-celery-{{ $name }}", "", "")'
       record: hpa_custom_metrics_deployment_queues_length
   {{- end }}
   {{- end }}

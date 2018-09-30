@@ -2,6 +2,12 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: elasticsearch-manage
+  name: {{ include "chart.fullname" . }}-elasticsearch-manage
+  labels:
+    app: elasticsearch-manage
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -11,6 +17,10 @@ metadata:
 spec:
   backoffLimit: 10
   template:
+    metadata:
+      labels:
+        app: elasticsearch-manage
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
@@ -18,6 +28,7 @@ spec:
       - args:
         - ./scripts/add_templates.py
         env:
+      {{- if .Values.elasticsearch.host }}
         - name: ELASTIC_HOST
           value: "{{ .Values.elasticsearch.host }}"
         - name: ELASTIC_PORT
@@ -30,6 +41,20 @@ spec:
           value: "{{ if .Values.elasticsearch.tls }}1{{ end }}"
         - name: ELASTIC_VERIFY_CERTS
           value: "{{ if .Values.elasticsearch.verifyCerts }}1{{ end }}"
+      {{- else }}
+        - name: ELASTIC_HOST
+          value: {{ include "chart.fullname" . }}-elasticsearch
+        - name: ELASTIC_PORT
+          value: "9200"
+        - name: ELASTIC_USER
+          value: ""
+        - name: ELASTIC_PASSWORD
+          value: ""
+        - name: ELASTIC_SSL
+          value: ""
+        - name: ELASTIC_VERIFY_CERTS
+          value: ""
+      {{- end }}
         image: {{ .Values.image.registry }}/elasticsearch-manage:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: elasticsearch-manage

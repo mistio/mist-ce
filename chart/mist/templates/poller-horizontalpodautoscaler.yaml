@@ -4,14 +4,17 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
+  name: {{ include "chart.fullname" $ }}-poller-{{ $name }}
   labels:
-    {{ $values.productShortName }}.service: poller-{{ $name }}
-  name: poller-{{ $name }}
+    app: poller-{{ $name }}
+    chart: {{ include "chart.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
 spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: poller-{{ $name }}
+    name: {{ include "chart.fullname" $ }}-poller-{{ $name }}
   minReplicas: {{ $settings.autoscaling.minReplicas }}
   maxReplicas: {{ $settings.autoscaling.maxReplicas }}
   metrics:
