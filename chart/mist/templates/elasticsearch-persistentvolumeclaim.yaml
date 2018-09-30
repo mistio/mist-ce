@@ -1,4 +1,4 @@
-{{ if and (eq .Values.elasticsearch.host "elasticsearch") (eq (toString .Values.elasticsearch.port) "9200") -}}
+{{ if eq .Values.elasticsearch.host "" -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

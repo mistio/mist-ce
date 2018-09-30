@@ -13,5 +13,9 @@ data:
     name = "influxdb"
     bind-addr = "0.0.0.0:9096"
     output = [
+      {{- if .Values.influxdb.host }}
         { name="influxdb", location = "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}/write" },
+      {{- else }}
+        { name="influxdb", location = "http://{{ include "chart.fullname" . }}-influxdb:8086/write" },
+      {{- end }}
     ]

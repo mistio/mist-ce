@@ -28,6 +28,7 @@ spec:
       - args:
         - ./scripts/add_templates.py
         env:
+      {{- if .Values.elasticsearch.host }}
         - name: ELASTIC_HOST
           value: "{{ .Values.elasticsearch.host }}"
         - name: ELASTIC_PORT
@@ -40,6 +41,20 @@ spec:
           value: "{{ if .Values.elasticsearch.tls }}1{{ end }}"
         - name: ELASTIC_VERIFY_CERTS
           value: "{{ if .Values.elasticsearch.verifyCerts }}1{{ end }}"
+      {{- else }}
+        - name: ELASTIC_HOST
+          value: {{ include "chart.fullname" . }}-elasticsearch
+        - name: ELASTIC_PORT
+          value: "9200"
+        - name: ELASTIC_USER
+          value: ""
+        - name: ELASTIC_PASSWORD
+          value: ""
+        - name: ELASTIC_SSL
+          value: ""
+        - name: ELASTIC_VERIFY_CERTS
+          value: ""
+      {{- end }}
         image: {{ .Values.image.registry }}/elasticsearch-manage:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: elasticsearch-manage
