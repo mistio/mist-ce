@@ -5,14 +5,17 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
+  name: {{ include "chart.fullname" $ }}-{{ $name }}
   labels:
-    {{ $values.productShortName }}.service: {{ $name }}
-  name: {{ $name }}
+    app: {{ $name }}
+    chart: {{ include "chart.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
 spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: {{ $name }}
+    name: {{ include "chart.fullname" $ }}-{{ $name }}
   minReplicas: {{ $settings.autoscaling.minReplicas }}
   maxReplicas: {{ $settings.autoscaling.maxReplicas }}
   metrics:

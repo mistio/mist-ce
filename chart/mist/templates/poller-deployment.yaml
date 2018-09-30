@@ -3,9 +3,12 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" $ }}-poller-{{ $name }}
   labels:
-    {{ $.Values.productShortName }}.service: poller-{{ $name }}
-  name: poller-{{ $name }}
+    app: poller-{{ $name }}
+    chart: {{ include "chart.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
 spec:
   replicas: {{ $settings.replicas | default "1" }}
   strategy:
@@ -13,7 +16,8 @@ spec:
   template:
     metadata:
       labels:
-        {{ $.Values.productShortName }}.service: poller-{{ $name }}
+        app: poller-{{ $name }}
+        release: {{ $.Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
         checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") $ | sha256sum }}
@@ -53,7 +57,7 @@ spec:
       volumes:
       - name: {{ $.Values.productShortName }}-config
         configMap:
-          name: {{ $.Values.productShortName }}
+          name: {{ include "chart.fullname" $ }}-{{ $.Values.productShortName }}
 {{- if $.Values.nodeSelector }}
       nodeSelector:
 {{ toYaml $.Values.nodeSelector | indent 8 }}

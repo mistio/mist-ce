@@ -1,13 +1,17 @@
-{{ if and (eq .Values.mongodb.host "mongodb") (eq (toString .Values.mongodb.port) "27017") -}}
+{{ if eq .Values.mongodb.host "" -}}
 apiVersion: v1
 kind: Service
 metadata:
+  name: {{ include "chart.fullname" . }}-mongodb
   labels:
-    {{ .Values.productShortName }}.service: mongodb
-  name: mongodb
+    app: mongodb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
   - port: 27017
   selector:
-    {{ .Values.productShortName }}.service: mongodb
+    app: mongodb
+    release: {{ .Release.Name }}
 {{- end }}

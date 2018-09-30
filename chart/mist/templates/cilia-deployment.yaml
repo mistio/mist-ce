@@ -1,9 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-cilia
   labels:
-    {{ .Values.productShortName }}.service: cilia
-  name: cilia
+    app: cilia
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.cilia.replicas | default "1" }}
   strategy:
@@ -11,7 +14,8 @@ spec:
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: cilia
+        app: cilia
+        release: {{ .Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
         checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") . | sha256sum }}
@@ -38,7 +42,7 @@ spec:
       volumes:
       - name: {{ .Values.productShortName }}-config
         configMap:
-          name: {{ .Values.productShortName }}
+          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

@@ -1,13 +1,17 @@
-{{ if and (eq .Values.elasticsearch.host "elasticsearch") (eq (toString .Values.elasticsearch.port) "9200") -}}
+{{ if eq .Values.elasticsearch.host "" -}}
 apiVersion: v1
 kind: Service
 metadata:
+  name: {{ include "chart.fullname" . }}-elasticsearch
   labels:
-    {{ .Values.productShortName }}.service: elasticsearch
-  name: elasticsearch
+    app: elasticsearch
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
   - port: 9200
   selector:
-    {{ .Values.productShortName }}.service: elasticsearch
+    app: elasticsearch
+    release: {{ .Release.Name }}
 {{- end }}
