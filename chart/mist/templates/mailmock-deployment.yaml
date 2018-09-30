@@ -1,4 +1,4 @@
-{{ if eq .Values.smtp.host "mailmock" -}}
+{{ if eq .Values.smtp.host "" -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
