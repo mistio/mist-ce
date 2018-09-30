@@ -1,7 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress
+  name: {{ include "chart.fullname" . }}
+  labels:
+    app: nginx
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
@@ -16,5 +21,5 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: nginx
+          serviceName: {{ include "chart.fullname" . }}-nginx
           servicePort: 80

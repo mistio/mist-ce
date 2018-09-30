@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-ui
   labels:
-    {{ .Values.productShortName }}.service: ui
-  name: ui
+    app: ui
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.ui.replicas | default "1" }}
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: ui
+        app: ui
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}

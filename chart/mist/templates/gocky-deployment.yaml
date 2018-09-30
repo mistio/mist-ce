@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: gocky
+  name: {{ include "chart.fullname" . }}-gocky
   labels:
-    {{ .Values.productShortName }}.service: gocky
+    app: gocky
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.gocky.replicas | default "1" }}
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: gocky
+        app: gocky
+        release: {{ .Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
         checksum/config: {{ include (print $.Template.BasePath "/gocky-configmap.yaml") . | sha256sum }}
@@ -40,7 +44,7 @@ spec:
       volumes:
       - name: gocky-config
         configMap:
-          name: gocky-configmap
+          name: {{ include "chart.fullname" . }}-gocky
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

@@ -394,7 +394,7 @@ deploy master:
     DISPLAY: ":1.0"
     REGISTER_USER_BEFORE_FEATURE: "True"
     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
-    IMAP_HOST: mailmock.test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+    IMAP_HOST: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-mailmock.test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.svc.cluster.local
   before_script:
     - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
     - echo "Test argument is $TEST"

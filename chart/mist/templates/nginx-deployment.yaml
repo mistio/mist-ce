@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-nginx
   labels:
-    {{ .Values.productShortName }}.service: nginx
-  name: nginx
+    app: nginx
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.nginx.replicas | default "1" }}
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: nginx
+        app: nginx
+        release: {{ .Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
         checksum/config: {{ include (print $.Template.BasePath "/nginx-configmap.yaml") . | sha256sum }}
@@ -42,7 +46,7 @@ spec:
       volumes:
       - name: nginx-config
         configMap:
-          name: nginx-configmap
+          name: {{ include "chart.fullname" . }}-nginx
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

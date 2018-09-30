@@ -17,7 +17,7 @@ http:
 
 # Email settings. Change this to connect to a real SMTP server.
 smtp:
-  host: mailmock
+  host: ''
   port: 8025
   username: ''
   password: ''
@@ -26,7 +26,7 @@ smtp:
 
 # Elasticsearch settings. Change this to use a remote elasticsearch cluster.
 elasticsearch:
-  host: elasticsearch
+  host: ''
   port: 9200
   username: ''
   password: ''
@@ -35,7 +35,7 @@ elasticsearch:
 
 # InfluxDB settings. Change this to use a remote InfluxDB cluster.
 influxdb:
-  host: influxdb
+  host: ''
   port: 8086
   db: telegraf
 
@@ -105,7 +105,7 @@ rabbitmqExternal:
 
 # MongoDB settings. Change this to use a remote MongoDB cluster.
 mongodb:
-  host: mongodb
+  host: ''
   port: 27017
 
 # Docker settings (used by orchestration plugin). This has to be configured for
