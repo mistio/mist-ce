@@ -1,7 +1,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: apply-migrations
+  name: {{ include "chart.fullname" . }}-migrations
+  labels:
+    app: migrations
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -11,6 +16,10 @@ metadata:
 spec:
   backoffLimit: 10
   template:
+    metadata:
+      labels:
+        app: migrations
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
@@ -28,5 +37,5 @@ spec:
       volumes:
       - name: {{ .Values.productShortName }}-config
         configMap:
-          name: {{ .Values.productShortName }}
+          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
       restartPolicy: Never

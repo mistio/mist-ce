@@ -1,15 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: {{ include "chart.fullname" . }}-landing
   labels:
-    {{ .Values.productShortName }}.service: landing
-  name: landing
+    app: landing
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.landing.replicas | default "1" }}
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: landing
+        app: landing
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}

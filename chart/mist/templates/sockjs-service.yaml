@@ -1,24 +1,32 @@
 apiversion: v1
 kind: Service
 metadata:
+  name: {{ include "chart.fullname" . }}-sockjs
   labels:
-    {{ .Values.productShortName }}.service: sockjs
-  name: sockjs
+    app: sockjs
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   ports:
   - port: 8081
   selector:
-    {{ .Values.productShortName }}.service: sockjs
+    app: sockjs
+    release: {{ .Release.Name }}
 ---
 apiversion: v1
 kind: Service
 metadata:
+  name: {{ include "chart.fullname" . }}-sockjs-headless
   labels:
-    {{ .Values.productShortName }}.service: sockjs
-  name: sockjs-headless
+    app: sockjs
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   clusterIP: None
   ports:
   - port: 8081
   selector:
-    {{ .Values.productShortName }}.service: sockjs
+    app: sockjs
+    release: {{ .Release.Name }}

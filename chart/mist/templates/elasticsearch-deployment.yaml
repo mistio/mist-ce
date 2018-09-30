@@ -1,10 +1,13 @@
-{{ if and (eq .Values.elasticsearch.host "elasticsearch") (eq (toString .Values.elasticsearch.port) "9200") -}}
+{{ if eq .Values.elasticsearch.host "" -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: elasticsearch
+  name: {{ include "chart.fullname" . }}-elasticsearch
   labels:
-    {{ .Values.productShortName }}.service: elasticsearch
+    app: elasticsearch
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   strategy:
@@ -12,7 +15,8 @@ spec:
   template:
     metadata:
       labels:
-        {{ .Values.productShortName }}.service: elasticsearch
+        app: elasticsearch
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: elasticsearch
@@ -31,7 +35,7 @@ spec:
       volumes:
       - name: elasticsearch
         persistentVolumeClaim:
-          claimName: elasticsearch
+          claimName: {{ include "chart.fullname" . }}-elasticsearch
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

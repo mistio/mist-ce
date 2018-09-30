@@ -4,14 +4,17 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
+  name: {{ include "chart.fullname" $ }}-celery-{{ $name }}
   labels:
-    {{ $values.productShortName }}.service: celery-{{ $name }}
-  name: celery-{{ $name }}
+    app: celery-{{ $name }}
+    chart: {{ include "chart.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
 spec:
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: celery-{{ $name }}
+    name: {{ include "chart.fullname" $ }}-celery-{{ $name }}
   minReplicas: {{ $settings.autoscaling.minReplicas }}
   maxReplicas: {{ $settings.autoscaling.maxReplicas }}
   metrics:
@@ -33,7 +36,7 @@ spec:
         target:
           apiVersion: extensions/v1beta1
           kind: Deployment
-          name: celery-{{ $name }}
+          name: {{ include "chart.fullname" $ }}-celery-{{ $name }}
         metricName: hpa_custom_metrics_deployment_queues_length
         targetValue: 10
 {{- end }}
