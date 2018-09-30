@@ -334,7 +334,7 @@ deploy test:
   <<: *deploy_template
   environment:
     name: test/$CI_COMMIT_REF_SLUG
-    url: http://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
+    url: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy test
   variables:
     namespace: test-$CI_PROJECT_NAME
@@ -386,7 +386,7 @@ deploy review:
   <<: *deploy_review_template
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: http://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
+    url: https://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy review
   except:
     - master
@@ -396,7 +396,7 @@ deploy master:
   <<: *deploy_review_template
   environment:
     name: master
-    url: http://master$DEPLOY_DOMAIN_SUFFIX
+    url: https://master$DEPLOY_DOMAIN_SUFFIX
   only:
     - master
   when: manual
@@ -409,7 +409,7 @@ deploy master:
   image: $TESTS_IMAGE
   variables:
     GIT_STRATEGY: none
-    MIST_URL: http://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
+    MIST_URL: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
     DISPLAY: ":1.0"
     REGISTER_USER_BEFORE_FEATURE: "True"
     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
