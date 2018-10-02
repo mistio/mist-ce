@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apply-migrations
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - args:
+        - bin/migrate
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: apply-migrations
+        resources: {}
+        volumeMounts:
+        - name: {{ .Values.productShortName }}-config
+          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ .Values.productShortName }}-config
+        configMap:
+          name: {{ .Values.productShortName }}
+      restartPolicy: Never

@@ -226,7 +226,7 @@ compose:
 
 .deploy_template: &deploy_template
   stage: deploy
-  image: dtzar/helm-kubectl
+  image: dtzar/helm-kubectl:2.10.0
   before_script:
     - |
         set -e
@@ -293,7 +293,12 @@ compose:
             rm -rf $tls_tmpdir
           fi
 
+          helm init --client-only
+          helm repo update
+          helm dependency update ./chart/
+
           helm upgrade --install --namespace $namespace \
+            --wait --timeout=600 \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
             --set image.registry="$REGISTRY_IMAGE" \
@@ -315,7 +320,7 @@ compose:
           while kubectl --namespace $namespace get pods | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
             sleep 10 && echo '.'
           done
-          while !(curl -sSLf "$CI_ENVIRONMENT_URL"); do
+          while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
             sleep 5 && echo 'Environment not ready yet...'
           done
         }
@@ -336,6 +341,9 @@ deploy test:
       enableDevUsers: true
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
+      rabbitmq:
+        nodeSelector:
+          cloud.google.com/gke-nodepool: generic
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
@@ -351,6 +359,9 @@ deploy test:
         password: $SENDGRID_PASSWORD
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
+      rabbitmq:
+        nodeSelector:
+          cloud.google.com/gke-nodepool: generic
 
 deploy review:
   <<: *deploy_review_template
@@ -410,6 +421,7 @@ API:main:schedules: *api_test_template
 API:main:scripts: *api_test_template
 API:main:rbac: *api_test_template
 API:main:ip_whitelisting: *api_test_template
+API:main:volumes: *api_test_template
 
 .API:plugin:orchestration: *api_test_template
 .API:plugin:tunnels: *api_test_template
@@ -474,7 +486,7 @@ UI:ip-whitelisting:
 
 .undeploy_template: &undeploy_template
   stage: undeploy
-  image: dtzar/helm-kubectl
+  image: dtzar/helm-kubectl:2.10.0
   variables:
     GIT_STRATEGY: none
   before_script:

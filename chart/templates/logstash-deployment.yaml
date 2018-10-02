@@ -23,13 +23,13 @@ spec:
         - name: ELASTIC_PASSWORD
           value: {{ .Values.elasticsearch.password | default "admin" }}
         - name: RABBITMQ_HOST
-          value: {{ .Values.rabbitmq.host }}
+          value: {{ if .Values.rabbitmq.enabled }}{{ .Release.Name }}-rabbitmq{{ else }}{{ .Values.rabbitmqExternal.host }}{{ end }}
         - name: RABBITMQ_PORT
-          value: "{{ .Values.rabbitmq.port }}"
+          value: "{{ if .Values.rabbitmq.enabled }}5672{{ else }}{{ .Values.rabbitmqExternal.port }}{{ end }}"
         - name: RABBITMQ_USERNAME
-          value: {{ .Values.rabbitmq.username }}
+          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.rabbitmqUsername }}{{ else }}{{ .Values.rabbitmqExternal.username }}{{ end }}
         - name: RABBITMQ_PASSWORD
-          value: {{ .Values.rabbitmq.password }}
+          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.rabbitmqPassword }}{{ else }}{{ .Values.rabbitmqExternal.password }}{{ end }}
         - name: INFLUXDB_HOST
           value: {{ .Values.influxdb.host }}
         - name: INFLUXDB_PORT
@@ -39,7 +39,7 @@ spec:
         resources:
           requests:
             memory: 500Mi
-            cpu: 170m
+            cpu: 200m
           limits:
             memory: 700Mi
             cpu: 1000m

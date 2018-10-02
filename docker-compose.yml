@@ -120,6 +120,9 @@ services:
     expose:
       - 8081
 
+  apply-migrations:
+    <<: *backend
+    command: bin/wait-all bin/migrate
 
   ui:
     image: $IMG_REGISTRY/ui:$IMG_TAG

@@ -39,8 +39,65 @@ influxdb:
   port: 8086
   db: telegraf
 
-# Rabbitmq settings. Change this to use a remote RabbitMQ cluster.
+# Options for rabbitmq subchart.
 rabbitmq:
+  enabled: true
+  rabbitmqUsername: guest
+  rabbitmqPassword: guest
+  replicaCount: 1
+  resources:
+    requests:
+      memory: 250Mi
+      cpu: 1000m
+    limits:
+      memory: 500Mi
+      cpu: 2000m
+  service:
+    clusterIP: ''
+  nodeSelector: {}
+  prometheus:
+    exporter:
+      enabled: true
+    operator:
+      enabled: true
+  updateStrategy: RollingUpdate
+  extraConfig: |-
+    tcp_listen_options.keepalive = true
+  policies: |
+    {
+      "name": "ha-all",
+      "pattern": ".*",
+      "vhost": "/",
+      "priority": 0,
+      "definition": {
+        "ha-mode": "exactly",
+        "ha-params": 2
+      }
+    },
+    {
+      "name": "autoexpire-celeryev-queues",
+      "pattern": "celeryev\\..*",
+      "vhost": "/",
+      "priority": 10,
+      "apply-to": "queues",
+      "definition": {
+        "expires": 300000
+      }
+    },
+    {
+      "name": "autoexpire-celerypidbox-queues",
+      "pattern": ".*\\.celery\\.pidbox",
+      "vhost": "/",
+      "priority": 10,
+      "apply-to": "queues",
+      "definition": {
+        "expires": 300000
+      }
+    }
+
+# Use an external rabbitmq. This will only be used
+# if `rabbitmq.enabled` is false.
+rabbitmqExternal:
   host: rabbitmq
   port: 5672
   username: guest
@@ -113,8 +170,48 @@ sendgridEmailNotificationsKey: ''
 # directly exposed in this file.
 extraSettings: ''
 
-# Node selector will be applied to all pods for all deployments.
+# Node selector will be applied to all pods for all deployments, excluding
+# subcharts.
 nodeSelector: {}
+
+preemptible:
+  tolerations:
+  - key: "preemptible"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  nodeAffinity:
+    # requiredDuringSchedulingIgnoredDuringExecution:
+    #   nodeSelectorTerms:
+    #   - matchExpressions:
+    #     - key: "preemptible"
+    #       operator: "In"
+    #       values:
+    #       - "true"
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 1
+      preference:
+        matchExpressions:
+        - key: "preemptible"
+          operator: "In"
+          values:
+          - "true"
+
+# Configure prometheus exporters. Subcharts may require separate configuration.
+prometheus:
+  enabled: true
+  operator:
+    enabled: true
+    serviceMonitor:
+      interval: 20s
+      namespace: monitoring
+      selector:
+        prometheus: kube-prometheus
+    rules:
+      interval: 20s
+      namespace: monitoring
+      selector:
+        prometheus: kube-prometheus
 
 # Deployment options (replicas, resource quotas etc).
 deployment:
@@ -126,7 +223,14 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 4
+      replicas: 1
+      autoscaling: &autoscaling
+        enabled: true
+        minReplicas: 1
+        maxReplicas: 20
+        targetCPUUtilizationPercentage: 80
+        # targetMemoryUtilizationPercentage: 80
+      gracePeriod: 3600
       resources:
         requests:
           memory: 1000Mi
@@ -140,17 +244,21 @@ deployment:
         - command
         - deployments
         - mappings
+        - networks
+        - volumes
     gevent:
       enabled: true
-      replicas: 2
+      replicas: 1
+      autoscaling: *autoscaling
       pool: gevent
       resources:
         requests:
           memory: 150Mi
-          cpu: 500m
+          cpu: 200m
         limits:
           memory: 250Mi
           cpu: 1000m
+      gracePeriod: 3600
       queues:
         - scripts
         - probe
@@ -162,38 +270,42 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 600Mi
           cpu: 100m
         limits:
           memory: 1000Mi
-          cpu: 2000m
+          cpu: 1000m
       queues:
         - celery
     machines:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
-          cpu: 100m
+          memory: 800Mi
+          cpu: 200m
         limits:
-          memory: 1000Mi
+          memory: 1200Mi
           cpu: 2000m
+      preemptible: true
       queues:
         - machines
     command:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 400Mi
           cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 800Mi
           cpu: 2000m
       queues:
         - command
@@ -201,25 +313,28 @@ deployment:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 400Mi
           cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 800Mi
           cpu: 2000m
+      gracePeriod: 3600
       queues:
         - deployments
     mappings:
       enabled: false
       pool: prefork
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 400Mi
           cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 800Mi
           cpu: 2000m
       queues:
         - mappings
@@ -227,6 +342,7 @@ deployment:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -234,51 +350,167 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      gracePeriod: 3600
       queues:
         - scripts
     probe:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
           cpu: 100m
         limits:
-          memory: 2000Mi
+          memory: 200Mi
           cpu: 1000m
+      preemptible: true
       queues:
         - probe
     ping:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
           cpu: 100m
         limits:
-          memory: 2000Mi
+          memory: 200Mi
           cpu: 1000m
+      preemptible: true
       queues:
         - ping
     rules:
       enabled: false
       pool: gevent
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 100Mi
           cpu: 100m
         limits:
-          memory: 2000Mi
+          memory: 400Mi
           cpu: 1000m
+      preemptible: true
       queues:
         - rules
+    networks:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 800Mi
+          cpu: 200m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - networks
+    volumes:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 800Mi
+          cpu: 200m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - volumes
+
+  # Poller deployment settings.
+  poller:
+    generic:
+      enabled: true
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 500Mi
+          cpu: 1000m
+        limits:
+          memory: 700Mi
+          cpu: 2000m
+      preemptible: true
+      scheduler: mist.api.poller.schedulers.PollingScheduler
+    owners:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 50Mi
+          cpu: 250m
+        limits:
+          memory: 300Mi
+          cpu: 1000m
+      preemptible: true
+      scheduler: mist.api.poller.schedulers.ShardedOwnerScheduler
+    clouds:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 500Mi
+          cpu: 1000m
+      preemptible: true
+      scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
+    machines:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 250Mi
+          cpu: 500m
+        limits:
+          memory: 500Mi
+          cpu: 1000m
+      preemptible: true
+      scheduler: mist.api.poller.schedulers.ShardedMachineScheduler
+
+  # Cilia deployment settings. Set replicas to 0 to disable.
+  cilia:
+    replicas: 1
+    resources:
+      requests:
+        memory: 150Mi
+        cpu: 70m
+      limits:
+        memory: 300Mi
+        cpu: 500m
+
+  # Gocky deployment settings.
+  gocky:
+    replicas: 1
+    autoscaling: *autoscaling
+    resources:
+      requests:
+        memory: 10Mi
+        cpu: 50m
+      limits:
+        memory: 50Mi
+        cpu: 1000m
 
   # Api deployment settings.
   api:
-    replicas: 2
+    replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 800Mi
@@ -289,7 +521,8 @@ deployment:
 
   # Sockjs deployment settings.
   sockjs:
-    replicas: 2
+    replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 100Mi
@@ -301,6 +534,7 @@ deployment:
   # UI deployment settings.
   ui:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 30Mi
@@ -312,10 +546,11 @@ deployment:
   # Nginx deployment settings.
   nginx:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 30Mi
-        cpu: 10m
+        cpu: 50m
       limits:
         memory: 60Mi
         cpu: 1000m
@@ -323,6 +558,7 @@ deployment:
   # Landing deployment settings.
   landing:
     replicas: 1
+    autoscaling: *autoscaling
     resources:
       requests:
         memory: 20Mi
