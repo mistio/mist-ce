@@ -1,8 +1,8 @@
 # Changelog
 
-## v3.3.0 (unreleased)
+## v3.3.0 (23 October 2018)
 
-* Feature: Support for block storage volumes in GCE, EC2, Openstack, DigitalOcean
+* Feature: Support for block storage volumes in GCE, EC2, OpenStack, DigitalOcean
 * Feature: Automatic db migrations
 * Feature: Display org logo in user menu
 * Feature: Resize GCE machines
