@@ -6,6 +6,12 @@
 * Feature: Automatic db migrations
 * Feature: Display org logo in user menu
 * Feature: Resize GCE machines
+* Feature: Allow to create multiple interfaces and assign static IPs to KVM guest VMs
+* Feature: Implement VM cloning for KVM
+* Feature: Support snapshots in vSphere
+* Feature: Allow to enable/disable and edit the window/frequency of a NoDataRule
+* Feature: Saved searches in log listings
+* Feature: Cloud listing page
 * Change: Use html5 date & time inputs
 * Change: Improve performance when applying patches to the model over websocket
 * Change: Reduce poller update threshold to 90 secs
