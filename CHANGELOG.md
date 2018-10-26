@@ -1,5 +1,46 @@
 # Changelog
 
+## v3.3.0 (23 October 2018)
+
+* Feature: Support for block storage volumes in GCE, EC2, OpenStack, DigitalOcean
+* Feature: Automatic db migrations
+* Feature: Display org logo in user menu
+* Feature: Resize GCE machines
+* Feature: Allow to create multiple interfaces and assign static IPs to KVM guest VMs
+* Feature: Implement VM cloning for KVM
+* Feature: Support snapshots in vSphere
+* Feature: Allow to enable/disable and edit the window/frequency of a NoDataRule
+* Feature: Saved searches in log listings
+* Feature: Cloud listing page
+* Change: Use html5 date & time inputs
+* Change: Improve performance when applying patches to the model over websocket
+* Change: Reduce poller update threshold to 90 secs
+* Change: Add k8s deployment specific script that displays online portal users
+* Bugfix: Properly pass params when running scheduled scripts
+* Bugfix: Display prices in resize dialog correctly for DigitalOcean
+
+## v3.2.0 (6 Aug 2018)
+
+Performance optimizations, preliminary support for Alibaba Cloud (Aliyun ECS), minor bugfixes
+
+* Feature: Initial support for Alibaba Cloud
+* Feature: Configure default post deploy steps for selected clouds
+* Feature: Support VNC console action on OpenStack
+* Bugfix: Fix influxdb mountpath in helm chart
+* Bugfix: Fix VCloud OS detection
+* Bugfix: Fix vSphere machine listing issue
+* Bugfix: Fix load graph for many machines
+* Change: Expose more settings for rabbitmq, gocky, cilia in helm chart
+* Change: Upgrade gocky images
+* Change: Configurable pollers in helm chart
+* Change: Add flag to disable machine polling acceleration
+* Change: Optimize tag query when calculating machine cost
+* Change: Re-implement metering for checks and datapoints based on rate/sec
+* Change: Dont probe stopped machines or localhost
+* Change: Dont run update_poller task if not necessary
+* Change: Import middleware chains from plugins, if defined
+* Change: Make scheduler configurable in bin/poller
+
 
 ## v3.1.0 (16 Jul 2018)
 

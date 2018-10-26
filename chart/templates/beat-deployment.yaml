@@ -29,7 +29,7 @@ spec:
             memory: 250Mi
             cpu: 200m
           requests:
-            memory: 125Mi
+            memory: 150Mi
             cpu: 50m
         volumeMounts:
         - name: {{ .Values.productShortName }}-config

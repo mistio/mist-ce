@@ -1,11 +1,10 @@
-{{ $values := .Values -}}
-{{ range $name, $settings := $values.deployment.poller -}}
+{{ range $name, $settings := $.Values.deployment.poller -}}
 {{ if $settings.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    {{ $values.productShortName }}.service: poller-{{ $name }}
+    {{ $.Values.productShortName }}.service: poller-{{ $name }}
   name: poller-{{ $name }}
 spec:
   replicas: {{ $settings.replicas | default "1" }}
@@ -14,21 +13,21 @@ spec:
   template:
     metadata:
       labels:
-        {{ $values.productShortName }}.service: poller-{{ $name }}
+        {{ $.Values.productShortName }}.service: poller-{{ $name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
         checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") $ | sha256sum }}
     spec:
       imagePullSecrets:
-{{ toYaml $values.image.secrets | indent 8 }}
+{{ toYaml $.Values.image.secrets | indent 8 }}
       containers:
       - name: poller-{{ $name }}
         args:
         - bin/poller
         - -s
         - {{ $settings.scheduler }}
-        image: {{ $values.image.registry }}/api:{{ $values.image.tag }}
-        imagePullPolicy: {{ $values.image.pullPolicy }}
+        image: {{ $.Values.image.registry }}/api:{{ $.Values.image.tag }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
         resources:
           requests:
             memory: {{ $settings.resources.requests.memory | default "500Mi" }}
@@ -37,16 +36,27 @@ spec:
             memory: {{ $settings.resources.limits.memory | default "1000Mi" }}
             cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
         volumeMounts:
-        - name: {{ $values.productShortName }}-config
-          mountPath: /etc/{{ $values.productShortName }}/settings/settings.py
+        - name: {{ $.Values.productShortName }}-config
+          mountPath: /etc/{{ $.Values.productShortName }}/settings/settings.py
           subPath: settings.py
+{{- if $settings.preemptible }}
+{{- if $.Values.preemptible.tolerations }}
+      tolerations:
+{{ toYaml $.Values.preemptible.tolerations | indent 8 }}
+{{- end }}
+{{- if $.Values.preemptible.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+{{ toYaml $.Values.preemptible.nodeAffinity | indent 10 }}
+{{- end }}
+{{- end }}
       volumes:
-      - name: {{ $values.productShortName }}-config
+      - name: {{ $.Values.productShortName }}-config
         configMap:
-          name: {{ $values.productShortName }}
-{{- if $values.nodeSelector }}
+          name: {{ $.Values.productShortName }}
+{{- if $.Values.nodeSelector }}
       nodeSelector:
-{{ toYaml $values.nodeSelector | indent 8 }}
+{{ toYaml $.Values.nodeSelector | indent 8 }}
 {{- end }}
 ---
 {{ end }}
