@@ -7,7 +7,10 @@ metadata:
     {{ .Values.productShortName }}.service: influxdb
 spec:
   ports:
-    - port: 8086
+    - name: default
+      port: 8086
+    - name: backup
+      port: 8088
   selector:
     {{ .Values.productShortName }}.service: influxdb
 {{- end }}
