@@ -21,4 +21,4 @@ RUN echo "{\"sha\":\"$VERSION_SHA\",\"name\":\"$VERSION_NAME\",\"repo\":\"$VERSI
         > /mist-version.json
 
 # Generate swagger spec (API documentation).
-RUN python /mist.api/openapi/generate_api_spec.py
+RUN python3 /mist.api/openapi/generate_api_spec.py
