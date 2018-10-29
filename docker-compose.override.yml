@@ -60,3 +60,11 @@ services:
   gocky:
     volumes:
       - ./docker/gocky:/etc/gocky
+
+  timescaledb:
+    image: timescale/timescaledb
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: root
+    ports:
+      - 5432:5432
