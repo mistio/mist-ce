@@ -146,7 +146,13 @@ auth:
   github:
     key: ''
     secret: ''
-
+backup:
+  key: ''
+  secret: ''
+  bucket: ''
+  gpg:
+    recipient: ''
+    public: ''
 # Used to clone repos.
 githubBotToken: ''
 

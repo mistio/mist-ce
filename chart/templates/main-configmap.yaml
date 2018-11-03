@@ -75,8 +75,6 @@ data:
     ALLOW_SIGNIN_GOOGLE = {{ if .Values.auth.google.signin }}True{{ else }}False{{ end }}
     ALLOW_SIGNUP_GITHUB = {{ if .Values.auth.github.signup }}True{{ else }}False{{ end }}
     ALLOW_SIGNIN_GITHUB = {{ if .Values.auth.github.signin }}True{{ else }}False{{ end }}
-    AWS_ACCESS_KEY = "{{ .Values.awsAccessKey }}"
-    AWS_SECRET_KEY = "{{ .Values.awsSecretKey }}"
 
     GITLAB_TOKEN = "{{ .Values.gitlabToken }}"
     BILLING_NOTIFICATIONS_WEBHOOK = "{{ .Values.slackWebhooks.billing }}"
@@ -87,4 +85,13 @@ data:
     OLARK_ID = "{{ .Values.olarkId }}"
     SENDGRID_EMAIL_NOTIFICATIONS_KEY = "{{ .Values.sendgridEmailNotificationsKey }}"
 
+    BACKUP = {
+        "key": "{{ .Values.backup.key }}",
+        "secret": "{{ .Values.backup.secret }}",
+        "bucket": "{{ .Values.backup.bucket }}",
+        "gpg": {
+            "recipient": "{{ .Values.backup.gpg.recipient }}",
+            "public": "{{ .Values.backup.gpg.public }}"
+        }
+    }
 {{ .Values.extraSettings | indent 4 }}
