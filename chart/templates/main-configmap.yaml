@@ -91,7 +91,7 @@ data:
         "bucket": "{{ .Values.backup.bucket }}",
         "gpg": {
             "recipient": "{{ .Values.backup.gpg.recipient }}",
-            "public": "{{ .Values.backup.gpg.public }}"
+            "public": """{{ .Values.backup.gpg.public }}""
         }
     }
 {{ .Values.extraSettings | indent 4 }}
