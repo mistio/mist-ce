@@ -29,6 +29,7 @@ data:
 
     INFLUX = {
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
+        'backup': "http://{{ .Values.influxdb.host }}:8088",
         'db': "{{ .Values.influxdb.db }}",
     }
 
