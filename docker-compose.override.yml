@@ -60,3 +60,7 @@ services:
   gocky:
     volumes:
       - ./docker/gocky:/etc/gocky
+
+  influxdb:
+    volumes:
+      - ./docker/influxdb:/etc/influxdb
