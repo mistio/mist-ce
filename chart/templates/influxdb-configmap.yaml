@@ -4,7 +4,7 @@ metadata:
   name: influxdb-configmap
 data:
   influxdb.conf: |+
-    bind-addr = "0.0.0.0:8088"
+    bind-address = ":8088"
     [meta]
       dir = "/var/lib/influxdb/meta"
 
