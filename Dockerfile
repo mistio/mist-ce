@@ -1,5 +1,5 @@
 # Inherit the mist.api image.
-ARG FROM_IMAGE=mist/mist:staging
+ARG FROM_IMAGE=mist/mist:python3
 FROM $FROM_IMAGE
 
 # Configure product defaults.
@@ -21,4 +21,4 @@ RUN echo "{\"sha\":\"$VERSION_SHA\",\"name\":\"$VERSION_NAME\",\"repo\":\"$VERSI
         > /mist-version.json
 
 # Generate swagger spec (API documentation).
-RUN python3 /mist.api/openapi/generate_api_spec.py
+RUN python /mist.api/openapi/generate_api_spec.py
