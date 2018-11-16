@@ -1,7 +1,7 @@
-# Mist.io Community Edition
+# Mist Cloud Management Platform - Community Edition
 
-Mist.io helps you operate, monitor and govern your computing infrastructure,
-across clouds and platforms. The code is provided under the GNU AGPL v3.0
+Mist helps you manage and monitor your computing infrastructure, across
+multiple clouds and platforms. The code is provided under the GNU AGPL v3.0
 License.
 
 The Enterprise Edition and the Hosted Service that include Role Based Access, VPN tunnels and
@@ -19,7 +19,7 @@ Recommended hardware resources are:
 
 ## Installation
 
-Mist.io is a large application split into microservices which are packages in
+Mist is a large application split into microservices which are packages in
 docker containers. The easiest way to run it is by using `docker-compose`. So,
 in order to run it, one needs to install a recent version of
 [docker](https://docs.docker.com/engine/installation/) and
@@ -29,14 +29,14 @@ To install the latest stable release, head over to
 [releases](https://github.com/mistio/mist-ce/releases) and follow the
 instructions there.
 
-After a few minutes (depending on your connection) all mist.io containers will
+After a few minutes (depending on your connection) all the mist containers will
 be downloaded and started in the background.
 
 Run `docker-compose ps`. All containers should be in the UP state, except
 shortlived container elasticsearch-manage.
 
 
-## Running Mist.io
+## Running Mist
 
 Make sure you're inside the directory containing the `docker-compose.yml` file.
 
@@ -44,28 +44,28 @@ Switch to the directory containing the `docker-compose.yml` file and run
 
     docker-compose up -d
 
-This will start all the mist.io docker containers in the background.
+This will start all the mist docker containers in the background.
 
 To create a user for the first time, first run
 
     docker-compose exec api sh
 
-This should drop you in a shell into one of the mist.io containers. In there,
+This should drop you in a shell into one of the mist containers. In there,
 run
 
     ./bin/adduser --admin admin@example.com
 
 Replace the email address with yours. Try running `./bin/adduser -h` for more
 options. The `--docker-cloud` flag will add the docker daemon hosting the
-mist.io installation as a docker cloud in the created account.
+mist installation as a docker cloud in the created account.
 
-Mist.io binds on port 80 of the host. Visit http://localhost and login with the
+Mist binds on port 80 of the host. Visit http://localhost and login with the
 email and password specified above.
 
-Welcome to Mist.io! Enjoy!
+Welcome to Mist! Enjoy!
 
 
-## Configuring Mist.io
+## Configuring
 
 After the initial `docker-compose up -d`, you'll see that a configuration file
 is created in `./settings/settings.py`. Edit this file to modify configuration.
@@ -87,8 +87,8 @@ If running on anything other than `localhost`, you'll need to set the
 ### Mail settings
 
 In some cases, such as user registration, forgotten passwords, user invitations
-etc, mist.io needs to send emails. By default, mist.io is configured to use a
-mock mailer. To see logs sent by mist.io, run
+etc, mist needs to send emails. By default, mist is configured to use a
+mock mailer. To see logs sent by mist, run
 
     docker-compose logs -f mailmock
 
@@ -137,9 +137,9 @@ Update `CORE_URI` in mist's settings (see URL section above).
 Run `docker-compose up -d`.
 
 
-## Managing Mist.io
+## Managing Mist
 
-Mist.io is managed using `docker-compose`. Look that up for details. Some
+Mist is managed using `docker-compose`. Look that up for details. Some
 useful commands follow. Keep in mind that you need to run these from inside the
 directory containing the `docker-compose.yml` file:
 
@@ -158,10 +158,10 @@ directory containing the `docker-compose.yml` file:
     # 50 lines.
     docker-compose logs --tail=50 -f api celery
 
-    # Stop mist.io
+    # Stop mist
     docker-compose stop
 
-    # Start mist.io
+    # Start mist
     docker-compose start
     # or even better
     docker-compose up -d
@@ -180,15 +180,11 @@ within the same directory as before. This way the new installation will use the
 same Docker volumes.
 3. Run `docker-compose up -d` to bring up the new version.
 4. Check that everything is in order by running `docker-compose ps`. Also check
-if your Mist.io portal works as expected.
-5. In some cases, it might be necessary to run the latest database migration
-scripts. Connect to the api container and run the latest scripts in
-`mist.io/api/migrations`. e.g. `docker-compose exec api ls migrations`
-and then `docker-compose exec api python migrations/0006-list-locations.py`
+if your Mist portal works as expected.
 
 ## Staging version
 
-If you want to install the latest bleeding edge build of mist.io,
+If you want to install the latest bleeding edge build of mist,
 run the following:
 
 ```bash
@@ -199,7 +195,7 @@ docker-compose up -d
 
 ## Development deployment
 
-If you're planning to modify Mist.io's source code, an alternative installation
+If you're planning to modify Mist's source code, an alternative installation
 method is recommended.
 
 Clone this git repo and all its submodules with something like:
@@ -215,4 +211,4 @@ directory, now there's also a `docker-compose.override.yml` file in the current
 directory in addition to `docker-compose.yml` and is used to modify the
 configuration for development mode.
 
-The above instructions for running and managing Mist.io apply.
+The above instructions for running and managing Mist apply.
