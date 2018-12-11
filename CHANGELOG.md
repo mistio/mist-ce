@@ -1,11 +1,27 @@
 # Changelog
 
-## v3.3.0 (unreleased)
+## v3.4.0 (unreleased)
 
-* Feature: Support for block storage volumes in GCE, EC2, Openstack, DigitalOcean
+* Feature: Automatic backup & restore scripts for mongo & influx
+* Feature: Pre and post action hooks
+
+## v3.3.1 (6 November 2018)
+
+* Bugfix: Correctly check if DNS is enabled when polling for zones
+* Bugfix: Fix issue when destroying vSphere machines
+
+## v3.3.0 (23 October 2018)
+
+* Feature: Support for block storage volumes in GCE, EC2, OpenStack, DigitalOcean
 * Feature: Automatic db migrations
 * Feature: Display org logo in user menu
 * Feature: Resize GCE machines
+* Feature: Allow to create multiple interfaces and assign static IPs to KVM guest VMs
+* Feature: Implement VM cloning for KVM
+* Feature: Support snapshots in vSphere
+* Feature: Allow to enable/disable and edit the window/frequency of a NoDataRule
+* Feature: Saved searches in log listings
+* Feature: Cloud listing page
 * Change: Use html5 date & time inputs
 * Change: Improve performance when applying patches to the model over websocket
 * Change: Reduce poller update threshold to 90 secs

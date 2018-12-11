@@ -148,7 +148,13 @@ auth:
   github:
     key: ''
     secret: ''
-
+backup:
+  key: ''
+  secret: ''
+  bucket: ''
+  gpg:
+    recipient: ''
+    public: ''
 # Used to clone repos.
 githubBotToken: ''
 
@@ -430,6 +436,21 @@ deployment:
       preemptible: true
       queues:
         - volumes
+    zones:
+      enabled: false
+      pool: prefork
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 800Mi
+          cpu: 200m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - zones
 
   # Poller deployment settings.
   poller:

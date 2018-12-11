@@ -33,9 +33,15 @@ spec:
             memory: 200Mi
             cpu: 1000m
         volumeMounts:
+        - name: influxdb-config
+          mountPath: /etc/influxdb/influxdb.conf
+          subPath: influxdb.conf
         - mountPath: /var/lib/influxdb
           name: influxdb
       volumes:
+      - name: influxdb-config
+        configMap:
+          name: influxdb-configmap
       - name: influxdb
         persistentVolumeClaim:
           claimName: {{ include "chart.fullname" . }}-influxdb

@@ -159,6 +159,7 @@ services:
     image: influxdb
     environment:
       INFLUXDB_DB: telegraf
+      INFLUXDB_BIND_ADDRESS: "0.0.0.0:8088"
     ports:
       - 8083:8083
       - 8086:8086

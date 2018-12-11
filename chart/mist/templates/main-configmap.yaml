@@ -53,6 +53,7 @@ data:
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
+        'backup': "http://{{ .Values.influxdb.host }}:8088",
         'db': "{{ .Values.influxdb.db }}",
       {{- else }}
         'host': "http://{{ include "chart.fullname" . }}-influxdb:8086",
@@ -124,4 +125,13 @@ data:
     CILIA_TRIGGER_API = "http://{{ include "chart.fullname" . }}-api"
     GOCKY_HOST = "{{ include "chart.fullname" . }}-gocky"
 
+    BACKUP = {
+        "key": "{{ .Values.backup.key }}",
+        "secret": "{{ .Values.backup.secret }}",
+        "bucket": "{{ .Values.backup.bucket }}",
+        "gpg": {
+            "recipient": "{{ .Values.backup.gpg.recipient }}",
+            "public":  """{{ .Values.backup.gpg.public | indent 4 }}""".strip()
+        }
+    }
 {{ .Values.extraSettings | indent 4 }}

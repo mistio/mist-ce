@@ -10,7 +10,10 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   ports:
-    - port: 8086
+    - name: default
+      port: 8086
+    - name: backup
+      port: 8088
   selector:
     app: influxdb
     release: {{ .Release.Name }}
