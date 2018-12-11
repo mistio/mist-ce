@@ -279,7 +279,7 @@ compose:
                 kubectl replace --namespace $namespace --force -f -
           fi
 
-          export tls_secret_name=
+          export tls_settings=
           if [ -n "$TLS_KEY" ] && [ -n "$TLS_CRT" ]; then
             tls_tmpdir=$(mktemp -d)
             echo "$TLS_KEY" > $tls_tmpdir/tls.key
@@ -290,7 +290,7 @@ compose:
               --cert $tls_tmpdir/tls.crt \
               -o yaml --dry-run | \
                 kubectl replace --namespace $namespace --force -f -
-            export tls_secret_name=https
+            export tls_settings="--set http.tlsSecret=https"
             rm -rf $tls_tmpdir
           fi
 
@@ -306,7 +306,6 @@ compose:
             --set image.pullPolicy=IfNotPresent \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
-            --set http.tlsSecret="$tls_secret_name" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
@@ -314,6 +313,7 @@ compose:
             --set docker.key="$DOCKER_KEY" \
             --set docker.cert="$DOCKER_CERT" \
             --set docker.ca="$DOCKER_CA" \
+            $tls_settings \
             $(elasticsearch_params) \
             $release ./chart/mist/
           apk add --no-cache curl
@@ -334,12 +334,20 @@ deploy test:
   <<: *deploy_template
   environment:
     name: test/$CI_COMMIT_REF_SLUG
-    url: http://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
+    url: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy test
   variables:
     namespace: test-$CI_PROJECT_NAME
     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-    values: |
+    values: |-
+      http:
+        tlsSecret: tls-wildcard-test-mist-io
+        tlsHosts:
+          - '*.test.mist.io'
+        tlsAnnotations:
+          certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+          certmanager.k8s.io/acme-challenge-type: dns01
+          certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: true
       nodeSelector:
         cloud.google.com/gke-nodepool: generic
@@ -353,6 +361,14 @@ deploy test:
     namespace: $CI_PROJECT_NAME
     release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |
+      http:
+        tlsSecret: tls-wildcard-review-mist-io
+        tlsHosts:
+          - '*.review.mist.io'
+        tlsAnnotations:
+          certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+          certmanager.k8s.io/acme-challenge-type: dns01
+          certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: false
       smtp:
         host: smtp.sendgrid.net
@@ -370,7 +386,7 @@ deploy review:
   <<: *deploy_review_template
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: http://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
+    url: https://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy review
   except:
     - master
@@ -380,7 +396,7 @@ deploy master:
   <<: *deploy_review_template
   environment:
     name: master
-    url: http://master$DEPLOY_DOMAIN_SUFFIX
+    url: https://master$DEPLOY_DOMAIN_SUFFIX
   only:
     - master
   when: manual
@@ -393,7 +409,7 @@ deploy master:
   image: $TESTS_IMAGE
   variables:
     GIT_STRATEGY: none
-    MIST_URL: http://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
+    MIST_URL: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
     DISPLAY: ":1.0"
     REGISTER_USER_BEFORE_FEATURE: "True"
     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
