@@ -41,7 +41,7 @@ spec:
       volumes:
       - name: influxdb-config
         configMap:
-          name: influxdb-configmap
+          name: {{ include "chart.fullname" . }}-influxdb
       - name: influxdb
         persistentVolumeClaim:
           claimName: {{ include "chart.fullname" . }}-influxdb
