@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: influxdb-configmap
+  name: {{ include "chart.fullname" . }}-configmap
 data:
   influxdb.conf: |+
     bind-address = ":8088"
