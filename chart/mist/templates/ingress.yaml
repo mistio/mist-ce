@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
   annotations:
     kubernetes.io/ingress.class: nginx
-{{ toYaml .Values.http.tlsAnnotations | indent 4 }}
+{{- if .Values.http.tlsAnnotations }}{{ toYaml .Values.http.tlsAnnotations | indent 4 }}{{- end }}
 spec:
 {{- if .Values.http.tlsSecret }}
   tls:
