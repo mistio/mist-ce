@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-ui
+  labels:
+    app: ui
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.ui.replicas | default "1" }}
+  template:
+    metadata:
+      labels:
+        app: ui
+        release: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: ui
+        args:
+        - sh
+        - /entry.sh
+        image: {{ .Values.image.registry }}/ui:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.deployment.ui.resources.requests.memory | default "30Mi" }}
+            cpu: {{ .Values.deployment.ui.resources.requests.cpu | default "10m" }}
+          limits:
+            memory: {{ .Values.deployment.ui.resources.limits.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.ui.resources.limits.cpu | default "100m" }}
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; gracefully terminate instead
+              command: ["/usr/sbin/nginx","-s","quit"]
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

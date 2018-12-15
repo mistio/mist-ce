@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-gocky
+  labels:
+    app: gocky
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.gocky.replicas | default "1" }}
+  template:
+    metadata:
+      labels:
+        app: gocky
+        release: {{ .Release.Name }}
+      annotations:
+        # Trigger modification of deployment & restart of pods if config changes.
+        checksum/config: {{ include (print $.Template.BasePath "/gocky-configmap.yaml") . | sha256sum }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: gocky
+        image: {{ .Values.image.registry }}/gocky:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+        - -config
+        - /etc/gocky/config.toml
+        ports:
+        - containerPort: 9096
+        - containerPort: 9097
+        volumeMounts:
+        - name: gocky-config
+          mountPath: /etc/gocky/config.toml
+          subPath: config.toml
+        resources:
+          requests:
+            memory: {{ .Values.deployment.gocky.resources.requests.memory | default "10Mi" }}
+            cpu: {{ .Values.deployment.gocky.resources.requests.cpu | default "50m" }}
+          limits:
+            memory: {{ .Values.deployment.gocky.resources.limits.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.gocky.resources.limits.cpu | default "1000m" }}
+      volumes:
+      - name: gocky-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-gocky
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

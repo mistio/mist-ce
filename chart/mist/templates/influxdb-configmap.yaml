@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chart.fullname" . }}-influxdb
+  app: influxdb
+  chart: {{ include "chart.chart" . }}
+  release: {{ .Release.Name }}
+  heritage: {{ .Release.Service }}
+data:
+  influxdb.conf: |+
+    bind-address = ":8088"
+    [meta]
+      dir = "/var/lib/influxdb/meta"
+
+    [data]
+      dir = "/var/lib/influxdb/data"
+      engine = "tsm1"
+      wal-dir = "/var/lib/influxdb/wal"

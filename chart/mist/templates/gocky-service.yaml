@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-gocky
+  labels:
+    app: gocky
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+    - name: gocky-relay
+      port: 9097
+    - name: influxdb-relay
+      port: 9096
+  selector:
+    app: gocky
+    release: {{ .Release.Name }}

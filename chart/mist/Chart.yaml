@@ -1,0 +1,3 @@
+name: mist
+description: A Helm Chart for Mist CE.
+version: 0.0.1

@@ -1,0 +1,17 @@
+{{ if eq .Values.elasticsearch.host "" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-elasticsearch
+  labels:
+    app: elasticsearch
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+  - port: 9200
+  selector:
+    app: elasticsearch
+    release: {{ .Release.Name }}
+{{- end }}

@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-landing
+  labels:
+    app: landing
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.landing.replicas | default "1" }}
+  template:
+    metadata:
+      labels:
+        app: landing
+        release: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: landing
+        args:
+        - sh
+        - /entry.sh
+        image: {{ .Values.image.registry }}/landing:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.deployment.landing.resources.requests.memory | default "20Mi" }}
+            cpu: {{ .Values.deployment.landing.resources.requests.cpu | default "10m" }}
+          limits:
+            memory: {{ .Values.deployment.landing.resources.limits.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.landing.resources.limits.cpu | default "200m" }}
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; gracefully terminate instead
+              command: ["/usr/sbin/nginx","-s","quit"]
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

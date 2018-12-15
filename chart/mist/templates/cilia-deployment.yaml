@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-cilia
+  labels:
+    app: cilia
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.cilia.replicas | default "1" }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cilia
+        release: {{ .Release.Name }}
+      annotations:
+        # Trigger modification of deployment & restart of pods if config changes.
+        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") . | sha256sum }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: cilia
+        args:
+        - bin/cilia
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.deployment.cilia.resources.requests.memory | default "150Mi" }}
+            cpu: {{ .Values.deployment.cilia.resources.requests.cpu | default "70m" }}
+          limits:
+            memory: {{ .Values.deployment.cilia.resources.limits.memory | default "300Mi" }}
+            cpu: {{ .Values.deployment.cilia.resources.limits.cpu | default "500m" }}
+        volumeMounts:
+        - name: {{ .Values.productShortName }}-config
+          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ .Values.productShortName }}-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

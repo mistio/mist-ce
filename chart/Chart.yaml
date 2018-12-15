@@ -1,5 +1,0 @@
-name: chart
-description: A Helm Chart for Mist CE.
-version: 0.0.1
-sources:
-home:

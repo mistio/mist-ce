@@ -1,0 +1,20 @@
+{{ if eq .Values.influxdb.host "" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-influxdb
+  labels:
+    app: influxdb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+    - name: default
+      port: 8086
+    - name: backup
+      port: 8088
+  selector:
+    app: influxdb
+    release: {{ .Release.Name }}
+{{- end }}

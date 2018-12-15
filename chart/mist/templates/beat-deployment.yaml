@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-beat
+  labels:
+    app: beat
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: beat
+        release: {{ .Release.Name }}
+      annotations:
+        # Trigger modification of deployment & restart of pods if config changes.
+        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") . | sha256sum }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: beat
+        args:
+        - bin/beat
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          limits:
+            memory: 250Mi
+            cpu: 200m
+          requests:
+            memory: 150Mi
+            cpu: 50m
+        volumeMounts:
+        - name: {{ .Values.productShortName }}-config
+          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ .Values.productShortName }}-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
