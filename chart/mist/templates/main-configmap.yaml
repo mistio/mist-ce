@@ -53,10 +53,11 @@ data:
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
-        'backup': "http://{{ .Values.influxdb.host }}:8088",
+        'backup': "{{ .Values.influxdb.host }}:8088",
         'db': "{{ .Values.influxdb.db }}",
       {{- else }}
         'host': "http://{{ include "chart.fullname" . }}-influxdb:8086",
+        'backup': '{{ include "chart.fullname" . }}-influxdb:8088',
         'db': "telegraf",
       {{- end }}
     }
