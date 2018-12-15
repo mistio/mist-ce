@@ -526,7 +526,7 @@ undeploy test:
 
 undeploy test_early:
   <<: *undeploy_template
-  stage: undeploy
+  stage: deploy
   environment:
     name: test/$CI_COMMIT_REF_SLUG
     action: stop
