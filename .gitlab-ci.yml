@@ -524,6 +524,17 @@ undeploy test:
     GIT_STRATEGY: none
     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
 
+undeploy test_early:
+  <<: *undeploy_template
+  stage: undeploy
+  environment:
+    name: test/$CI_COMMIT_REF_SLUG
+    action: stop
+  variables:
+    GIT_STRATEGY: none
+    release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+  when: manual
+
 undeploy review:
   <<: *undeploy_template
   environment:
