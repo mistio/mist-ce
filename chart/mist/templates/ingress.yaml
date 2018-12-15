@@ -7,11 +7,11 @@ metadata:
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-  {{- if .Values.http.tlsAnnotations }}
   annotations:
     kubernetes.io/ingress.class: nginx
-    {{ toYaml .Values.http.tlsAnnotations | indent 4 }}
-  {{- end }}
+{{- if .Values.http.tlsAnnotations }}
+{{ toYaml .Values.http.tlsAnnotations | indent 4 }}
+{{- end }}
 spec:
 {{- if .Values.http.tlsSecret }}
   tls:
