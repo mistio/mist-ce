@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-kibana
+  labels:
+    app: kibana
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kibana
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: kibana
+        env:
+        - name: ELASTICSEARCH_URL
+      {{- if .Values.elasticsearch.host }}
+          value: http{{ if .Values.elasticsearch.tls }}s{{end}}://{{ .Values.elasticsearch.host }}:{{ .Values.elasticsearch.port }}
+      {{- else }}
+          value: http://{{ include "chart.fullname" . }}-elasticsearch:9200
+      {{- end }}
+        image: kibana:5.6.10
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 150Mi
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

@@ -1,0 +1,22 @@
+{{ if .Values.prometheus.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-celery-exporter
+  labels:
+    app: celery-exporter
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    prometheus.io/path: /
+    prometheus.io/port: "8888"
+    prometheus.io/scrape: "true"
+spec:
+  ports:
+  - name: exporter
+    port: 8888
+  selector:
+    app: celery-exporter
+    release: {{ .Release.Name }}
+{{- end }}

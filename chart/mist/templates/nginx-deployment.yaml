@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-nginx
+  labels:
+    app: nginx
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.nginx.replicas | default "1" }}
+  template:
+    metadata:
+      labels:
+        app: nginx
+        release: {{ .Release.Name }}
+      annotations:
+        # Trigger modification of deployment & restart of pods if config changes.
+        checksum/config: {{ include (print $.Template.BasePath "/nginx-configmap.yaml") . | sha256sum }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: nginx
+        image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          requests:
+            memory: {{ .Values.deployment.nginx.resources.requests.memory | default "30Mi" }}
+            cpu: {{ .Values.deployment.nginx.resources.requests.cpu | default "10m" }}
+          limits:
+            memory: {{ .Values.deployment.nginx.resources.limits.memory | default "60Mi" }}
+            cpu: {{ .Values.deployment.nginx.resources.limits.cpu | default "1000m" }}
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; gracefully terminate instead
+              command: ["/usr/sbin/nginx","-s","quit"]
+      terminationGracePeriodSeconds: 600
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-nginx
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

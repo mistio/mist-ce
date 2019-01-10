@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-memcached
+  labels:
+    app: memcached
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: memcached
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: memcached
+        image: memcached
+        resources:
+          requests:
+            memory: 30Mi
+            cpu: 1m
+          limits:
+            memory: 60Mi
+            cpu: 100m
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
