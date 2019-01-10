@@ -46,7 +46,7 @@ spec:
         - name: INFLUXDB_HOST
           value: {{ if .Values.influxdb.host }}{{ .Values.influxdb.host }}{{ else }}{{ include "chart.fullname" . }}-influxdb{{ end }}
         - name: INFLUXDB_PORT
-          value: "{{ if .Values.influxdb.host }}{{ .Values.influxdb.port }}{{ else }}80806{{ end }}"
+          value: "{{ if .Values.influxdb.host }}{{ .Values.influxdb.port }}{{ else }}8086{{ end }}"
         image: {{ .Values.image.registry }}/logstash:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
