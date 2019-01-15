@@ -440,7 +440,7 @@ API:main:machines: *api_test_template
 API:main:networks: *api_test_template
 API:main:schedules: *api_test_template
 API:main:scripts: *api_test_template
-API:main:rbac: *api_test_template
+API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template
 
@@ -469,7 +469,7 @@ UI:keys: *ui_test_template
 UI:scripts: *ui_test_template
 UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
-UI:rbac-teams: *ui_test_template
+UI:teams: *ui_test_template
 UI:zones: *ui_test_template
 UI:rules-1/2: *ui_test_template
 UI:rules-2/2: *ui_test_template
@@ -493,10 +493,10 @@ UI:ip-whitelisting:
   only:
     - staging
 
-.UI:rbac-rules-1/4: *ui_test_template
-.UI:rbac-rules-2/4: *ui_test_template
-.UI:rbac-rules-3/4: *ui_test_template
-.UI:rbac-rules-4/4: *ui_test_template
+.UI:rbac-1/4: *ui_test_template
+.UI:rbac-2/4: *ui_test_template
+.UI:rbac-3/4: *ui_test_template
+.UI:rbac-4/4: *ui_test_template
 .UI:orchestration: *ui_test_template
 .UI:insights:
   <<: *ui_test_template
