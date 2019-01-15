@@ -1,9 +1,12 @@
 # Changelog
 
-## v3.4.0 (unreleased)
+## v4.0.0 (unreleased)
 
 * Feature: Automatic backup & restore scripts for mongo & influx
 * Feature: Pre and post action hooks
+* Feature: Widget to select existing tags
+* Change: Upgrade backend code to Python 3.7
+* Change: Upgrade frontend code to Polymer 2.x and Web Components v1
 
 ## v3.3.1 (6 November 2018)
 
