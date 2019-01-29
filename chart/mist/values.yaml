@@ -236,13 +236,13 @@ deployment:
         enabled: true
         minReplicas: 1
         maxReplicas: 20
-        targetCPUUtilizationPercentage: 80
+        targetCPUUtilizationPercentage: 85
         # targetMemoryUtilizationPercentage: 80
       gracePeriod: 3600
       resources:
         requests:
-          memory: 1000Mi
-          cpu: 600m
+          memory: 800Mi
+          cpu: 300m
         limits:
           memory: 1200Mi
           cpu: 2000m
@@ -262,7 +262,7 @@ deployment:
       resources:
         requests:
           memory: 150Mi
-          cpu: 200m
+          cpu: 100m
         limits:
           memory: 250Mi
           cpu: 1000m
@@ -461,7 +461,7 @@ deployment:
       resources:
         requests:
           memory: 500Mi
-          cpu: 1000m
+          cpu: 800m
         limits:
           memory: 700Mi
           cpu: 2000m
@@ -500,7 +500,7 @@ deployment:
       resources:
         requests:
           memory: 250Mi
-          cpu: 500m
+          cpu: 400m
         limits:
           memory: 500Mi
           cpu: 1000m
@@ -537,7 +537,7 @@ deployment:
     resources:
       requests:
         memory: 800Mi
-        cpu: 600m
+        cpu: 400m
       limits:
         memory: 1000Mi
         cpu: 2000m
