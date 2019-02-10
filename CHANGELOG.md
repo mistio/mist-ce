@@ -1,9 +1,18 @@
 # Changelog
 
-## v3.4.0 (unreleased)
+## v4.0.0 (unreleased)
+
+This is a major release that brings important performance improvements both in the backend as well as in the frontend. It also introduces usability improvements when filtering lists, when adding "other server" clouds and when selecting tags, keys & networks.
 
 * Feature: Automatic backup & restore scripts for mongo & influx
 * Feature: Pre and post action hooks
+* Feature: Widget to select existing tags
+* Feature: Configurable filters in every list
+* Feature: Searchable selection widgets for keys & networks
+* Feature: Collapsible sections in monitoring dashboards
+* Change: Improve interaction when adding "Other Server" Clouds
+* Change: Upgrade backend code to Python 3.7
+* Change: Upgrade frontend code to Polymer 2.x and Web Components v1
 
 ## v3.3.1 (6 November 2018)
 
