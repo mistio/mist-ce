@@ -2,7 +2,7 @@
 
 ## v4.0.3 (24 February 2019)
 
-* Bugfix: Fix displat if custom org logos
+* Bugfix: Fix display of custom org logos
 
 ## v4.0.2 (20 February 2019)
 
