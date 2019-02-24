@@ -27,10 +27,10 @@ spec:
           value: telegraf
         resources:
           requests:
-            memory: 100Mi
+            memory: 200Mi
             cpu: 50m
           limits:
-            memory: 200Mi
+            memory: 500Mi
             cpu: 1000m
         volumeMounts:
         - name: influxdb-config
