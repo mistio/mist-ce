@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.3 (24 February 2019)
+
+* Bugfix: Fix displat if custom org logos
+
+## v4.0.2 (20 February 2019)
+
+* Bugfix: Fix Python3 compatibility issue in vSphere libcloud driver
+
+## v4.0.1 (20 February 2019)
+
+* Bugfix: Update Python to 3.7.2, fixes uwsgi segfault when handling invalid certs
+
 ## v4.0.0 (19 February 2019)
 
 This is a major release that brings important performance improvements both in the backend as well as in the frontend. It also introduces usability improvements when filtering lists, exploring logs, adding "other server" clouds and when selecting tags, keys & networks in forms.
