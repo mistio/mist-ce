@@ -58,6 +58,7 @@ data:
             add_header X-XSS-Protection "1; mode=block";
 
             client_max_body_size 4096m;
+            client_body_timeout 300s;
 
             location / {
                 proxy_pass http://{{ include "chart.fullname" . }}-api;
