@@ -1,11 +1,12 @@
 # Changelog
 
-## v4.0.3 (12 March 2019)
+## v4.0.3 (20 March 2019)
 
 * Bugfix: Fix floating ip string representation in OpenStack driver
 * Bugfix: Hide location field if empty and non required
 * Bugfix: Force update of key selection lists when keys arrive from socket
 * Bugfix: Fix display of custom org logos
+* Bugfix: Improve UI update when applying patch to resource property
 
 ## v4.0.2 (20 February 2019)
 
