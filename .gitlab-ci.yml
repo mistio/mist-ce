@@ -206,8 +206,8 @@ compose:
   stage: build
   image: python:alpine
   before_script:
+    - apk add --no-cache gettext gcc
     - pip install docker-compose
-    - apk add --no-cache gettext
   script:
     - mkdir -p artifacts
     - export IMG_REGISTRY=$(eval echo \$${COMPOSE_REGISTRY}_IMAGE)
