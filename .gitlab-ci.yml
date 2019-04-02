@@ -206,7 +206,7 @@ compose:
   stage: build
   image: python:alpine
   before_script:
-    - apk add --no-cache gettext build-base
+    - apk add --no-cache gettext build-base libffi-dev
     - pip install docker-compose
   script:
     - mkdir -p artifacts
