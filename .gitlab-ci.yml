@@ -245,6 +245,7 @@ compose:
           set_if_not_empty elasticsearch.username $ELASTICSEARCH_USERNAME
           set_if_not_empty elasticsearch.password $ELASTICSEARCH_PASSWORD
           set_if_not_empty elasticsearch.tls $ELASTICSEARCH_TLS
+          set_if_not_empty elasticsearch.verifyCerts $ELASTICSEARCH_TLS
         }
 
         function deploy() {
