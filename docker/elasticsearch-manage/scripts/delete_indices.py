@@ -4,6 +4,8 @@ import os
 import sys
 import traceback
 
+import certifi
+
 from elasticsearch import Elasticsearch
 
 
@@ -15,6 +17,7 @@ def es_client():
                    os.getenv('ELASTIC_PASSWORD', '')),
         use_ssl=bool(os.getenv('ELASTIC_SSL', False)),
         verify_certs=bool(os.getenv('ELASTIC_VERIFY_CERTS', False)),
+        ca_certs=certifi.where()
     )
 
 
@@ -28,7 +31,6 @@ def delete_indices(index):
     for host in es.transport.hosts:
         hosts.append(host['host'])
 
-    print()
     print('Connected to: %s' % ', '.join(hosts))
     print('This operation will DELETE indices with index pattern: "%s"' % index)
 

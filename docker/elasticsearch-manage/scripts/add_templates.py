@@ -7,6 +7,8 @@ import json
 import argparse
 import traceback
 
+import certifi
+
 from elasticsearch import Elasticsearch
 
 
@@ -21,6 +23,7 @@ def es_client():
                    os.getenv('ELASTIC_PASSWORD', '')),
         use_ssl=bool(os.getenv('ELASTIC_SSL', False)),
         verify_certs=bool(os.getenv('ELASTIC_VERIFY_CERTS', False)),
+        ca_certs=certifi.where()
     )
     for i in range(20):
         if es.ping():
