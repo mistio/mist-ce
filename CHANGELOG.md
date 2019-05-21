@@ -1,10 +1,10 @@
 # Changelog
-## v4.1.0 (17 May 2019)
+## v4.1.0 (21 May 2019)
 
 * Feature: Add support for volumes in Packet clouds
 * Feature: Add support for volumes and machine provisioning in Aliyun ECS clouds
 * Feature: Support new OpenSSH key format
-* Feature: Set filesystem_type when creating volumes in DigitalOcean
+* Feature: Set filesystem type when creating volumes in DigitalOcean
 * Feature: Create and attach volume on OpenStack machine creation
 * Change: Refactor landing page, improving customizability and SEO
 * Change: Use OpenStack API v2.2
@@ -17,6 +17,7 @@
 * Bugfix: Fix price retrieval for GCE Asia regions
 * Bugfix: Avoid XML parse errors in xml-viewer in resource metadata sections
 * Bugfix: Fix port detection on OpenStack post machine create steps
+* Bugfix: Assign volume ownership on creation
 
 ## v4.0.3 (20 March 2019)
 
