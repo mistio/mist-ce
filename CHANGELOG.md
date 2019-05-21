@@ -18,6 +18,7 @@
 * Bugfix: Avoid XML parse errors in xml-viewer in resource metadata sections
 * Bugfix: Fix port detection on OpenStack post machine create steps
 * Bugfix: Assign volume ownership on creation
+* Bugfix: Fix sidebar counter updates
 
 ## v4.0.3 (20 March 2019)
 
