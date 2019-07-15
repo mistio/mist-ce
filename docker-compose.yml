@@ -5,6 +5,11 @@ version: '2.0'
 
 services:
 
+  fdb:
+    image: mist/fdb
+    restart: on-failure:5
+    volumes:
+      - foundationdb:/var/lib/foundationdb/data:rw
 
   mongodb:
     image: mongo:3.2
@@ -198,3 +203,4 @@ volumes:
   elasticsearch: {}
   influxdb: {}
   mongodb: {}
+  foundationdb: {}
