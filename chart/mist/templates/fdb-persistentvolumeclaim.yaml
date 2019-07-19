@@ -11,7 +11,6 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ssd
   resources:
     requests:
       storage: 30Gi
