@@ -10,6 +10,7 @@ services:
     restart: on-failure:5
     volumes:
       - foundationdb:/var/lib/foundationdb/data:rw
+      - fdbetc:/etc/foundationdb/:rw
 
   mongodb:
     image: mongo:3.2
@@ -82,6 +83,7 @@ services:
       - rabbitmq
     volumes:
       - ./settings:$CONF_DIR/settings
+      - fdbetc:/etc/foundationdb/:ro
     environment:
       SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
@@ -204,3 +206,4 @@ volumes:
   influxdb: {}
   mongodb: {}
   foundationdb: {}
+  fdbetc: {}
