@@ -1,10 +1,10 @@
-{{ if eq .Values.mongodb.host "" -}}
+{{ if eq .Values.fdb.host "" -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "chart.fullname" . }}-mongodb
+  name: {{ include "chart.fullname" . }}-fdb
   labels:
-    app: mongodb
+    app: fdb
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -14,5 +14,5 @@ spec:
   storageClassName: ssd
   resources:
     requests:
-      storage: 100Mi
+      storage: 30Gi
 {{- end }}

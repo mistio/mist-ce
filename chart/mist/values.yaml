@@ -41,6 +41,9 @@ influxdb:
   port: 8086
   db: telegraf
 
+fdb:
+  host: ''
+
 # Options for rabbitmq subchart.
 rabbitmq:
   enabled: true

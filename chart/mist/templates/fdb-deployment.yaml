@@ -1,0 +1,43 @@
+{{ if eq .Values.fdb.host "" -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-fdb
+  labels:
+    app: fdb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: fdb
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: fdb
+        image: mist/fdb
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: 4000Mi
+            cpu: 400m
+          limits:
+            memory: 6000Mi
+            cpu: 2000m
+        volumeMounts:
+        - mountPath: /var/lib/foundationdb/data
+          name: fdb
+      volumes:
+      - name: fdb
+        persistentVolumeClaim:
+          claimName: {{ include "chart.fullname" . }}-fdb
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+{{- end }}

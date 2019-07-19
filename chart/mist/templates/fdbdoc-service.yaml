@@ -1,0 +1,17 @@
+{{ if eq .Values.fdb.host "" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-fdbdoc
+  labels:
+    app: fdb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+  - port: 27017
+  selector:
+    app: fdb
+    release: {{ .Release.Name }}
+{{- end }}
