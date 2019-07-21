@@ -7,9 +7,16 @@ metadata:
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    cloud.google.com/app-protocols: '{"port80":"HTTP2"}'
 spec:
   ports:
-  - port: 80
-  selector:
-    app: nginx
-    release: {{ .Release.Name }}
+   - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: port80
+   selector:
+     app: nginx
+     release: {{ .Release.Name }}
+  type: NodePort
+  externalTrafficPolicy: Local
