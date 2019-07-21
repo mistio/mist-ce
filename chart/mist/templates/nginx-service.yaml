@@ -7,14 +7,21 @@ metadata:
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+{{- if .Values.http.tlsSecret }}
   annotations:
-    cloud.google.com/app-protocols: '{"port80":"HTTP2"}'
+    cloud.google.com/app-protocols: '{"port443":"HTTP2"}'
+{{- end }}
 spec:
   ports:
-   - port: 80
+  - port: 80
     targetPort: 80
     protocol: TCP
     name: port80
+{{- if .Values.http.tlsSecret }}
+  - port: 443
+    targetPort: 443
+    name: port443
+{{- end }}
    selector:
      app: nginx
      release: {{ .Release.Name }}
