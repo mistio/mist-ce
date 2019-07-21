@@ -239,8 +239,12 @@ deployment:
         enabled: true
         minReplicas: 1
         maxReplicas: 20
-        targetCPUUtilizationPercentage: 85
+        targetCPUUtilizationPercentage: 95
         # targetMemoryUtilizationPercentage: 80
+        customMetric:
+          enabled: false
+          name: hpa_custom_metrics_deployment_queues_length
+          targetValue: 10
       gracePeriod: 3600
       resources:
         requests:
