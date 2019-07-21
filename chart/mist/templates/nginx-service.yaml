@@ -22,7 +22,7 @@ spec:
     targetPort: 443
     name: port443
 {{- end }}
-   selector:
+  selector:
      app: nginx
      release: {{ .Release.Name }}
   type: NodePort
