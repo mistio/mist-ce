@@ -26,10 +26,15 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 80
+        - containerPort: 443
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
+{{- if .Values.http.tlsSecret }}
+        - name: tls-cert
+          mountPath: /etc/nginx/tls
+{{- end }}
         resources:
           requests:
             memory: {{ .Values.deployment.nginx.resources.requests.memory | default "30Mi" }}
@@ -47,6 +52,11 @@ spec:
       - name: nginx-config
         configMap:
           name: {{ include "chart.fullname" . }}-nginx
+{{- if .Values.http.tlsSecret }}
+      - name: tls-cert
+        secret:
+          secretName: {{ .Values.http.tlsSecret }}
+{{- end }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
