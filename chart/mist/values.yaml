@@ -13,6 +13,8 @@ image:
 # HTTP settings for the deployed application.
 http:
   host: localhost
+  http2: false
+  static: ''
   tlsSecret: ''
   tlsHosts: []
   tlsAnnotations: {}
