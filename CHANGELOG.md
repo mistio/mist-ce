@@ -9,7 +9,6 @@
 * Bugfix: Fix volume actions & attachment info update in UI
 * Bugfix: Fix volume parsing in DigitalOcean and OpenStack
 * Bugfix: Fix detach_volume in OpenStack driver
-* Bugfix: Dont throw exception when landing content page is unreachable
 
 ## v4.1.0 (21 May 2019)
 
