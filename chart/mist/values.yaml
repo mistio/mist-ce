@@ -247,8 +247,8 @@ deployment:
       gracePeriod: 3600
       resources:
         requests:
-          memory: 800Mi
-          cpu: 300m
+          memory: 400Mi
+          cpu: 400m
         limits:
           memory: 1200Mi
           cpu: 2000m
@@ -268,7 +268,7 @@ deployment:
       resources:
         requests:
           memory: 150Mi
-          cpu: 100m
+          cpu: 200m
         limits:
           memory: 250Mi
           cpu: 1000m
@@ -287,8 +287,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 600Mi
-          cpu: 100m
+          memory: 400Mi
+          cpu: 500m
         limits:
           memory: 1000Mi
           cpu: 1000m
@@ -301,8 +301,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 800Mi
-          cpu: 200m
+          memory: 400Mi
+          cpu: 500m
         limits:
           memory: 1200Mi
           cpu: 2000m
@@ -316,8 +316,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 400Mi
-          cpu: 100m
+          memory: 300Mi
+          cpu: 200m
         limits:
           memory: 800Mi
           cpu: 2000m
@@ -330,8 +330,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 400Mi
-          cpu: 100m
+          memory: 300Mi
+          cpu: 200m
         limits:
           memory: 800Mi
           cpu: 2000m
@@ -345,8 +345,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 400Mi
-          cpu: 100m
+          memory: 300Mi
+          cpu: 200m
         limits:
           memory: 800Mi
           cpu: 2000m
@@ -360,7 +360,7 @@ deployment:
       resources:
         requests:
           memory: 200Mi
-          cpu: 100m
+          cpu: 200m
         limits:
           memory: 1000Mi
           cpu: 2000m
@@ -375,7 +375,7 @@ deployment:
       resources:
         requests:
           memory: 100Mi
-          cpu: 100m
+          cpu: 200m
         limits:
           memory: 200Mi
           cpu: 1000m
@@ -390,7 +390,7 @@ deployment:
       resources:
         requests:
           memory: 100Mi
-          cpu: 100m
+          cpu: 200m
         limits:
           memory: 200Mi
           cpu: 1000m
@@ -405,7 +405,7 @@ deployment:
       resources:
         requests:
           memory: 100Mi
-          cpu: 100m
+          cpu: 200m
         limits:
           memory: 400Mi
           cpu: 1000m
@@ -419,8 +419,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 800Mi
-          cpu: 200m
+          memory: 400Mi
+          cpu: 300m
         limits:
           memory: 1200Mi
           cpu: 2000m
@@ -434,8 +434,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 800Mi
-          cpu: 200m
+          memory: 400Mi
+          cpu: 300m
         limits:
           memory: 1200Mi
           cpu: 2000m
@@ -449,8 +449,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 800Mi
-          cpu: 200m
+          memory: 400Mi
+          cpu: 250m
         limits:
           memory: 1200Mi
           cpu: 2000m
@@ -466,8 +466,8 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 500Mi
-          cpu: 800m
+          memory: 400Mi
+          cpu: 200m
         limits:
           memory: 700Mi
           cpu: 2000m
@@ -480,7 +480,7 @@ deployment:
       resources:
         requests:
           memory: 50Mi
-          cpu: 250m
+          cpu: 300m
         limits:
           memory: 300Mi
           cpu: 1000m
@@ -493,7 +493,7 @@ deployment:
       resources:
         requests:
           memory: 200Mi
-          cpu: 100m
+          cpu: 400m
         limits:
           memory: 500Mi
           cpu: 1000m
@@ -506,7 +506,7 @@ deployment:
       resources:
         requests:
           memory: 250Mi
-          cpu: 400m
+          cpu: 500m
         limits:
           memory: 500Mi
           cpu: 1000m
@@ -542,8 +542,8 @@ deployment:
     autoscaling: *autoscaling
     resources:
       requests:
-        memory: 800Mi
-        cpu: 400m
+        memory: 500Mi
+        cpu: 300m
       limits:
         memory: 1000Mi
         cpu: 2000m
@@ -557,7 +557,7 @@ deployment:
         memory: 100Mi
         cpu: 100m
       limits:
-        memory: 200Mi
+        memory: 300Mi
         cpu: 1000m
 
   # UI deployment settings.
