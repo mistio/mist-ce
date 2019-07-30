@@ -43,7 +43,7 @@ discover submodules:
 
 .dind_template: &docker_template
   stage: build
-  image: docker:git
+  image: docker:18-git
   services:
     - docker:dind
   variables: &docker_variables
