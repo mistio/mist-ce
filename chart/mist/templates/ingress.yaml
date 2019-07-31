@@ -8,7 +8,6 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
-    kubernetes.io/ingress.class: nginx
 {{- if .Values.http.tlsSecret }}
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     {{- if .Values.http.http2 }}
@@ -17,6 +16,8 @@ metadata:
 {{- end }}
 {{- if .Values.http.static }}
     kubernetes.io/ingress.global-static-ip-name: {{ .Values.http.static }}
+{{- else }}
+    kubernetes.io/ingress.class: nginx
 {{- end }}
 {{- if .Values.http.tlsAnnotations }}
 {{ toYaml .Values.http.tlsAnnotations | indent 4 }}
