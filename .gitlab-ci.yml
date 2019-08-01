@@ -43,12 +43,13 @@ discover submodules:
 
 .dind_template: &docker_template
   stage: build
-  image: docker:git
+  image: docker:18.09-git
   services:
     - docker:dind
   variables: &docker_variables
     DOCKER_DRIVER: overlay2
-    DOCKER_HOST: "tcp://localhost:2375"
+    DOCKER_HOST: tcp://localhost:2375/
+    DOCKER_TLS_CERTDIR: ''
   retry: 2
   tags:
     - cpu
@@ -226,7 +227,7 @@ compose:
 
 .deploy_template: &deploy_template
   stage: deploy
-  image: dtzar/helm-kubectl:2.10.0
+  image: dtzar/helm-kubectl:2.14.1
   before_script:
     - |
         set -e
@@ -352,11 +353,6 @@ deploy test:
           certmanager.k8s.io/acme-challenge-type: dns01
           certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: true
-      nodeSelector:
-        cloud.google.com/gke-nodepool: generic
-      rabbitmq:
-        nodeSelector:
-          cloud.google.com/gke-nodepool: generic
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
@@ -379,11 +375,6 @@ deploy test:
         starttls: true
         username: apikey
         password: $SENDGRID_PASSWORD
-      nodeSelector:
-        cloud.google.com/gke-nodepool: generic
-      rabbitmq:
-        nodeSelector:
-          cloud.google.com/gke-nodepool: generic
 
 deploy review:
   <<: *deploy_review_template

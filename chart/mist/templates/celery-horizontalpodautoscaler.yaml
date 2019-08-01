@@ -30,15 +30,15 @@ spec:
         name: memory
         targetAverageUtilization: {{ $settings.autoscaling.targetMemoryUtilizationPercentage }}
 {{- end }}
-{{- if and $.Values.prometheus.enabled $.Values.prometheus.operator.enabled }}
+{{- if $settings.autoscaling.customMetric.enabled }}
     - type: Object
       object:
         target:
           apiVersion: extensions/v1beta1
           kind: Deployment
           name: {{ include "chart.fullname" $ }}-celery-{{ $name }}
-        metricName: hpa_custom_metrics_deployment_queues_length
-        targetValue: 10
+        metricName: {{ $settings.autoscaling.customMetric.name }}
+        targetValue: {{ $settings.autoscaling.customMetric.targetValue }}
 {{- end }}
 ---
 {{ end }}
