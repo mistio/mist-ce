@@ -18,8 +18,6 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: {{ .Values.http.static }}
 {{- else }}
     kubernetes.io/ingress.class: nginx
-<<<<<<< HEAD
-=======
 {{- if .Values.http.tlsSecret }}
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     {{- if .Values.http.http2 }}
@@ -28,7 +26,6 @@ metadata:
 {{- end }}
 {{- if .Values.http.static }}
     kubernetes.io/ingress.global-static-ip-name: {{ .Values.http.static }}
->>>>>>> staging
 {{- end }}
 {{- if .Values.http.tlsAnnotations }}
 {{ toYaml .Values.http.tlsAnnotations | indent 4 }}
