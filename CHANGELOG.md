@@ -1,4 +1,9 @@
 # Changelog
+## v4.1.4 (4 September 2019)
+
+* Bugfix: Search for vSphere machine snapshots recursively
+* Bugfix: Remove deprecated ex_disk_id param in create_machine which affected the machine's network configuration.
+* Bugfix: Fix list_sizes on Packet when using Project API token
 
 ## v4.1.1 (21 July 2019)
 

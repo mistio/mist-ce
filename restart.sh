@@ -7,7 +7,7 @@ if [ $# -eq 0 ]; then
 elif [ $# -eq 1 ] && [ "$@" = "api" ]; then
     echo "Sending HUP signal to uwsgi"
     echo "---------------------------------------------------"
-    docker-compose exec api pkill -HUP uwsgi
+    docker-compose exec api sh -c "kill -HUP 1"
     echo "Done."
 else
     echo "Restarting $@"
