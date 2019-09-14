@@ -112,8 +112,8 @@ rabbitmqExternal:
 
 # MongoDB settings. Change this to use a remote MongoDB cluster.
 mongodb:
-  host: ''
-  port: 27017
+  host: '172.20.32.202'
+  port: 27016
 
 # Docker settings (used by orchestration plugin). This has to be configured for
 # orchestration to work.
