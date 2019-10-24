@@ -15,9 +15,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- end }}
 {{- end }}
-{{- if .Values.http.static }}
-    kubernetes.io/ingress.global-static-ip-name: {{ .Values.http.static }}
-{{- end }}
 {{- if .Values.http.tlsAnnotations }}
 {{ toYaml .Values.http.tlsAnnotations | indent 4 }}
 {{- end }}
