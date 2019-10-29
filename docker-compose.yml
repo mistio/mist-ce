@@ -181,6 +181,8 @@ services:
       - 9097:9097
     depends_on:
       - rabbitmq
+    volumes:
+      - fdbetc:/etc/foundationdb/:ro
 
 
   traefik:
