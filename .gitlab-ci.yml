@@ -170,6 +170,19 @@ build api:
           .
     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
+build tsfdb:
+  <<: *docker_template
+  script:
+    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha tsfdb)"
+    - docker_pull $SRC_IMG
+    - |
+        docker build \
+          -t $CI_PROJECT_NAME/tsfdb:$CI_COMMIT_SHA \
+          --build-arg FROM_IMAGE=$SRC_IMG \
+          --build-arg MIST_VERSION_SHA=$CI_COMMIT_SHA \
+          --build-arg MIST_VERSION_NAME=$CI_COMMIT_REF_NAME \
+          .
+    - docker_push $CI_PROJECT_NAME/tsfdb:$CI_COMMIT_SHA tsfdb
 
 .docker_build_template: &docker_build_template
   <<: *docker_template
@@ -183,7 +196,6 @@ build nginx: *docker_build_template
 build gocky: *docker_build_template
 build logstash: *docker_build_template
 build elasticsearch-manage: *docker_build_template
-build tsfdb: *docker_build_template
 
 .docker_retag_template: &docker_retag_template
   <<: *docker_template
