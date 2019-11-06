@@ -173,7 +173,7 @@ build api:
 build tsfdb:
   <<: *docker_template
   script:
-    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha tsfdb)"
+    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/tsfdb:$(get_submodule_sha tsfdb)"
     - docker_pull $SRC_IMG
     - |
         docker build \
