@@ -183,7 +183,7 @@ build nginx: *docker_build_template
 build gocky: *docker_build_template
 build logstash: *docker_build_template
 build elasticsearch-manage: *docker_build_template
-
+build tsfdb: *docker_build_template
 
 .docker_retag_template: &docker_retag_template
   <<: *docker_template

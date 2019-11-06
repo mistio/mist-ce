@@ -12,6 +12,12 @@ services:
       - foundationdb:/var/lib/foundationdb/data:rw
       - fdbetc:/etc/foundationdb/:rw
 
+  tsfdb:
+    image: $IMG_REGISTRY/tsfdb:$IMG_TAG
+    restart: on-failure:5
+    volumes:
+      - fdbetc:/etc/foundationdb/:rw
+
   mongodb:
     image: mongo:3.2
     restart: on-failure:5

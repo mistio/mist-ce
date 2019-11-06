@@ -10,3 +10,6 @@
 [submodule "tests"]
 	path = tests
 	url = ../mist.tests.git
+[submodule "tsfdb"]
+	path = tsfdb
+	url = ../tsfdb-server
