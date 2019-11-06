@@ -170,20 +170,6 @@ build api:
           .
     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
-build tsfdb:
-  <<: *docker_template
-  script:
-    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/tsfdb:$(get_submodule_sha tsfdb)"
-    - docker_pull $SRC_IMG
-    - |
-        docker build \
-          -t $CI_PROJECT_NAME/tsfdb:$CI_COMMIT_SHA \
-          --build-arg FROM_IMAGE=$SRC_IMG \
-          --build-arg MIST_VERSION_SHA=$CI_COMMIT_SHA \
-          --build-arg MIST_VERSION_NAME=$CI_COMMIT_REF_NAME \
-          .
-    - docker_push $CI_PROJECT_NAME/tsfdb:$CI_COMMIT_SHA tsfdb
-
 .docker_build_template: &docker_build_template
   <<: *docker_template
   script:
@@ -213,6 +199,7 @@ build elasticsearch-manage: *docker_build_template
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
 retag tests: *docker_retag_template
+retag tsfdb: *docker_retag_template
 
 
 compose:
