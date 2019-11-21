@@ -1,13 +1,131 @@
 # Mist Cloud Management Platform - Community Edition
 
-Mist helps you manage and monitor your computing infrastructure, across
-multiple clouds and platforms. The code is provided under the GNU AGPL v3.0
-License.
+Mist is an open source platform for managing heterogeneous computing 
+infrastructure, aka a Multi-Cloud Management Platform.
 
-The Enterprise Edition and the Hosted Service that include Role Based Access, VPN tunnels and
-Insights for cost optimization are available at https://mist.io
+The managed computing resources may be running on any combination of public 
+clouds, private clouds, hypervisors, bare metal servers, container hosts.
+
+Mist is developed by Mist.io Inc. The code for the Community Edition is 
+provided under the Apache License. The Enterprise Edition and the Hosted 
+Service include plugins for Governance, Role Based Access Control & Cost 
+Insights. They are available for purchase at __https://mist.io__. Paid support 
+plans are available for any edition.
 
 <img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768">
+
+# Who needs Mist?
+
+1. Organizations that depend on hybrid or multi-cloud infrastructure
+2. Organizations that provide infrastructure resources to their users on a self-service fashion
+
+They often end up building silos of distinct tools, processes & teams for each 
+supported platform, introducing operational complexities which can affect both 
+security and efficiency.
+
+As the heterogeneity increases, it's becoming increasingly difficult to
+- train users
+- set access control rules
+- set governance policies like quotas and other constraints
+- audit usage
+- monitor/optimize costs
+- automate complex deployments
+- set up metering & billing
+
+Mist provides a unified way to operate, monitor & govern these resources. The 
+mission statement of the Mist platform is to help commoditize computing by 
+alleviating vendor lock-in. 
+
+# Features
+
+- Instant visibility of all the available resources across clouds, grouped by tags
+- Instant reporting/estimation of the current infrastructure costs
+- Compare current & past costs, correlate with usage, provide right-sizing recommendations (EE/HS only)
+- Provision new resources on any cloud: machines, volumes, networks, zones, records
+- Perform life cycle actions on existing resources: stop, start, reboot, resize, destroy, etc
+- Instant audit logging for all actions performed through Mist or detected through continuous polling
+- Upload scripts to the library, run them on any machine while enforcing audit logging and centralized control of SSH keys
+- SSH command shell on any machine within the browser or through the CLI, enforcing audit logging and centralized control of SSH keys
+- Enable monitoring on target machines to display real time system & custom metrics and store them for long term access
+- Set rules on metrics or logs that trigger notifications, webhooks, scripts or machine lifecycle actions
+- Set schedules that trigger scripts or machine lifecycle actions
+- Set fine grained access control policies per team/tag/resource/action (EE/HS only)
+- Set governance constraints: e.g. quotas on cost per user/team, required expiration dates (EE/HS only)
+- Upload infrastructure templates that may describe complex deployments and workflows (EE/HS only)
+- Deploy and scale Kubernetes clusters on any supported cloud (EE/HS only)
+
+# Terminology
+
+#### Cloud
+Any service that provides on-demand access to computing resources
+- Public clouds  (e.g. AWS, Azure, Google Cloud, IBM Cloud, DigitalOcean, Linode, Packet)
+- Private clouds (e.g. based on OpenStack, vSphere, OnApp)
+- Hypervisors (e.g. KVM, ESXi),
+- Container hosts / Container clusters
+- Bare metal / Other server
+
+#### Machine
+
+Any computing resource is a machine. There are many types of machines and some machines may contain other machines.
+
+#### Volume
+
+Any physical or virtual data storage device. E.g. Physical HDD/SSD, Cloud disks, EBS volumes, etc. Volumes may be attached on machines. May be provisioned along with machines or independently.
+
+#### Network
+
+Private network spaces that machines can join. e.g. AWS VPC's
+
+#### Script
+
+An executable (e.g. bash script) or an Ansible playbook that can run on machines over SSH. Scripts may be added inline or by a reference to a tarball or a Git repository.
+
+#### Template
+
+A blueprint that describes the full lifecycle of an application that may require multiple computing resources, network, storage and additional configurations. E.g. The provided Kubernetes template enables the deployment of a Kubernetes cluster on any cloud and provides workflows to easily scale the cluster up or down. Currently supporting Cloudify blueprints. Terraform support coming soon.
+
+#### Stack
+
+The deployment of a template is a Stack. A Stack may include resources (e.g. machines, networks, volumes) and provides a set of workflow actions that can be performed. A Stack created by the Kubernetes template refers to a Kubernetes cluster. It includes references to the master and worker nodes and provides scale up & down workflows that can be applied to the cluster.
+
+#### Tunnel
+
+A point to point VPN enabling Mist to manage infrastructure that's not on publicly addressable network space.
+
+# Architecture
+
+Mist is a cloud native application split into microservices which are packaged as Docker containers. It can be deployed on a single host with Docker Compose, or on a Kubernetes cluster using Helm.
+
+The most notable components are the following:
+- Mist UI, a web application built with Web Components and Polymer
+- REST API that serves requests from clients
+- WebSocket API, sends real-time updates to connected clients and proxies shell connections
+- Hubshell service, opens SSH connections to machines or shell connections using the Docker API
+- Celery workers, running asynchronous jobs
+- Celery Beat schedulers & pollers that schedule polling tasks, as well as user defined scheduled actions
+- Gocky as the relay to receive and pre-process monitoring metrics
+- RabbitMQ message queue service
+- InfluxDB, Graphite or FoundationDB as a time series database
+- MongoDB or FoundationDB Document Layer as the main database
+- Elasticsearch for storing and searching logs
+- Logstash for routing logs to Elasticsearch
+- Telegraf as a data collection agent, installed on monitored machines
+
+![Architecture.svg](Architecture.svg)
+
+The user interacts with the RESTful Mist API through client apps like the Mist 
+UI in the browser, or command line tools (e.g. cURL,  Mist CLI). The Mist UI, 
+apart from invoking the RESTful API, also establishes a WebSocket connection, 
+which is used to receive real time updates and to proxy shell connections to 
+machines. The Mist API server interacts with the respective API's of the 
+target clouds, either directly, or by adding tasks that get executed 
+asynchronously by Celery workers. The messaging is following the AMQP protocol 
+and gets coordinated by RabbitMQ. The main data store is MongoDB. Logs are 
+being stored in Elasticsearch. Time series data go to either Graphite, 
+InfluxDB or TSFDB, depending on the installation. Schedules and polling tasks 
+are triggered by Celery Beat. Whenever a shell connection is required (e.g. 
+SSH or Docker Shell), Hubshell establishes the connection and makes it 
+available through the WebSocket API.
 
 ## Hardware requirements
 
@@ -19,10 +137,12 @@ Recommended hardware resources are:
 
 ## Installation
 
-Mist is a large application split into microservices which are packages in
-docker containers. The easiest way to run it is by using `docker-compose`. So,
-in order to run it, one needs to install a recent version of
-[docker](https://docs.docker.com/engine/installation/) and
+
+### Single host
+
+The easiest way to get started with Mist is to install the latest release 
+using `docker-compose`. So, in order to run it, one needs to install a recent 
+version of [docker](https://docs.docker.com/engine/installation/) and
 [docker-compose](https://docs.docker.com/compose/install/).
 
 To install the latest stable release, head over to
@@ -34,6 +154,12 @@ be downloaded and started in the background.
 
 Run `docker-compose ps`. All containers should be in the UP state, except
 shortlived container elasticsearch-manage.
+
+
+### Kubernetes cluster
+
+Use the available helm chart within the chart directory.
+
 
 
 ## Running Mist
@@ -210,5 +336,28 @@ This setup will mount the checked out code into the containers. By cloning the
 directory, now there's also a `docker-compose.override.yml` file in the current
 directory in addition to `docker-compose.yml` and is used to modify the
 configuration for development mode.
+
+If you're not interested in frontend development, you can comment out the ui & 
+landing sections within the `docker-compose.override.yml` file and re-run 
+`docker-compose up -d`. Otherwise, you'll also need to install the ui & 
+landing page dependencies before you can access the Mist UI.
+
+Install all front-end dependencies with the following commands
+
+    docker-compose exec landing bower install
+    docker-compose exec ui bower install
+
+And then build the landing & ui bundles
+
+    docker-compose exec landing polymer build
+    docker-compose exec ui node --max_old_space_size=4096 /usr/local/bin/polymer build
+    docker-compose exec ui cp bower_components/echarts/dist/echarts.common.min.js build/bundled/bower_components/echarts/dist/
+
+When doing front-end development, it's usually more convenient to serve the 
+source code instead of the bundles. To do that, edit settings/settings.py and 
+set `JS_BUILD = False`. Restart the api container for the changes to take 
+effect
+
+    ./restart.sh api
 
 The above instructions for running and managing Mist apply.
