@@ -49,6 +49,12 @@ data:
 
         server {
             listen               80;
+{{- if .Values.http.http2 }}
+            listen               443 http2 ssl;
+            server_name {{ .Values.http.host }};
+            ssl_certificate     /etc/nginx/tls/tls.crt;
+            ssl_certificate_key /etc/nginx/tls/tls.key;
+{{- end }}
             underscores_in_headers  on;
 
             #security -mostly- related headers

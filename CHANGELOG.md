@@ -1,4 +1,20 @@
 # Changelog
+## v4.1.4 (4 September 2019)
+
+* Bugfix: Search for vSphere machine snapshots recursively
+* Bugfix: Remove deprecated ex_disk_id param in create_machine which affected the machine's network configuration.
+* Bugfix: Fix list_sizes on Packet when using Project API token
+
+## v4.1.1 (21 July 2019)
+
+* Change: Catch jsonpatch errors, prevents browser memory increase over time
+* Change: Dont store shell sessions by default
+* Bugfix: Only show available Aliyun sizes in resize dialog
+* Bugfix: Fix issue with sidebar counters not updating
+* Bugfix: Fix volume actions & attachment info update in UI
+* Bugfix: Fix volume parsing in DigitalOcean and OpenStack
+* Bugfix: Fix detach_volume in OpenStack driver
+
 ## v4.1.0 (21 May 2019)
 
 * Feature: Add support for volumes in Packet clouds
