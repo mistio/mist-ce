@@ -134,6 +134,14 @@
             "index": true,
             "type": "keyword"
           },
+          "network_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "volume_id": {
+            "index": true,
+            "type": "keyword"
+          },
           "key_id": {
             "index": true,
             "type": "keyword"
