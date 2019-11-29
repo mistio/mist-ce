@@ -1,4 +1,37 @@
 # Changelog
+
+## v4.2.0 (29 November 2019)
+
+This release brings major enhancements on rules and logging. It's now possible 
+to set rules on logs that match any managed resource. Observation logs are 
+emitted whenever the poller detects new, missing or updated machines, volumes, 
+networks or zones.
+
+* Feature: Log observations of infrastructure changes
+* Feature: Rules on logs
+* Feature: Rules can trigger webhook actions
+* Feature: Add alert level & description in rule notification actions
+* Feature: Add optional domain name field for OpenStack clouds
+* Feature: Add support for FoundationDB Document Layer as a replacement for MongoDB
+* Feature: Improve volume support for Azure Resource Manager
+* Feature: Attach disk upon machine creation on Alibaba Cloud
+* Feature: Attach existing and new volume when creating EC2 Instance
+* Feature: Attach existing volume when creating DigitalOcean droplet
+* Feature: Add cloudinit support for OpenStack, Alibaba Cloud, IBM Cloud, Vultr
+* Feature: Add support for Maxihost bare metal cloud
+* Feature: Set machine expiraion date
+* Feature: Enforce constraints on expiration dates (EE/HS only)
+* Feature: Enforce quotas on cost per team/user/org (EE/HS only)
+* Feature: Enforce RBAC permissions on the UI by hiding unavailable actions (EE/HS only)
+* Change: Update add cloud form, separate providers into categories
+* Change: Deprecate Nephoscale provider
+* Change: Rename Softlayer to IBM Cloud
+* Change: Update cloud provider logos
+* Change: Improve DNS record creation widget when creating machine
+* Bugfix: Fix IBM Cloud machine size association
+* Bugfix: Fix provisioning on Alibaba Cloud
+* Bugfix: Fix provisioning use cases on Azure Resource Manager
+
 ## v4.1.4 (4 September 2019)
 
 * Bugfix: Search for vSphere machine snapshots recursively
