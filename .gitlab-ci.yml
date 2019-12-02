@@ -226,7 +226,7 @@ compose:
 
 .deploy_template: &deploy_template
   stage: deploy
-  image: dtzar/helm-kubectl:2.14.1
+  image: dtzar/helm-kubectl:2.16.1
   before_script:
     - |
         set -e
