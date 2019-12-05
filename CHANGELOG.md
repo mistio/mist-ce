@@ -19,7 +19,7 @@ networks or zones.
 * Feature: Attach existing volume when creating DigitalOcean droplet
 * Feature: Add cloudinit support for OpenStack, Alibaba Cloud, IBM Cloud, Vultr
 * Feature: Add support for Maxihost bare metal cloud
-* Feature: Set machine expiraion date
+* Feature: Add support for machine expiration dates
 * Feature: Enforce constraints on expiration dates (EE/HS only)
 * Feature: Enforce quotas on cost per team/user/org (EE/HS only)
 * Feature: Enforce RBAC permissions on the UI by hiding unavailable actions (EE/HS only)
