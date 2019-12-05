@@ -463,6 +463,7 @@ deployment:
     generic:
       enabled: true
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 400Mi
@@ -475,6 +476,7 @@ deployment:
     owners:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 50Mi
@@ -487,6 +489,7 @@ deployment:
     clouds:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 200Mi
@@ -499,6 +502,7 @@ deployment:
     machines:
       enabled: false
       replicas: 1
+      autoscaling: *autoscaling
       resources:
         requests:
           memory: 250Mi
