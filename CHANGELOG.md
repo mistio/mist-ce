@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.2.0 (11 December 2019)
+## v4.2.0 (12 December 2019)
 
 This release brings major enhancements on rules and logging. It's now possible 
 to set rules on logs that match any managed resource. Observation logs are 
