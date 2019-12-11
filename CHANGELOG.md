@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.2.0 (29 November 2019)
+## v4.2.0 (11 December 2019)
 
 This release brings major enhancements on rules and logging. It's now possible 
 to set rules on logs that match any managed resource. Observation logs are 
@@ -31,6 +31,7 @@ networks or zones.
 * Bugfix: Fix IBM Cloud machine size association
 * Bugfix: Fix provisioning on Alibaba Cloud
 * Bugfix: Fix provisioning use cases on Azure Resource Manager
+* Bugfix: Fix attach/detach volume on DigitalOcean
 
 ## v4.1.4 (4 September 2019)
 
