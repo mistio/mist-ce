@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.2.1 (17 December 2019)
+
+* Bugfix: Fix image retrieval for vSphere machines
+
 ## v4.2.0 (12 December 2019)
 
 This release brings major enhancements on rules and logging. It's now possible 
