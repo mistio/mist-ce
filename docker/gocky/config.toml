@@ -15,11 +15,11 @@ output = [
 
 # metering will send stats for samples/org/machine
 # you have to also set amqp-url for metering to work
-#enable-metering = true
+enable-metering = true
 
-#amqp-url = "amqp://guest:guest@rabbitmq:5672/"
+amqp-url = "amqp://guest:guest@rabbitmq:5672/"
 
-#cron-schedule = "@every 10s"
+cron-schedule = "@every 10s"
 
 # drop-unauthorized is used when data are coming to gocky having a source
 # different than traefik (e.g. unauthorized)
