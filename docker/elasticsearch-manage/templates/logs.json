@@ -169,10 +169,6 @@
           "external_id": {
             "index": true,
             "type": "keyword"
-          },
-          "_id": {
-            "index": true,
-            "type": "keyword"
           }
         }
       },
