@@ -1,9 +1,9 @@
 [[http]]
-name = "influxdb"
+name = "all_backends"
 bind-addr = "0.0.0.0:9096"
 output = [
-    { name="influxdb", location="http://influxdb:8086/write", type="influxdb" },
-    { name="fdb", location="fdb:4500", type="fdb" },
+    { name="influxdb", location="http://influxdb:8086/write", type="influxdb", fail-on-error=false},
+    { name="fdb", location="fdb:4500", type="fdb" , fail-on-error=false},
 ]
 
 #[[fdb]]
