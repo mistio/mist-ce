@@ -12,7 +12,7 @@ metadata:
     heritage: {{ $.Release.Service }}
 spec:
   scaleTargetRef:
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     name: {{ include "chart.fullname" $ }}-celery-{{ $name }}
   minReplicas: {{ $settings.autoscaling.minReplicas }}
@@ -34,7 +34,7 @@ spec:
     - type: Object
       object:
         target:
-          apiVersion: extensions/v1beta1
+          apiVersion: apps/v1
           kind: Deployment
           name: {{ include "chart.fullname" $ }}-celery-{{ $name }}
         metricName: {{ $settings.autoscaling.customMetric.name }}

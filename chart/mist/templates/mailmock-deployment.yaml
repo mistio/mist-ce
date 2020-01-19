@@ -1,5 +1,5 @@
 {{ if eq .Values.smtp.host "" -}}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}-mailmock
@@ -10,6 +10,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:

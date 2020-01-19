@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}-nginx
@@ -9,6 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.nginx.replicas | default "1" }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:

@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}-ui
@@ -9,6 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.ui.replicas | default "1" }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
@@ -27,7 +30,7 @@ spec:
         resources:
           requests:
             memory: {{ .Values.deployment.ui.resources.requests.memory | default "30Mi" }}
-            cpu: {{ .Values.deployment.ui.resources.requests.cpu | default "10m" }}
+            cpu: {{ .Values.deployment.ui.resources.requests.cpu | default "1m" }}
           limits:
             memory: {{ .Values.deployment.ui.resources.limits.memory | default "50Mi" }}
             cpu: {{ .Values.deployment.ui.resources.limits.cpu | default "100m" }}
