@@ -1,6 +1,11 @@
 # Changelog
 
-## v4.2.0 (29 November 2019)
+## v4.2.1 (17 December 2019)
+
+* Bugfix: Fix image retrieval for vSphere machines
+* Bugfix: Fix webhooks on org rules & webhooks with empty body
+
+## v4.2.0 (12 December 2019)
 
 This release brings major enhancements on rules and logging. It's now possible 
 to set rules on logs that match any managed resource. Observation logs are 
@@ -19,7 +24,7 @@ networks or zones.
 * Feature: Attach existing volume when creating DigitalOcean droplet
 * Feature: Add cloudinit support for OpenStack, Alibaba Cloud, IBM Cloud, Vultr
 * Feature: Add support for Maxihost bare metal cloud
-* Feature: Set machine expiraion date
+* Feature: Add support for machine expiration dates
 * Feature: Enforce constraints on expiration dates (EE/HS only)
 * Feature: Enforce quotas on cost per team/user/org (EE/HS only)
 * Feature: Enforce RBAC permissions on the UI by hiding unavailable actions (EE/HS only)
@@ -31,6 +36,7 @@ networks or zones.
 * Bugfix: Fix IBM Cloud machine size association
 * Bugfix: Fix provisioning on Alibaba Cloud
 * Bugfix: Fix provisioning use cases on Azure Resource Manager
+* Bugfix: Fix attach/detach volume on DigitalOcean
 
 ## v4.1.4 (4 September 2019)
 

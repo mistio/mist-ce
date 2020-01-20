@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}-swagger
@@ -9,6 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
@@ -28,7 +31,7 @@ spec:
             cpu: 200m
           requests:
             memory: 20Mi
-            cpu: 10m
+            cpu: 1m
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
