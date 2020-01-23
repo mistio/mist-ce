@@ -37,6 +37,8 @@ spec:
         - name: gocky-config
           mountPath: /etc/gocky/config.toml
           subPath: config.toml
+        - name: fdb-config
+          mountPath: /etc/foundationdb/
         resources:
           requests:
             memory: {{ .Values.deployment.gocky.resources.requests.memory | default "10Mi" }}
@@ -48,6 +50,15 @@ spec:
       - name: gocky-config
         configMap:
           name: {{ include "chart.fullname" . }}-gocky
+      - name: fdb-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-fdb-config
+          defaultMode: 420
+          items:
+          - key: cluster-file
+            path: fdb.cluster
+          - key: ca-file
+            path: ca.pem
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
