@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}-api
@@ -9,6 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.deployment.api.replicas | default "1" }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
@@ -28,8 +31,8 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: {{ .Values.deployment.api.resources.requests.memory | default "800Mi" }}
-            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "600m" }}
+            memory: {{ .Values.deployment.api.resources.requests.memory | default "500Mi" }}
+            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "100m" }}
           limits:
             memory: {{ .Values.deployment.api.resources.limits.memory | default "1000Mi" }}
             cpu: {{ .Values.deployment.api.resources.limits.cpu | default "2000m" }}

@@ -64,9 +64,9 @@ rabbitmq:
   nodeSelector: {}
   prometheus:
     exporter:
-      enabled: true
+      enabled: false
     operator:
-      enabled: true
+      enabled: false
   updateStrategy: RollingUpdate
   extraConfig: |-
     tcp_listen_options.keepalive = true
@@ -114,6 +114,7 @@ rabbitmqExternal:
 mongodb:
   host: ''
   port: 27017
+  usePassword: false
 
 # Docker settings (used by orchestration plugin). This has to be configured for
 # orchestration to work.
@@ -212,9 +213,9 @@ preemptible:
 
 # Configure prometheus exporters. Subcharts may require separate configuration.
 prometheus:
-  enabled: true
+  enabled: false
   operator:
-    enabled: true
+    enabled: false
     serviceMonitor:
       interval: 20s
       namespace: monitoring

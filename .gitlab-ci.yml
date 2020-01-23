@@ -462,8 +462,9 @@ UI:images-networks: *ui_test_template
 UI:user-actions: *ui_test_template
 UI:teams: *ui_test_template
 UI:zones: *ui_test_template
-UI:rules-1/2: *ui_test_template
-UI:rules-2/2: *ui_test_template
+UI:rules-1/3: *ui_test_template
+UI:rules-2/3: *ui_test_template
+UI:rules-3/3: *ui_test_template
 UI:machines-1/2:
   <<: *ui_test_template
   retry: 1
