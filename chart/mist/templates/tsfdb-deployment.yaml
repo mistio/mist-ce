@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-tsfdb
+  labels:
+    app: tsfdb
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: tsfdb
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: tsfdb
+        env:
+        - name: API_URL
+          value: /api/v1/spec
+        image: {{ .Values.image.registry }}/tsfdb-server:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          limits:
+            memory: 50Mi
+            cpu: 200m
+          requests:
+            memory: 20Mi
+            cpu: 1m
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

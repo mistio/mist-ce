@@ -127,7 +127,7 @@ docker:
 
 # Monitoring settings.
 monitoring:
-  defaultMethod: telegraf-influxdb
+  defaultMethod: telegraf-tsfdb
 
 # Allow registration of dev users, used for testing purposes.
 enableDevUsers: false
