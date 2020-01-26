@@ -25,6 +25,9 @@ spec:
           value: /api/v1/spec
         image: {{ .Values.image.registry }}/tsfdb-server:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: fdb-config
+          mountPath: /etc/foundationdb/
         resources:
           limits:
             memory: 50Mi
@@ -32,6 +35,16 @@ spec:
           requests:
             memory: 20Mi
             cpu: 1m
+      volumes:
+      - name: fdb-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-fdb-config
+          defaultMode: 420
+          items:
+          - key: cluster-file
+            path: fdb.cluster
+          - key: ca-file
+            path: ca.pem
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
