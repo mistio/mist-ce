@@ -1,4 +1,5 @@
 {{ if eq .Values.fdb.host "" -}}
+apiVersion: apps.foundationdb.org/v1beta1
 kind: FoundationDBCluster
 metadata:
   labels:
