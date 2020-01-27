@@ -23,7 +23,7 @@ spec:
         env:
         - name: API_URL
           value: /api/v1/spec
-        image: {{ .Values.image.registry }}/tsfdb-server:{{ .Values.image.tag }}
+        image: {{ .Values.image.registry }}/tsfdb:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: fdb-config
