@@ -90,7 +90,7 @@ data:
   {{- if .Values.mongodb.host }}
     MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
   {{- else }}
-    MONGO_URI = "{{ include "chart.fullname" . }}-fdbdoc:27017"
+    MONGO_URI = "{{ include "chart.fullname" . }}-mongodb:27017"
   {{- end }}
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
