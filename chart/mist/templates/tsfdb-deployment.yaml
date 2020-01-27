@@ -18,6 +18,8 @@ spec:
         app: tsfdb
         release: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - name: tsfdb
         env:
