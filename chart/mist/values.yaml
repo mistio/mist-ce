@@ -112,6 +112,7 @@ rabbitmqExternal:
 
 # MongoDB settings. Change this to use a remote MongoDB cluster.
 mongodb:
+  deploy: true
   host: ''
   port: 27017
   usePassword: false

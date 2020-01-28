@@ -5,7 +5,7 @@ dependencies:
     name: rabbitmq-ha
     version: 1.38.2
   - alias: mongodb
-    condition: eq .Values.mongodb.host ""
+    condition: mongodb.deploy
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: mongodb
     version: 7.7.0
