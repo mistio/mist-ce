@@ -32,8 +32,8 @@ spec:
           mountPath: /etc/foundationdb/
         resources:
           limits:
-            memory: 50Mi
-            cpu: 200m
+            memory: 500Mi
+            cpu: 500m
           requests:
             memory: 20Mi
             cpu: 1m
