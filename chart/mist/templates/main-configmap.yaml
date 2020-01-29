@@ -49,7 +49,7 @@ data:
         'elastic_verify_certs': False,
       {{- end }}
     }
-
+    TSFDB_URI = {{ if .Values.fdb.tsfdb }} "http://{{ include "chart.fullname" . }}-tsfdb:8080" {{ else }} "" {{ end }}
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
@@ -90,7 +90,11 @@ data:
   {{- if .Values.mongodb.host }}
     MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
   {{- else }}
+    {{- if .Values.fdb.fdbdoc }}
+    MONGO_URI = "{{ include "chart.fullname" . }}-fdbdoc:27017"
+    {{- else }}
     MONGO_URI = "{{ include "chart.fullname" . }}-mongodb:27017"
+    {{- end }}
   {{- end }}
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
