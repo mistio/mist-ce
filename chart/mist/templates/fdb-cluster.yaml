@@ -11,6 +11,7 @@ metadata:
   name: {{ include "chart.fullname" . }}-fdb
 spec:
   version: 6.2.11
+  storageClass: ssd
   faultDomain:
     key: foundationdb.org/none
   processCounts:
@@ -19,7 +20,6 @@ spec:
     - "knob_disable_posix_kernel_aio=1"
   persistentVolumeClaim:
     spec:
-      storageClassName: ssd
       resources:
         requests:
           storage: "16G"
@@ -34,7 +34,7 @@ spec:
           resources:
             requests:
               cpu: 250m
-              memory: 128Mi
+              memory: 4Gi
         - name: foundationdb-kubernetes-sidecar
           securityContext:
             runAsUser: 0
