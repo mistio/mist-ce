@@ -3,7 +3,7 @@ name = "all_backends"
 bind-addr = "0.0.0.0:9096"
 output = [
     { name="influxdb", location="http://influxdb:8086/write", type="influxdb", fail-on-error=false},
-    { name="fdb", location="fdb:4500", type="fdb" , fail-on-error=false, batch-size-metrics=10, disable-aggregation=true},
+    { name="fdb", location="fdb:4500", type="fdb" , fail-on-error=false, batch-size-metrics=10, disable-aggregation=true, timeout="5s"},
 ]
 
 #[[fdb]]
