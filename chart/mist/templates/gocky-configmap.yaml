@@ -21,6 +21,6 @@ data:
       {{- end }}
       {{- end }}
       {{- if .Values.fdb.tsfdb }}
-        { name="fdb", location="fdb:4500", type="fdb", fail-on-error=false},
+        { name="fdb", location="fdb:4500", type="fdb", fail-on-error=false, batch-size-metrics=1, disable-aggregation=true, timeout="5s"},
       {{- end }}
     ]
