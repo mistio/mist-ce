@@ -10,7 +10,7 @@ metadata:
 data:
   config.toml: |
     [[http]]
-    name = "influxdb"
+    name = "all_backends"
     bind-addr = "0.0.0.0:9096"
     output = [
       {{- if .Values.influxdb.monitoring }}

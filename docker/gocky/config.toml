@@ -6,12 +6,6 @@ output = [
     { name="fdb", location="fdb:4500", type="fdb", fail-on-error=false},
 ]
 
-#[[fdb]]
-#name = "fdb"
-#bind-addr = "0.0.0.0:9097"
-#output = [
-#    { name="fdb", location = "fdb:4500" },
-#]
 
 # metering will send stats for samples/org/machine
 # you have to also set amqp-url for metering to work
