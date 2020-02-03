@@ -16,11 +16,6 @@ services:
     image: rabbitmq:3.6.6-management
     restart: on-failure:5
 
-  memcached:
-    image: memcached
-    restart: on-failure:5
-
-
   elasticsearch:
     image: elasticsearch:5.6.10
     restart: on-failure:5
@@ -71,7 +66,6 @@ services:
   celery-prefork: &backend
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
-      - memcached
       - mongodb
       - elasticsearch
       - rabbitmq
