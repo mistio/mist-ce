@@ -42,6 +42,7 @@ influxdb:
   host: ''
   port: 8086
   db: telegraf
+  monitoring: true
 
 # Options for rabbitmq subchart.
 rabbitmq:
