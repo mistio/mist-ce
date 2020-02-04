@@ -11,7 +11,6 @@ variables:
   # API & UI tests image
   TESTS_IMAGE: $DOCKERHUB_IMAGE/tests:$CI_COMMIT_SHA
   SUBMODULES_IMAGE: mist
-  KUBERNETES_NAMESPACE_OVERWRITE: test-$CI_PROJECT_NAME
 
 stages:
   - discover
@@ -342,7 +341,7 @@ deploy test:
     url: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
     on_stop: undeploy test
   variables:
-    namespace: test-$CI_PROJECT_NAME
+    namespace: $KUBE_NAMESPACE
     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |-
       http:
