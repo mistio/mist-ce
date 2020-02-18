@@ -18,6 +18,7 @@ http:
   tlsSecret: ''
   tlsHosts: []
   tlsAnnotations: {}
+  tlsClusterIssuer: ''
 
 # Email settings. Change this to connect to a real SMTP server.
 smtp:

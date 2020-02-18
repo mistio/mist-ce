@@ -14,6 +14,9 @@ metadata:
     {{- if .Values.http.http2 }}
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- end }}
+    {{- if .Values.http.tlsClusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.http.tlsClusterIssuer }}
+    {{- end }}
 {{- end }}
 {{- if .Values.http.tlsAnnotations }}
 {{ toYaml .Values.http.tlsAnnotations | indent 4 }}
