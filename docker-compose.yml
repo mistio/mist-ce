@@ -193,6 +193,13 @@ services:
       - 8040:80
       - 8041:8080
 
+  huproxy:
+    image: mist/huproxy
+    command: /app --listen 0.0.0.0:8086
+    environment:
+      MONGO_URI: mongodb://mongodb:27017
+    expose:
+      - 8086
 
 volumes:
   elasticsearch: {}
