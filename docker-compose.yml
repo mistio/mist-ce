@@ -7,7 +7,7 @@ services:
 
 
   mongodb:
-    image: mongo:3.2
+    image: mongo:3.4
     restart: on-failure:5
     volumes:
       - mongodb:/data/db:rw
