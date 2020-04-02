@@ -134,6 +134,14 @@
             "index": true,
             "type": "keyword"
           },
+          "network_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "volume_id": {
+            "index": true,
+            "type": "keyword"
+          },
           "key_id": {
             "index": true,
             "type": "keyword"
@@ -155,6 +163,10 @@
             "type": "keyword"
           },
           "schedule_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "external_id": {
             "index": true,
             "type": "keyword"
           }
@@ -174,6 +186,14 @@
             "index": true,
             "type": "keyword"
           },
+          "network_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "volume_id": {
+            "index": true,
+            "type": "keyword"
+          },
           "key_id": {
             "index": true,
             "type": "keyword"
@@ -195,6 +215,10 @@
             "type": "keyword"
           },
           "schedule_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "external_id": {
             "index": true,
             "type": "keyword"
           }
@@ -217,6 +241,10 @@
           "key_id": {
             "index": true,
             "type": "keyword"
+          },
+          "external_id": {
+            "index": true,
+            "type": "keyword"
           }
         }
       },
@@ -231,6 +259,42 @@
             "type": "keyword"
           },
           "machine_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "network_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "volume_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "key_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "script_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "template_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "stack_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "tunnel_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "schedule_id": {
+            "index": true,
+            "type": "keyword"
+          },
+          "external_id": {
             "index": true,
             "type": "keyword"
           },

@@ -10,3 +10,6 @@
 [submodule "tests"]
 	path = tests
 	url = ../mist.tests.git
+[submodule "docker/nginx/static/novnc"]
+	path = docker/nginx/static/novnc
+	url = https://github.com/novnc/noVNC.git

@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}-swagger
+  name: {{ include "chart.fullname" . }}-huproxy
   labels:
-    app: swagger
+    app: huproxy
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -15,20 +15,30 @@ spec:
   template:
     metadata:
       labels:
-        app: swagger
+        app: huproxy
         release: {{ .Release.Name }}
     spec:
       containers:
-      - name: swagger
+      - name: huproxy
+        args:
+        - /app
+        - --listen
+        - 0.0.0.0:8086
         env:
-        - name: API_URL
-          value: /api/v1/spec
-        image: mist/swagger-ui
+        - name: MONGO_URI
+        {{- if .Values.mongodb.host }}
+          value: mongodb://{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
+        {{- else }}
+          value: mongodb://{{ .Release.Name }}-mongodb:27017
+        {{- end }}
+        - name: SECRET
+          value: {{ .Values.internalKeys.secret }}
+        image: mist/huproxy
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
-            memory: 50Mi
-            cpu: 200m
+            memory: 500Mi
+            cpu: 500m
           requests:
             memory: 20Mi
             cpu: 1m

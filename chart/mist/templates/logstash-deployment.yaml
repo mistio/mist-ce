@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "chart.fullname" . }}-logstash
@@ -9,6 +9,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
@@ -52,7 +55,7 @@ spec:
         resources:
           requests:
             memory: 500Mi
-            cpu: 200m
+            cpu: 100m
           limits:
             memory: 700Mi
             cpu: 1000m
