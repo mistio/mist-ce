@@ -28,6 +28,9 @@ spec:
         args:
         - bin/uwsgi
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        ports:
+          - containerPort: 80
+            protocol: TCP
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:

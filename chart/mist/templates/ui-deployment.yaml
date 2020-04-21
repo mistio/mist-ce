@@ -26,6 +26,9 @@ spec:
         - sh
         - /entry.sh
         image: {{ .Values.image.registry }}/ui:{{ .Values.image.tag }}
+        ports:
+          - containerPort: 80
+            protocol: TCP
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
