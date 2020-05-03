@@ -201,6 +201,11 @@ services:
     expose:
       - 8086
 
+  wsproxy:
+    image: mist/wsproxy
+    expose:
+      - 8764
+
 volumes:
   elasticsearch: {}
   influxdb: {}
