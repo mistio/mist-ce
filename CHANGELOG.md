@@ -1,5 +1,28 @@
 # Changelog
 
+## v4.3.0 (May 2020)
+
+This release greatly improves support for KVM. It's now possible to manage multiple hypervisors as a single cloud and to access VNC console, assign VNF's with SR-IOV and more. It also introduces support for new platforms like LXD, KubeVirt, G8. Support for vSphere/vCenter has been enhanced significantly. Many bugfixes and improvements under the hood are included. The Enterprise Edition introduces support for Active Directory & LDAP.
+
+- Feature: Support LDAP & Active Directory (EE only)
+- Feature: Add support for LXD clouds
+- Feature: Add support for KubeVirt clouds
+- Feature: Add support for vSphere 6.7, add optional support for new REST API
+- Feature: Add support for GIG G8 clouds
+- Feature: Support multiple hosts in KVM clouds
+- Feature: Support VNC console for KVM machines
+- Feature: Display KVM machine image, size and parent in listing
+- Feature: Support listing and configuring VNFs on KVM
+- Feature: Add polling for images
+- Feature: Add process pool option to update machines in parallel, avoid unnecessary db updates
+- Feature: Support listing and selecting security group on machine creation for AWS
+- Change: Rename conditions to selectors
+- Change: Deprecate UserTasks & remove memcached
+- Change: Show more info about DigitalOcean sizes, like in DO console
+- Bugfix: Fix cost estimation for Packet, AWS, Azure
+- Bugfix: Fix clone action in KVM
+
+
 ## v4.2.1 (17 December 2019)
 
 * Bugfix: Fix image retrieval for vSphere machines
