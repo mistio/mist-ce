@@ -7,7 +7,8 @@ This release greatly improves support for KVM. It's now possible to manage multi
 - Feature: Support LDAP & Active Directory (EE only)
 - Feature: Add support for LXD clouds
 - Feature: Add support for KubeVirt clouds
-- Feature: Add support for vSphere 6.7, add optional support for new REST API
+- Feature: Widens support for vSphere/vCenter versions v4.0 up to v6.7, add optional support for new REST API
+- Feature: Add support for vSphere Content Libraries, select Folder & Datastore when provisioning
 - Feature: Add support for GIG G8 clouds
 - Feature: Support multiple hosts in KVM clouds
 - Feature: Support VNC console for KVM machines
@@ -18,6 +19,7 @@ This release greatly improves support for KVM. It's now possible to manage multi
 - Feature: Support listing and selecting security group on machine creation for AWS
 - Change: Rename conditions to selectors
 - Change: Deprecate UserTasks & remove memcached
+- Change: Update most Python dependencies
 - Change: Show more info about DigitalOcean sizes, like in DO console
 - Bugfix: Fix cost estimation for Packet, AWS, Azure
 - Bugfix: Fix clone action in KVM
