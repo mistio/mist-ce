@@ -238,7 +238,7 @@ deployment:
       pool: prefork
       replicas: 1
       autoscaling: &autoscaling
-        enabled: true
+        enabled: false
         minReplicas: 1
         maxReplicas: 20
         targetCPUUtilizationPercentage: 95
