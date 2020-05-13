@@ -50,7 +50,7 @@ rabbitmq:
   enabled: true
   rabbitmqUsername: guest
   rabbitmqPassword: guest
-  replicaCount: 1
+  replicaCount: 3
   resources:
     requests:
       memory: 500Mi
