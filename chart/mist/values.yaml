@@ -54,10 +54,10 @@ rabbitmq:
   resources:
     requests:
       memory: 250Mi
-      cpu: 1000m
+      cpu: 2000m
     limits:
       memory: 500Mi
-      cpu: 2000m
+      cpu: 3000m
   service:
     clusterIP: ''
   nodeSelector: {}
