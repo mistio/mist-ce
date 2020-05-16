@@ -1,15 +1,16 @@
 # Changelog
 
-## v4.3.0 (May 2020)
+## v4.3.0 (16 May 2020)
 
-This release greatly improves support for KVM. It's now possible to manage multiple hypervisors as a single cloud and to access VNC console, assign VNF's with SR-IOV and more. It also introduces support for new platforms like LXD, KubeVirt, G8. Support for vSphere/vCenter has been enhanced significantly. Many bugfixes and improvements under the hood are included. The Enterprise Edition introduces support for Active Directory & LDAP.
+This release greatly improves support for KVM. It's now possible to manage multiple hypervisors as a single cloud and to access VNC console, assign VNF's with SR-IOV and more. It also introduces support for new platforms like LXD, KubeVirt, G8. Support for vSphere/vCenter has been enhanced significantly. Many bugfixes and improvements under the hood are included. The Enterprise Edition introduces support for Active Directory & LDAP and includes the first version of the Price Catalog for configuring custom pricing policies on cloud resources.
 
 - Feature: Support LDAP & Active Directory (EE only)
+- Feature: Pricing policy catalog (EE only, experimental)
 - Feature: Add support for LXD clouds
 - Feature: Add support for KubeVirt clouds
 - Feature: Widens support for vSphere/vCenter versions v4.0 up to v6.7, add optional support for new REST API
 - Feature: Add support for vSphere Content Libraries, select Folder & Datastore when provisioning
-- Feature: Add support for GIG G8 clouds
+- Feature: Add support for GIG G8 clouds (experimental)
 - Feature: Support multiple hosts in KVM clouds
 - Feature: Support VNC console for KVM machines
 - Feature: Display KVM machine image, size and parent in listing
