@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.1 (19 May 2020)
+
+- Bugfix: Fix exception when provisioning GCE machines
+- Bugfix: Fix datetime serialization issue when listing machines in AWS clouds
+- Change: Unset missing_since for resources that pop back into existence
+
 ## v4.3.0 (16 May 2020)
 
 This release greatly improves support for KVM. It's now possible to manage multiple hypervisors as a single cloud and to access VNC console, assign VNF's with SR-IOV and more. It also introduces support for new platforms like LXD, KubeVirt, G8. Support for vSphere/vCenter has been enhanced significantly. Many bugfixes and improvements under the hood are included. The Enterprise Edition introduces support for Active Directory & LDAP and includes the first version of the Price Catalog for configuring custom pricing policies on cloud resources.
