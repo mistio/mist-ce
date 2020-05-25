@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.3.3 (25 May 2020)
+
+ - Bugfix: Fix provisioning on multi-host KVM when a host is down
+ - Bugfix: Include disk in KVM machine sizes
+ - Bugfix: Remove unnecessary scrollbars from dialogs
+ - Bugfix: Fix display of starred images in create machine form
+
 ## v4.3.2 (21 May 2020)
 
  - Change: Avoid dereferencing machine owner on clean, minor optimization
@@ -35,7 +42,6 @@ This release greatly improves support for KVM. It's now possible to manage multi
 - Change: Show more info about DigitalOcean sizes, like in DO console
 - Bugfix: Fix cost estimation for Packet, AWS, Azure
 - Bugfix: Fix clone action in KVM
-
 
 ## v4.2.1 (17 December 2019)
 
