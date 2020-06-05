@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.3.4 (5 June 2020)
+
+ - Bugfix: Fix ordering of starred images in machine create form
+ - Bugfix: Fix CSV export
+ - Bugfix: Fix zone listing issue for non-owners (EE/HS only)
+ - Bugfix: Fix network deletion in OpenStack
+
 ## v4.3.3 (25 May 2020)
 
  - Bugfix: Fix provisioning on multi-host KVM when a host is down
