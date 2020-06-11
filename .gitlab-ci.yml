@@ -509,10 +509,20 @@ UI:ip-whitelisting:
     - chrome
   when: manual
 
+  # remove below!
 MP:multiprovisioning-1: *multiprovisioning_test_template
 MP:multiprovisioning-2: *multiprovisioning_test_template
 MP:multiprovisioning-3: *multiprovisioning_test_template
-
+MP:aliyun-provisioning: *multiprovisioning_test_template
+MP:azure-provisioning: *multiprovisioning_test_template
+MP:digital-ocean-provisioning: *multiprovisioning_test_template
+MP:ec2-provisioning: *multiprovisioning_test_template
+MP:gce-provisioning: *multiprovisioning_test_template
+MP:kvm-provisioning: *multiprovisioning_test_template
+MP:linode-provisioning: *multiprovisioning_test_template
+MP:openstack-provisioning: *multiprovisioning_test_template
+MP:packet-provisioning: *multiprovisioning_test_template
+MP:rackspace-provisioning: *multiprovisioning_test_template
 #################### UNDEPLOY STAGE ####################
 
 .undeploy_template: &undeploy_template
