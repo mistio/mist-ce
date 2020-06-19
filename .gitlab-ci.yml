@@ -48,7 +48,6 @@ discover submodules:
     - docker:dind
   variables: &docker_variables
     DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://localhost:2375/
     DOCKER_TLS_CERTDIR: ''
   retry: 2
   tags:
