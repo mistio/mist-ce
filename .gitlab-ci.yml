@@ -12,574 +12,674 @@ variables:
   TESTS_IMAGE: $DOCKERHUB_IMAGE/tests:$CI_COMMIT_SHA
   SUBMODULES_IMAGE: mist
 
-stages:
-  - discover
-  - build
-  - release
-  - deploy
-  - test
-  - undeploy
+  VERSIONLABELMETHOD: "OnlyIfThisCommitHasVersion" # options: "OnlyIfThisCommitHasVersion","LastVersionTagInGit"
+  IMAGE_LABELS: >
+    --label org.opencontainers.image.vendor=$GITLAB_USER_NAME
+    --label org.opencontainers.image.authors=$GITLAB_USER_NAME
+    --label org.opencontainers.image.revision=$CI_COMMIT_SHA
+    --label org.opencontainers.image.source=$CI_PROJECT_URL
+    --label org.opencontainers.image.documentation=$CI_PROJECT_URL
+    --label org.opencontainers.image.licenses=$CI_PROJECT_URL
+    --label org.opencontainers.image.url=$CI_PROJECT_URL
+    --label vcs-url=$CI_PROJECT_URL
+    --label com.gitlab.ci.user=$GITLAB_USER_NAME
+    --label com.gitlab.ci.email=$GITLAB_USER_EMAIL
+    --label com.gitlab.ci.tagorbranch=$CI_COMMIT_REF_NAME
+    --label com.gitlab.ci.pipelineurl=$CI_PIPELINE_URL
+    --label com.gitlab.ci.commiturl=$CI_PROJECT_URL/commit/$CI_COMMIT_SHA
+    --label com.gitlab.ci.cijoburl=$CI_JOB_URL
+    --label com.gitlab.ci.mrurl=$CI_PROJECT_URL/-/merge_requests/$CI_MERGE_REQUEST_ID
 
+image:
+  name: gcr.io/kaniko-project/executor:debug
+  entrypoint: [""]
 
-#################### DISCOVER STAGE ####################
-
-discover submodules:
-  stage: discover
-  image: alpine:3.8
-  before_script:
-    - apk add --no-cache git
+get-latest-git-version:
+  stage: .pre
+  image:
+    name: alpine/git
+    entrypoint: [""]
+  rules:
+    - if: '$VERSIONLABELMETHOD == "LastVersionTagInGit"'
   script:
     - |
-        git submodule status --recursive | \
-          sed 's/^[ +-]\([0-9a-f]*\) \([^ ]*\).*$/\1,\2/' > submodules.csv
+      echo "the google kaniko container does not have git and does not have a packge manager to install it"
+      git clone https://github.com/GoogleContainerTools/kaniko.git
+      cd kaniko
+      echo "$(git describe --abbrev=0 --tags)" > ../VERSIONTAG.txt
+      echo "VERSIONTAG.txt contains $(cat ../VERSIONTAG.txt)"
   artifacts:
     paths:
-      - submodules.csv
-    expire_in: 10 days
-  dependencies: []
+      - VERSIONTAG.txt
 
 
-#################### BUILD STAGE ####################
-
-.dind_template: &docker_template
+.build_with_kaniko:
+  #Hidden job to use as an "extends" template
   stage: build
-  image: docker:18.09.0-git
-  services:
-    - docker:dind
-  variables: &docker_variables
-    DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://localhost:2375/
-    DOCKER_TLS_CERTDIR: ''
-  retry: 2
-  tags:
-    - cpu
-  before_script:
-    # Configure registries.
-    - |
-        export REGISTRIES=""
-
-        # Login to gitlab docker registry.
-        if [ -n "$CI_REGISTRY_IMAGE" ]; then
-          echo "Logging in to gitlab registry."
-          docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" \
-            $CI_REGISTRY
-          export REGISTRIES="$REGISTRIES $CI_REGISTRY_IMAGE"
-          echo "Logged in to gitlab registry."
-        else
-          echo "No credentials provided for gitlab registry, skipping."
-        fi
-
-        # Login to other registry.
-        if [ -n "$EXT_REGISTRY" ] && \
-           [ -n "$EXT_REGISTRY_IMAGE" ] && \
-           [ -n "$EXT_REGISTRY_USER" ] && \
-           [ -n "$EXT_REGISTRY_PASSWORD" ]
-        then
-          echo "Logging in to $EXT_REGISTRY."
-          docker login -u "$EXT_REGISTRY_USER" -p "$EXT_REGISTRY_PASSWORD" \
-            "$EXT_REGISTRY"
-          export REGISTRIES="$REGISTRIES $EXT_REGISTRY_IMAGE"
-          echo "Logged in to $EXT_REGISTRY."
-        else
-          echo "No credentials provided for external registry, skipping."
-        fi
-
-        # Login to dockerhub.
-        if [ -n "$DOCKERHUB_IMAGE" ] && \
-           [ -n "$DOCKERHUB_USER" ] && \
-           [ -n "$DOCKERHUB_PASSWORD" ]
-        then
-          echo "Logging in to dockerhub."
-          docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
-          export REGISTRIES="$REGISTRIES $DOCKERHUB_IMAGE"
-          echo "Logged in to dockerhub."
-        else
-          echo "No credentials provided for dockerhub, skipping."
-        fi
-
-        # Check if any registry configured.
-        if [ -z "$REGISTRIES" ]; then
-          echo "No registries configured, exiting."
-          exit 1
-        fi
-    - |
-        function docker_pull() {
-          # docker_pull <img> : Will retry several times to pull image.
-          img=$1
-          tries=60
-          sleep=10
-          echo "Will try to pull image $img ($tries tries, ${sleep}s sleep)."
-          for i in $(seq 1 $tries); do
-            if docker pull $img; then
-              echo "Image $img pulled successfully!"
-              return 0
-            fi
-            sleep $sleep
-          done
-          echo "Failed too pull image $img."
-          return 1
-        }
-    - |
-        function docker_push() {
-          # docker_push <src> <dest>: Retag and push image
-          # <src> must be the full name of a local image.
-          # <dest> must be just the image identifier, registry and tag will be
-          # added automatically.
-          tags="$CI_COMMIT_SHA $CI_COMMIT_REF_SLUG"
-          if [ "$CI_COMMIT_REF_NAME" = "master" ]; then
-            tags="$tags latest"
-          fi
-          src=$1
-          for registry in $REGISTRIES; do
-            for tag in $tags; do
-              dest="$registry/$2:$tag"
-              echo "Tagging image $src as $dest..."
-              docker tag $src $dest
-              echo "Pushing image $dest..."
-              docker push $dest
-            done
-          done
-        }
-    - |
-        function get_submodule_sha() {
-          cat submodules.csv | grep ",$1$" | cut -d, -f1
-        }
-    - |
-        function docker_retag_submodule() {
-          repo=$1
-          img=$2
-          src_img="$img:$(get_submodule_sha $repo)"
-          docker_pull $src_img
-          docker_push $src_img $repo
-        }
-  dependencies:
-    - discover submodules
-
-
-build api:
-  <<: *docker_template
   script:
-    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha api)"
-    - docker_pull $SRC_IMG
     - |
-        docker build \
-          -t $CI_PROJECT_NAME/api:$CI_COMMIT_SHA \
-          --build-arg FROM_IMAGE=$SRC_IMG \
-          --build-arg MIST_VERSION_SHA=$CI_COMMIT_SHA \
-          --build-arg MIST_VERSION_NAME=$CI_COMMIT_REF_NAME \
-          .
-    - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
+      echo "Building and shipping image to $CI_REGISTRY_IMAGE"
+      #Build date for opencontainers
+      BUILDDATE="'$(date '+%FT%T%z' | sed -E -n 's/(\+[0-9]{2})([0-9]{2})$/\1:\2/p')'" #rfc 3339 date
+      IMAGE_LABELS="$IMAGE_LABELS --label org.opencontainers.image.created=$BUILDDATE --label build-date=$BUILDDATE"
+      #Description for opencontainers
+      BUILDTITLE=$(echo $CI_PROJECT_TITLE | tr " " "_")
+      IMAGE_LABELS="$IMAGE_LABELS --label org.opencontainers.image.title=$BUILDTITLE --label org.opencontainers.image.description=$BUILDTITLE"
+      #Add ref.name for opencontainers
+      IMAGE_LABELS="$IMAGE_LABELS --label org.opencontainers.image.ref.name=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+
+      #Build Version Label and Tag from git tag, LastVersionTagInGit was placed by a previous job artifact
+      if [[ "$VERSIONLABELMETHOD" == "LastVersionTagInGit" ]]; then VERSIONLABEL=$(cat VERSIONTAG.txt); fi
+      if [[ "$VERSIONLABELMETHOD" == "OnlyIfThisCommitHasVersion" ]]; then VERSIONLABEL=$CI_COMMIT_TAG; fi
+      if [[ ! -z "$VERSIONLABEL" ]]; then
+        IMAGE_LABELS="$IMAGE_LABELS --label org.opencontainers.image.version=$VERSIONLABEL"
+        ADDITIONALTAGLIST="$ADDITIONALTAGLIST $VERSIONLABEL"
+      fi
+
+      ADDITIONALTAGLIST="$ADDITIONALTAGLIST $CI_COMMIT_REF_NAME $CI_COMMIT_SHORT_SHA"
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then ADDITIONALTAGLIST="$ADDITIONALTAGLIST latest"; fi
+      if [[ -n "$ADDITIONALTAGLIST" ]]; then
+        for TAG in $ADDITIONALTAGLIST; do
+          FORMATTEDTAGLIST="${FORMATTEDTAGLIST} --tag $CI_REGISTRY_IMAGE:$TAG "; 
+        done;
+      fi
+      
+      #Reformat Docker tags to kaniko's --destination argument:
+      FORMATTEDTAGLIST=$(echo "${FORMATTEDTAGLIST}" | sed s/\-\-tag/\-\-destination/g)
+
+      echo $FORMATTEDTAGLIST
+      echo $IMAGE_LABELS
+      mkdir -p /kaniko/.docker
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
+      /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile $FORMATTEDTAGLIST $IMAGE_LABELS
 
 
-.docker_build_template: &docker_build_template
-  <<: *docker_template
-  script:
-    - export img=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
-    - docker build -t $CI_PROJECT_NAME/$img:$CI_COMMIT_SHA docker/$img
-    - docker_push $CI_PROJECT_NAME/$img:$CI_COMMIT_SHA $img
-  dependencies: []
+build-for-gitlab-project-registry:
+  extends: .build_with_kaniko
+  environment:
+    #This is only here for completeness, since there are no CI CD Variables with this scope, the project defaults are used
+    # to push to this projects docker registry
+    name: push-to-gitlab-project-registry
 
-build nginx: *docker_build_template
-build gocky: *docker_build_template
-build logstash: *docker_build_template
-build elasticsearch-manage: *docker_build_template
-
-
-.docker_retag_template: &docker_retag_template
-  <<: *docker_template
-  variables:
-    <<: *docker_variables
-    GIT_STRATEGY: none
-  script:
-    - export arg1=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
-    - export arg2=$(echo "$CI_JOB_NAME" | cut -d " " -f3)
-    - export img="${SUBMODULES_IMAGE:-mist}/${arg1}"
-    - export submodule="${arg2:-$arg1}"
-    - echo "Will retag image $img from submodule $submodule."
-    - docker_retag_submodule $submodule $img
-
-retag landing: *docker_retag_template
-retag ui: *docker_retag_template
-retag tests: *docker_retag_template
-
-
-compose:
+build-for-docker-hub-registry_new:
+  extends: .build_with_kaniko
   stage: build
-  image: docker/compose:alpine-1.25.4
-  before_script:
-    - apk add --no-cache gettext
-  script:
-    - mkdir -p artifacts
-    - export IMG_REGISTRY=$(eval echo \$${COMPOSE_REGISTRY}_IMAGE)
-    - echo "IMG_REGISTRY=$IMG_REGISTRY"
-    - export IMG_TAG=$CI_COMMIT_REF_SLUG
-    - echo "IMG_TAG=$IMG_TAG"
-    - export CONF_DIR=/etc/mist
-    - envsubst < docker-compose.yml > artifacts/docker-compose.yml
-  artifacts:
-    paths:
-      - artifacts/docker-compose.yml
-  dependencies: []
-
-
-#################### DEPLOY STAGE ####################
-
-.deploy_template: &deploy_template
-  stage: deploy
-  image: dtzar/helm-kubectl:2.16.1
-  before_script:
-    - |
-        set -e
-
-        function set_if_not_empty() {
-          key="$1"
-          val="$2"
-          if [ -n "$val" ]; then
-            echo " --set $key=$val"
-          fi
-        }
-
-        function elasticsearch_params() {
-          set_if_not_empty elasticsearch.host $ELASTICSEARCH_HOST
-          set_if_not_empty elasticsearch.port $ELASTICSEARCH_PORT
-          set_if_not_empty elasticsearch.username $ELASTICSEARCH_USERNAME
-          set_if_not_empty elasticsearch.password $ELASTICSEARCH_PASSWORD
-          set_if_not_empty elasticsearch.tls $ELASTICSEARCH_TLS
-          set_if_not_empty elasticsearch.verifyCerts $ELASTICSEARCH_TLS
-        }
-
-        function deploy() {
-          export namespace="$1"
-          export release="$2"
-          touch values.yaml
-          export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
-          kubectl describe namespace/$namespace || \
-            kubectl create namespace $namespace
-
-          export image_secret_name=
-          export REGISTRY_IMAGE="$(eval echo \$${DEPLOY_REGISTRY}_IMAGE)"
-          export REGISTRY_USER="$(eval echo \$${DEPLOY_REGISTRY}_USER)"
-          export REGISTRY_PASSWORD="$(eval echo \"\$${DEPLOY_REGISTRY}_PASSWORD\")"
-          if [ "$DEPLOY_REGISTRY" = "CI_REGISTRY" ]; then
-            if [ "$CI_PROJECT_VISIBILITY" = "public" ]; then
-              export DEPLOY_REGISTRY_AUTH=
-            elif [ -n "$CI_REGISTRY_USER_PERMANENT" -a -n "$CI_REGISTRY_PASSWORD_PERMANENT" ]; then
-              export REGISTRY_USER="$CI_REGISTRY_USER_PERMANENT
-              export REGISTRY_PASSWORD="$CI_REGISTRY_PASSWORD_PERMANENT
-            fi
-          fi
-          if [ -n "$DEPLOY_REGISTRY_AUTH" ]; then
-            export image_secret_name=registry
-            kubectl create secret --namespace $namespace \
-              docker-registry $image_secret_name \
-              --docker-server=$REGISTRY_IMAGE \
-              --docker-username=$REGISTRY_USER \
-              --docker-password="$REGISTRY_PASSWORD" \
-              --docker-email=$GITLAB_USER_EMAIL \
-              -o yaml --dry-run | \
-                kubectl replace --namespace $namespace --force -f -
-          fi
-
-          export tls_settings=
-          if [ -n "$TLS_KEY" ] && [ -n "$TLS_CRT" ]; then
-            tls_tmpdir=$(mktemp -d)
-            echo "$TLS_KEY" > $tls_tmpdir/tls.key
-            echo "$TLS_CRT" > $tls_tmpdir/tls.crt
-            kubectl create secret --namespace $namespace \
-              tls https \
-              --key $tls_tmpdir/tls.key \
-              --cert $tls_tmpdir/tls.crt \
-              -o yaml --dry-run | \
-                kubectl replace --namespace $namespace --force -f -
-            export tls_settings="--set http.tlsSecret=https"
-            rm -rf $tls_tmpdir
-          fi
-
-          helm init --client-only
-          helm repo update
-          helm dependency update ./chart/mist/
-
-          helm upgrade --install --namespace $namespace \
-            --wait --timeout=600 \
-            -f values.yaml \
-            --set image.tag="$CI_COMMIT_SHA" \
-            --set image.registry="$REGISTRY_IMAGE" \
-            --set image.pullPolicy=IfNotPresent \
-            --set image.secrets[0].name="$image_secret_name" \
-            --set http.host="$host" \
-            --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
-            --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
-            --set docker.host="$DOCKER_HOST" \
-            --set docker.port="$DOCKER_PORT" \
-            --set docker.key="$DOCKER_KEY" \
-            --set docker.cert="$DOCKER_CERT" \
-            --set docker.ca="$DOCKER_CA" \
-            --set awsAccessKey="$AWS_ACCESS_KEY" \
-            --set awsSecretKey="$AWS_SECRET_KEY" \
-            $tls_settings \
-            $(elasticsearch_params) \
-            $release ./chart/mist/
-          apk add --no-cache curl
-          echo "Waiting for environment to be ready..."
-          while kubectl --namespace $namespace get pods -l release=$release | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
-            sleep 10 && echo '.'
-          done
-          while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
-            sleep 5 && echo 'Environment not ready yet...'
-          done
-        }
-  script:
-    - echo "$values" > values.yaml
-    - deploy $namespace $release
-  dependencies: []
-
-deploy test:
-  <<: *deploy_template
+  #This causes CI CD Variables to be taken from GitLab Project definition for variable scope "push-to-docker-hub",
+  # which overrides CI_REGISTRY, CI_REGISTRY_IMAGE, CI_REGISTRY_USER and CI_REGISTRY_PASSWORD
+  # these variables with this scope would need to be created if you copy this project to another group or instance
   environment:
-    name: test/$CI_COMMIT_REF_SLUG
-    url: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
-    on_stop: undeploy test
-  variables:
-    namespace: test-$CI_PROJECT_NAME
-    release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-    values: |-
-      http:
-        tlsSecret: tls-wildcard-test-mist-io
-        tlsHosts:
-          - '*.test.mist.io'
-        tlsAnnotations:
-          certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-          certmanager.k8s.io/acme-challenge-type: dns01
-          certmanager.k8s.io/acme-dns01-provider: mist-dns
-      enableDevUsers: true
+    name: push-to-docker-hub
 
-.deploy_review_template: &deploy_review_template
-  <<: *deploy_template
-  variables:
-    namespace: $CI_PROJECT_NAME
-    release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-    values: |
-      http:
-        tlsSecret: tls-wildcard-review-mist-io
-        tlsHosts:
-          - '*.review.mist.io'
-        tlsAnnotations:
-          certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-          certmanager.k8s.io/acme-challenge-type: dns01
-          certmanager.k8s.io/acme-dns01-provider: mist-dns
-      enableDevUsers: false
-      smtp:
-        host: smtp.sendgrid.net
-        port: 2525
-        starttls: true
-        username: apikey
-        password: $SENDGRID_PASSWORD
-
-deploy review:
-  <<: *deploy_review_template
-  environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    url: https://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
-    on_stop: undeploy review
-  except:
-    - master
-  when: manual
-
-deploy master:
-  <<: *deploy_review_template
-  environment:
-    name: master
-    url: https://master$DEPLOY_DOMAIN_SUFFIX
-  only:
-    - master
-  when: manual
+# stages:
+#   - discover
+#   - build
+#   - release
+#   - deploy
+#   - test
+#   - undeploy
 
 
-#################### TEST STAGE ####################
+# #################### DISCOVER STAGE ####################
 
-.test_template: &test_template
-  stage: test
-  image: $TESTS_IMAGE
-  variables:
-    GIT_STRATEGY: none
-    MIST_URL: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
-    DISPLAY: ":1.0"
-    REGISTER_USER_BEFORE_FEATURE: "True"
-    EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
-    IMAP_HOST: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-mailmock.test-$CI_PROJECT_NAME.svc.cluster.local
-  before_script:
-    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
-    - echo "Test argument is $TEST"
-    - echo "Image used is $TESTS_IMAGE"
-    - echo $TEST_SETTINGS | base64 -d > test_settings.py
-  dependencies: []
+# discover submodules:
+#   stage: discover
+#   image: alpine:3.8
+#   before_script:
+#     - apk add --no-cache git
+#   script:
+#     - |
+#         git submodule status --recursive | \
+#           sed 's/^[ +-]\([0-9a-f]*\) \([^ ]*\).*$/\1,\2/' > submodules.csv
+#   artifacts:
+#     paths:
+#       - submodules.csv
+#     expire_in: 10 days
+#   dependencies: []
 
 
-.api_test_template: &api_test_template
-  <<: *test_template
-  script:
-    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
+# #################### BUILD STAGE ####################
 
-API:main:api_token: *api_test_template
-API:main:clouds: *api_test_template
-API:main:dns: *api_test_template
-API:main:keys: *api_test_template
-API:main:images: *api_test_template
-API:main:libcloud_1/2: *api_test_template
-API:main:libcloud_2/2: *api_test_template
-API:main:machines: *api_test_template
-API:main:networks: *api_test_template
-API:main:schedules: *api_test_template
-API:main:scripts: *api_test_template
-API:main:teams: *api_test_template
-API:main:ip_whitelisting: *api_test_template
-API:main:volumes: *api_test_template
+# .dind_template: &docker_template
+#   stage: build
+#   name: gcr.io/kaniko-project/executor:debug
+#   entrypoint: [""]
 
-.API:plugin:orchestration: *api_test_template
-.API:plugin:tunnels: *api_test_template
+# services:
+#     - docker:18.09.0-dind
+#   variables: &docker_variables
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_HOST: tcp://localhost:2375/
+#     DOCKER_TLS_CERTDIR: ''
+#   retry: 2
+#   tags:
+#     - cpu
+#   before_script:
+#     # Configure registries.
+#     - |
+#         export REGISTRIES=""
 
+#         # Login to gitlab docker registry.
+#         if [ -n "$CI_REGISTRY_IMAGE" ]; then
+#           echo "Logging in to gitlab registry."
+#           docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" \
+#             $CI_REGISTRY
+#           export REGISTRIES="$REGISTRIES $CI_REGISTRY_IMAGE"
+#           echo "Logged in to gitlab registry."
+#         else
+#           echo "No credentials provided for gitlab registry, skipping."
+#         fi
 
-.ui_test_template: &ui_test_template
-  <<: *test_template
-  script:
-    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
-  artifacts:
-    paths:
-      - js_console.log
-      - artifacts/error.png
-      - artifacts/output.mp4
-    expire_in: 3 days
-    when: on_failure
-  tags:
-    - chrome
+#         # Login to other registry.
+#         if [ -n "$EXT_REGISTRY" ] && \
+#            [ -n "$EXT_REGISTRY_IMAGE" ] && \
+#            [ -n "$EXT_REGISTRY_USER" ] && \
+#            [ -n "$EXT_REGISTRY_PASSWORD" ]
+#         then
+#           echo "Logging in to $EXT_REGISTRY."
+#           docker login -u "$EXT_REGISTRY_USER" -p "$EXT_REGISTRY_PASSWORD" \
+#             "$EXT_REGISTRY"
+#           export REGISTRIES="$REGISTRIES $EXT_REGISTRY_IMAGE"
+#           echo "Logged in to $EXT_REGISTRY."
+#         else
+#           echo "No credentials provided for external registry, skipping."
+#         fi
 
-UI:clouds-add-1/2: *ui_test_template
-UI:clouds-add-2/2: *ui_test_template
-UI:clouds-actions: *ui_test_template
-UI:keys: *ui_test_template
-UI:scripts: *ui_test_template
-UI:images-networks: *ui_test_template
-UI:user-actions: *ui_test_template
-UI:teams: *ui_test_template
-UI:zones: *ui_test_template
-UI:rules-1/3: *ui_test_template
-UI:rules-2/3: *ui_test_template
-UI:rules-3/3: *ui_test_template
-UI:machines-1/2:
-  <<: *ui_test_template
-  retry: 1
-UI:machines-2/2:
-  <<: *ui_test_template
-  retry: 1
-UI:monitoring:
-  <<: *ui_test_template
-  retry: 1
-UI:schedulers-1/2:
-  <<: *ui_test_template
-  retry: 1
-UI:schedulers-2/2:
-  <<: *ui_test_template
-  retry: 1
-UI:ip-whitelisting:
-  <<: *ui_test_template
-  only:
-    - staging
+#         # Login to dockerhub.
+#         if [ -n "$DOCKERHUB_IMAGE" ] && \
+#            [ -n "$DOCKERHUB_USER" ] && \
+#            [ -n "$DOCKERHUB_PASSWORD" ]
+#         then
+#           echo "Logging in to dockerhub."
+#           docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
+#           export REGISTRIES="$REGISTRIES $DOCKERHUB_IMAGE"
+#           echo "Logged in to dockerhub."
+#         else
+#           echo "No credentials provided for dockerhub, skipping."
+#         fi
 
-.UI:rbac-1/4: *ui_test_template
-.UI:rbac-2/4: *ui_test_template
-.UI:rbac-3/4: *ui_test_template
-.UI:rbac-4/4: *ui_test_template
-.UI:orchestration: *ui_test_template
-.UI:insights:
-  <<: *ui_test_template
-  retry: 1
-
-.multiprovisioning_test_template: &multiprovisioning_test_template
-  <<: *test_template
-  script:
-    - /mist.tests/prepare_env.py -k --tags=$TEST /mist.tests/misttests/multiprovisioning/gui/features
-  artifacts:
-    paths:
-      - js_console.log
-      - artifacts/error.png
-      - artifacts/output.mp4
-    expire_in: 3 days
-    when: on_failure
-  tags:
-    - chrome
-  when: manual
-
-MP:multiprovisioning-1: *multiprovisioning_test_template
-MP:multiprovisioning-2: *multiprovisioning_test_template
-MP:multiprovisioning-3: *multiprovisioning_test_template
-
-#################### UNDEPLOY STAGE ####################
-
-.undeploy_template: &undeploy_template
-  stage: undeploy
-  image: dtzar/helm-kubectl:2.10.0
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - helm delete --purge $release
-  allow_failure: true
-  dependencies: []
-
-undeploy test:
-  <<: *undeploy_template
-  environment:
-    name: test/$CI_COMMIT_REF_SLUG
-    action: stop
-  variables:
-    GIT_STRATEGY: none
-    release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-
-undeploy review:
-  <<: *undeploy_template
-  environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    action: stop
-  variables:
-    GIT_STRATEGY: none
-    release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-  when: manual
-  except:
-    - master
+#         # Check if any registry configured.
+#         if [ -z "$REGISTRIES" ]; then
+#           echo "No registries configured, exiting."
+#           exit 1
+#         fi
+#     - |
+#         function docker_pull() {
+#           # docker_pull <img> : Will retry several times to pull image.
+#           img=$1
+#           tries=60
+#           sleep=10
+#           echo "Will try to pull image $img ($tries tries, ${sleep}s sleep)."
+#           for i in $(seq 1 $tries); do
+#             if docker pull $img; then
+#               echo "Image $img pulled successfully!"
+#               return 0
+#             fi
+#             sleep $sleep
+#           done
+#           echo "Failed too pull image $img."
+#           return 1
+#         }
+#     - |
+#         function docker_push() {
+#           # docker_push <src> <dest>: Retag and push image
+#           # <src> must be the full name of a local image.
+#           # <dest> must be just the image identifier, registry and tag will be
+#           # added automatically.
+#           tags="$CI_COMMIT_SHA $CI_COMMIT_REF_SLUG"
+#           if [ "$CI_COMMIT_REF_NAME" = "master" ]; then
+#             tags="$tags latest"
+#           fi
+#           src=$1
+#           for registry in $REGISTRIES; do
+#             for tag in $tags; do
+#               dest="$registry/$2:$tag"
+#               echo "Tagging image $src as $dest..."
+#               docker tag $src $dest
+#               echo "Pushing image $dest..."
+#               docker push $dest
+#             done
+#           done
+#         }
+#     - |
+#         function get_submodule_sha() {
+#           cat submodules.csv | grep ",$1$" | cut -d, -f1
+#         }
+#     - |
+#         function docker_retag_submodule() {
+#           repo=$1
+#           img=$2
+#           src_img="$img:$(get_submodule_sha $repo)"
+#           docker_pull $src_img
+#           docker_push $src_img $repo
+#         }
+#   dependencies:
+#     - discover submodules
 
 
-#################### RELEASE STAGE ####################
+# build api:
+#   <<: *docker_template
+#   script:
+#     - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha api)"
+#     - docker_pull $SRC_IMG
+#     - |
+#         docker build \
+#           -t $CI_PROJECT_NAME/api:$CI_COMMIT_SHA \
+#           --build-arg FROM_IMAGE=$SRC_IMG \
+#           --build-arg MIST_VERSION_SHA=$CI_COMMIT_SHA \
+#           --build-arg MIST_VERSION_NAME=$CI_COMMIT_REF_NAME \
+#           .
+#     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
-release: &release_template
-  when: manual
-  stage: release
-  image: python:2.7-alpine
-  before_script:
-    - apk add --update libmagic openssl
-    - pip install requests python-magic
-    - wget -O /usr/local/bin/submark https://github.com/dahlia/submark/releases/download/0.2.0/submark-linux-x86_64
-    - chmod +x /usr/local/bin/submark
-  script:
-    - mkdir release
-    - cp artifacts/docker-compose.yml release/docker-compose.yml
-    - HEADER=$(sed -n "s/^## \($CI_BUILD_REF_NAME .*\)$/\1/p" CHANGELOG.md)
-    - submark --omit-heading --h2="$HEADER" --out-file=release.md CHANGELOG.md
-    - sed -i 's/^### Changes/## Changes/' release.md
-    - echo >> release.md
-    - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/$CI_PROJECT_NAME/g" ci/release.md >> release.md
-    - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio $CI_PROJECT_NAME $CI_BUILD_REF_NAME
-  only:
-    # only for references that match a version string (v1.2.3)
-    - /^v\d+\.\d+\.\d+$/
-  except:
-    # Except branches, meaning it'll only apply to git tags
-    - branches
-  dependencies:
-    - compose
 
-prerelease:
-  <<: *release_template
-  variables:
-    RELEASE_ARGS: "--prerelease"
-  only:
-    # only for references that match a prelease version string (v1.2.3-beta)
-    - /^v\d+\.\d+\.\d+-.+$/
+# .docker_build_template: &docker_build_template
+#   <<: *docker_template
+#   script:
+#     - export img=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
+#     - docker build -t $CI_PROJECT_NAME/$img:$CI_COMMIT_SHA docker/$img
+#     - docker_push $CI_PROJECT_NAME/$img:$CI_COMMIT_SHA $img
+#   dependencies: []
+
+# build nginx: *docker_build_template
+# build gocky: *docker_build_template
+# build logstash: *docker_build_template
+# build elasticsearch-manage: *docker_build_template
+
+
+# .docker_retag_template: &docker_retag_template
+#   <<: *docker_template
+#   variables:
+#     <<: *docker_variables
+#     GIT_STRATEGY: none
+#   script:
+#     - export arg1=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
+#     - export arg2=$(echo "$CI_JOB_NAME" | cut -d " " -f3)
+#     - export img="${SUBMODULES_IMAGE:-mist}/${arg1}"
+#     - export submodule="${arg2:-$arg1}"
+#     - echo "Will retag image $img from submodule $submodule."
+#     - docker_retag_submodule $submodule $img
+
+# retag landing: *docker_retag_template
+# retag ui: *docker_retag_template
+# retag tests: *docker_retag_template
+
+
+# compose:
+#   stage: build
+#   image: docker/compose:alpine-1.25.4
+#   before_script:
+#     - apk add --no-cache gettext
+#   script:
+#     - mkdir -p artifacts
+#     - export IMG_REGISTRY=$(eval echo \$${COMPOSE_REGISTRY}_IMAGE)
+#     - echo "IMG_REGISTRY=$IMG_REGISTRY"
+#     - export IMG_TAG=$CI_COMMIT_REF_SLUG
+#     - echo "IMG_TAG=$IMG_TAG"
+#     - export CONF_DIR=/etc/mist
+#     - envsubst < docker-compose.yml > artifacts/docker-compose.yml
+#   artifacts:
+#     paths:
+#       - artifacts/docker-compose.yml
+#   dependencies: []
+
+
+# #################### DEPLOY STAGE ####################
+
+# .deploy_template: &deploy_template
+#   stage: deploy
+#   image: dtzar/helm-kubectl:2.16.1
+#   before_script:
+#     - |
+#         set -e
+
+#         function set_if_not_empty() {
+#           key="$1"
+#           val="$2"
+#           if [ -n "$val" ]; then
+#             echo " --set $key=$val"
+#           fi
+#         }
+
+#         function elasticsearch_params() {
+#           set_if_not_empty elasticsearch.host $ELASTICSEARCH_HOST
+#           set_if_not_empty elasticsearch.port $ELASTICSEARCH_PORT
+#           set_if_not_empty elasticsearch.username $ELASTICSEARCH_USERNAME
+#           set_if_not_empty elasticsearch.password $ELASTICSEARCH_PASSWORD
+#           set_if_not_empty elasticsearch.tls $ELASTICSEARCH_TLS
+#           set_if_not_empty elasticsearch.verifyCerts $ELASTICSEARCH_TLS
+#         }
+
+#         function deploy() {
+#           export namespace="$1"
+#           export release="$2"
+#           touch values.yaml
+#           export host=$(echo $CI_ENVIRONMENT_URL | sed 's/^https\?:\/\/\(.*\)/\1/')
+#           kubectl describe namespace/$namespace || \
+#             kubectl create namespace $namespace
+
+#           export image_secret_name=
+#           export REGISTRY_IMAGE="$(eval echo \$${DEPLOY_REGISTRY}_IMAGE)"
+#           export REGISTRY_USER="$(eval echo \$${DEPLOY_REGISTRY}_USER)"
+#           export REGISTRY_PASSWORD="$(eval echo \"\$${DEPLOY_REGISTRY}_PASSWORD\")"
+#           if [ "$DEPLOY_REGISTRY" = "CI_REGISTRY" ]; then
+#             if [ "$CI_PROJECT_VISIBILITY" = "public" ]; then
+#               export DEPLOY_REGISTRY_AUTH=
+#             elif [ -n "$CI_REGISTRY_USER_PERMANENT" -a -n "$CI_REGISTRY_PASSWORD_PERMANENT" ]; then
+#               export REGISTRY_USER="$CI_REGISTRY_USER_PERMANENT
+#               export REGISTRY_PASSWORD="$CI_REGISTRY_PASSWORD_PERMANENT
+#             fi
+#           fi
+#           if [ -n "$DEPLOY_REGISTRY_AUTH" ]; then
+#             export image_secret_name=registry
+#             kubectl create secret --namespace $namespace \
+#               docker-registry $image_secret_name \
+#               --docker-server=$REGISTRY_IMAGE \
+#               --docker-username=$REGISTRY_USER \
+#               --docker-password="$REGISTRY_PASSWORD" \
+#               --docker-email=$GITLAB_USER_EMAIL \
+#               -o yaml --dry-run | \
+#                 kubectl replace --namespace $namespace --force -f -
+#           fi
+
+#           export tls_settings=
+#           if [ -n "$TLS_KEY" ] && [ -n "$TLS_CRT" ]; then
+#             tls_tmpdir=$(mktemp -d)
+#             echo "$TLS_KEY" > $tls_tmpdir/tls.key
+#             echo "$TLS_CRT" > $tls_tmpdir/tls.crt
+#             kubectl create secret --namespace $namespace \
+#               tls https \
+#               --key $tls_tmpdir/tls.key \
+#               --cert $tls_tmpdir/tls.crt \
+#               -o yaml --dry-run | \
+#                 kubectl replace --namespace $namespace --force -f -
+#             export tls_settings="--set http.tlsSecret=https"
+#             rm -rf $tls_tmpdir
+#           fi
+
+#           helm init --client-only
+#           helm repo update
+#           helm dependency update ./chart/mist/
+
+#           helm upgrade --install --namespace $namespace \
+#             --wait --timeout=600 \
+#             -f values.yaml \
+#             --set image.tag="$CI_COMMIT_SHA" \
+#             --set image.registry="$REGISTRY_IMAGE" \
+#             --set image.pullPolicy=IfNotPresent \
+#             --set image.secrets[0].name="$image_secret_name" \
+#             --set http.host="$host" \
+#             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
+#             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
+#             --set docker.host="$DOCKER_HOST" \
+#             --set docker.port="$DOCKER_PORT" \
+#             --set docker.key="$DOCKER_KEY" \
+#             --set docker.cert="$DOCKER_CERT" \
+#             --set docker.ca="$DOCKER_CA" \
+#             --set awsAccessKey="$AWS_ACCESS_KEY" \
+#             --set awsSecretKey="$AWS_SECRET_KEY" \
+#             $tls_settings \
+#             $(elasticsearch_params) \
+#             $release ./chart/mist/
+#           apk add --no-cache curl
+#           echo "Waiting for environment to be ready..."
+#           while kubectl --namespace $namespace get pods -l release=$release | grep -v -e NAME -e Running -e Completed -e Evicted -e OutOfcpu; do
+#             sleep 10 && echo '.'
+#           done
+#           while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
+#             sleep 5 && echo 'Environment not ready yet...'
+#           done
+#         }
+#   script:
+#     - echo "$values" > values.yaml
+#     - deploy $namespace $release
+#   dependencies: []
+
+# deploy test:
+#   <<: *deploy_template
+#   environment:
+#     name: test/$CI_COMMIT_REF_SLUG
+#     url: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
+#     on_stop: undeploy test
+#   variables:
+#     namespace: test-$CI_PROJECT_NAME
+#     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+#     values: |-
+#       http:
+#         tlsSecret: tls-wildcard-test-mist-io
+#         tlsHosts:
+#           - '*.test.mist.io'
+#         tlsAnnotations:
+#           certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+#           certmanager.k8s.io/acme-challenge-type: dns01
+#           certmanager.k8s.io/acme-dns01-provider: mist-dns
+#       enableDevUsers: true
+
+# .deploy_review_template: &deploy_review_template
+#   <<: *deploy_template
+#   variables:
+#     namespace: $CI_PROJECT_NAME
+#     release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+#     values: |
+#       http:
+#         tlsSecret: tls-wildcard-review-mist-io
+#         tlsHosts:
+#           - '*.review.mist.io'
+#         tlsAnnotations:
+#           certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+#           certmanager.k8s.io/acme-challenge-type: dns01
+#           certmanager.k8s.io/acme-dns01-provider: mist-dns
+#       enableDevUsers: false
+#       smtp:
+#         host: smtp.sendgrid.net
+#         port: 2525
+#         starttls: true
+#         username: apikey
+#         password: $SENDGRID_PASSWORD
+
+# deploy review:
+#   <<: *deploy_review_template
+#   environment:
+#     name: review/$CI_COMMIT_REF_SLUG
+#     url: https://$CI_COMMIT_REF_SLUG$DEPLOY_DOMAIN_SUFFIX
+#     on_stop: undeploy review
+#   except:
+#     - master
+#   when: manual
+
+# deploy master:
+#   <<: *deploy_review_template
+#   environment:
+#     name: master
+#     url: https://master$DEPLOY_DOMAIN_SUFFIX
+#   only:
+#     - master
+#   when: manual
+
+
+# #################### TEST STAGE ####################
+
+# .test_template: &test_template
+#   stage: test
+#   image: $TESTS_IMAGE
+#   variables:
+#     GIT_STRATEGY: none
+#     MIST_URL: https://$CI_COMMIT_REF_SLUG$TEST_DEPLOY_DOMAIN_SUFFIX
+#     DISPLAY: ":1.0"
+#     REGISTER_USER_BEFORE_FEATURE: "True"
+#     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
+#     IMAP_HOST: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-mailmock.test-$CI_PROJECT_NAME.svc.cluster.local
+#   before_script:
+#     - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
+#     - echo "Test argument is $TEST"
+#     - echo "Image used is $TESTS_IMAGE"
+#     - echo $TEST_SETTINGS | base64 -d > test_settings.py
+#   dependencies: []
+
+
+# .api_test_template: &api_test_template
+#   <<: *test_template
+#   script:
+#     - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
+
+# API:main:api_token: *api_test_template
+# API:main:clouds: *api_test_template
+# API:main:dns: *api_test_template
+# API:main:keys: *api_test_template
+# API:main:images: *api_test_template
+# API:main:libcloud_1/2: *api_test_template
+# API:main:libcloud_2/2: *api_test_template
+# API:main:machines: *api_test_template
+# API:main:networks: *api_test_template
+# API:main:schedules: *api_test_template
+# API:main:scripts: *api_test_template
+# API:main:teams: *api_test_template
+# API:main:ip_whitelisting: *api_test_template
+# API:main:volumes: *api_test_template
+
+# .API:plugin:orchestration: *api_test_template
+# .API:plugin:tunnels: *api_test_template
+
+
+# .ui_test_template: &ui_test_template
+#   <<: *test_template
+#   script:
+#     - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
+#   artifacts:
+#     paths:
+#       - js_console.log
+#       - artifacts/error.png
+#       - artifacts/output.mp4
+#     expire_in: 3 days
+#     when: on_failure
+#   tags:
+#     - chrome
+
+# UI:clouds-add-1/2: *ui_test_template
+# UI:clouds-add-2/2: *ui_test_template
+# UI:clouds-actions: *ui_test_template
+# UI:keys: *ui_test_template
+# UI:scripts: *ui_test_template
+# UI:images-networks: *ui_test_template
+# UI:user-actions: *ui_test_template
+# UI:teams: *ui_test_template
+# UI:zones: *ui_test_template
+# UI:rules-1/3: *ui_test_template
+# UI:rules-2/3: *ui_test_template
+# UI:rules-3/3: *ui_test_template
+# UI:machines-1/2:
+#   <<: *ui_test_template
+#   retry: 1
+# UI:machines-2/2:
+#   <<: *ui_test_template
+#   retry: 1
+# UI:monitoring:
+#   <<: *ui_test_template
+#   retry: 1
+# UI:schedulers-1/2:
+#   <<: *ui_test_template
+#   retry: 1
+# UI:schedulers-2/2:
+#   <<: *ui_test_template
+#   retry: 1
+# UI:ip-whitelisting:
+#   <<: *ui_test_template
+#   only:
+#     - staging
+
+# .UI:rbac-1/4: *ui_test_template
+# .UI:rbac-2/4: *ui_test_template
+# .UI:rbac-3/4: *ui_test_template
+# .UI:rbac-4/4: *ui_test_template
+# .UI:orchestration: *ui_test_template
+# .UI:insights:
+#   <<: *ui_test_template
+#   retry: 1
+
+# .multiprovisioning_test_template: &multiprovisioning_test_template
+#   <<: *test_template
+#   script:
+#     - /mist.tests/prepare_env.py -k --tags=$TEST /mist.tests/misttests/multiprovisioning/gui/features
+#   artifacts:
+#     paths:
+#       - js_console.log
+#       - artifacts/error.png
+#       - artifacts/output.mp4
+#     expire_in: 3 days
+#     when: on_failure
+#   tags:
+#     - chrome
+#   when: manual
+
+# MP:multiprovisioning-1: *multiprovisioning_test_template
+# MP:multiprovisioning-2: *multiprovisioning_test_template
+# MP:multiprovisioning-3: *multiprovisioning_test_template
+
+# #################### UNDEPLOY STAGE ####################
+
+# .undeploy_template: &undeploy_template
+#   stage: undeploy
+#   image: dtzar/helm-kubectl:2.10.0
+#   variables:
+#     GIT_STRATEGY: none
+#   script:
+#     - helm delete --purge $release
+#   allow_failure: true
+#   dependencies: []
+
+# undeploy test:
+#   <<: *undeploy_template
+#   environment:
+#     name: test/$CI_COMMIT_REF_SLUG
+#     action: stop
+#   variables:
+#     GIT_STRATEGY: none
+#     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+
+# undeploy review:
+#   <<: *undeploy_template
+#   environment:
+#     name: review/$CI_COMMIT_REF_SLUG
+#     action: stop
+#   variables:
+#     GIT_STRATEGY: none
+#     release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+#   when: manual
+#   except:
+#     - master
+
+
+# #################### RELEASE STAGE ####################
+
+# release: &release_template
+#   when: manual
+#   stage: release
+#   image: python:2.7-alpine
+#   before_script:
+#     - apk add --update libmagic openssl
+#     - pip install requests python-magic
+#     - wget -O /usr/local/bin/submark https://github.com/dahlia/submark/releases/download/0.2.0/submark-linux-x86_64
+#     - chmod +x /usr/local/bin/submark
+#   script:
+#     - mkdir release
+#     - cp artifacts/docker-compose.yml release/docker-compose.yml
+#     - HEADER=$(sed -n "s/^## \($CI_BUILD_REF_NAME .*\)$/\1/p" CHANGELOG.md)
+#     - submark --omit-heading --h2="$HEADER" --out-file=release.md CHANGELOG.md
+#     - sed -i 's/^### Changes/## Changes/' release.md
+#     - echo >> release.md
+#     - sed "s/TAG/$CI_BUILD_REF_NAME/g;s/REPO/$CI_PROJECT_NAME/g" ci/release.md >> release.md
+#     - ./ci/release.py $RELEASE_ARGS --draft -f release/* -m @release.md mistio $CI_PROJECT_NAME $CI_BUILD_REF_NAME
+#   only:
+#     # only for references that match a version string (v1.2.3)
+#     - /^v\d+\.\d+\.\d+$/
+#   except:
+#     # Except branches, meaning it'll only apply to git tags
+#     - branches
+#   dependencies:
+#     - compose
+
+# prerelease:
+#   <<: *release_template
+#   variables:
+#     RELEASE_ARGS: "--prerelease"
+#   only:
+#     # only for references that match a prelease version string (v1.2.3-beta)
+#     - /^v\d+\.\d+\.\d+-.+$/
