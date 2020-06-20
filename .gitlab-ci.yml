@@ -14,15 +14,15 @@ variables:
 
   VERSIONLABELMETHOD: "OnlyIfThisCommitHasVersion" # options: "OnlyIfThisCommitHasVersion","LastVersionTagInGit"
   IMAGE_LABELS: >
-    --label org.opencontainers.image.vendor=$GITLAB_USER_NAME
-    --label org.opencontainers.image.authors=$GITLAB_USER_NAME
+    --label org.opencontainers.image.vendor="$GITLAB_USER_NAME"
+    --label org.opencontainers.image.authors="$GITLAB_USER_NAME"
     --label org.opencontainers.image.revision=$CI_COMMIT_SHA
     --label org.opencontainers.image.source=$CI_PROJECT_URL
     --label org.opencontainers.image.documentation=$CI_PROJECT_URL
     --label org.opencontainers.image.licenses=$CI_PROJECT_URL
     --label org.opencontainers.image.url=$CI_PROJECT_URL
     --label vcs-url=$CI_PROJECT_URL
-    --label com.gitlab.ci.user=$GITLAB_USER_NAME
+    --label com.gitlab.ci.user="$GITLAB_USER_NAME"
     --label com.gitlab.ci.email=$GITLAB_USER_EMAIL
     --label com.gitlab.ci.tagorbranch=$CI_COMMIT_REF_NAME
     --label com.gitlab.ci.pipelineurl=$CI_PIPELINE_URL
