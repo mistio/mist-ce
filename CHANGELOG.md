@@ -1,6 +1,7 @@
 # Changelog
 
-## v4.3.5 (25 June 2020)
+## v4.3.6 (25 June 2020)
+
  - Bugfix: Fix image path issue on KVM create machine
  - Bugfix: Fix insights utilization graph (EE/HS only)
  - Change: Increase max RAM size in KVM create machine fields
