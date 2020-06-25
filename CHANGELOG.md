@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.3.5 (25 June 2020)
+ - Bugfix: Fix image path issue on KVM create machine
+ - Bugfix: Fix insights utilization graph (EE/HS only)
+ - Change: Increase max RAM size in KVM create machine fields
+ - Change: Add option to disable image starring on machine create
+ - Change: Update default task queue names
+
 ## v4.3.5 (12 June 2020)
 
  - Bugfix: Fix machine provisioning for KVM clouds
