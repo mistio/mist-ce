@@ -434,6 +434,7 @@ API:main:scripts: *api_test_template
 API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template
+API:main:cloud_endpoints: *api_test_template
 
 .API:plugin:orchestration: *api_test_template
 .API:plugin:tunnels: *api_test_template
