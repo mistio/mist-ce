@@ -26,6 +26,7 @@ stages:
 discover submodules:
   stage: discover
   image: alpine:3.8
+  retry: 1  # sometimes gitlab api returns 500
   before_script:
     - apk add --no-cache git
   script:
