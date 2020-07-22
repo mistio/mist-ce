@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.3.7 (22 July 2020)
+
+ - Bugfix: Fix KVM add cloud with custom SSH port
+ - Bugfix: Fix undefine machine on KVM clouds
+ - Bugfix: Fix possible event loop error when creating machine on KVM clouds
+ - Bugfix: Fix possible even loop error when listing images in KVM clouds
+ - Bugfix: Fix possible event loop error when creating machine on Packet clouds
+ - Bugfix: Fix error when location is not found for list_storage_accounts on Azure clouds
+ - Bugfix: Add defensive check for vsphere and kubevirt specific endpoints to throw error the provider is not correct
+ - Bugfix: Fix region extraction from Packet clouds
+ - Change: Allow starting terminated machines on KVM clouds
+ - Change: Throw VolumeCreationError instead of `Cloud Unavailable` when volume creation fails
+ - Change: Update description of sizes in DigitalOcean clouds
+ - Change: Update min size for packet volumes to 100
+
 ## v4.3.6 (25 June 2020)
 
  - Bugfix: Fix image path issue on KVM create machine
