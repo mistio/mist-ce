@@ -2,7 +2,7 @@
 name = "all_backends"
 bind-addr = "0.0.0.0:9096"
 output = [
-    { name="tsfdb", location="http://tsfdb:8080/v1/datapoints", type="influxdb" },
+    #{ name="tsfdb", location="http://tsfdb:8080/v1/datapoints", type="influxdb" },
     { name="influxdb", location = "http://influxdb:8086/write", type="influxdb" },
 ]
 
