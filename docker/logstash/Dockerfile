@@ -10,7 +10,8 @@ ENV ELASTIC_URI=http://elasticsearch:9200 \
     RABBITMQ_USERNAME=guest \
     RABBITMQ_PASSWORD=guest \
     INFLUXDB_HOST=influxdb \
-    INFLUXDB_PORT=8086
+    INFLUXDB_PORT=8086 \
+    TSFDB_URI=tsfdb
 
 RUN logstash-plugin install logstash-output-influxdb
 
