@@ -513,7 +513,7 @@ UI:ip-whitelisting:
 
 
 # MP:aliyun-provisioning: *multiprovisioning_test_template
-# MP:azure-provisioning: *multiprovisioning_test_template
+MP:azure-provisioning: *multiprovisioning_test_template
 MP:digital-ocean-provisioning: *multiprovisioning_test_template
 # MP:ec2-provisioning: *multiprovisioning_test_template
 MP:gce-provisioning: *multiprovisioning_test_template
