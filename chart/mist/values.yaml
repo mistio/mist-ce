@@ -48,7 +48,7 @@ influxdb:
 # TSFDB settings.
 tsfdb:
   #image: *image-properties
-  enableSubchart: true
+  enableSubchart: false
   nameOverride: mist
 
 # Options for rabbitmq subchart.
