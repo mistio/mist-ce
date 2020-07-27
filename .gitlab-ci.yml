@@ -199,10 +199,10 @@ build elasticsearch-manage: *docker_build_template
     - echo "Will retag image $img from submodule $submodule."
     - docker_retag_submodule $submodule $img
 
-retag tsfdb: *docker_retag_template
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
 retag tests: *docker_retag_template
+retag tsfdb: *docker_retag_template
 
 
 compose:
