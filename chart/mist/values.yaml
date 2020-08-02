@@ -3,7 +3,7 @@
 productShortName: mist
 
 # Settings for docker images used in the chart.
-image:
+image: &image-properties
   registry: mistce
   tag: master
   pullPolicy: Always
@@ -44,6 +44,12 @@ influxdb:
   port: 8086
   db: telegraf
   monitoring: true
+
+# TSFDB settings.
+tsfdb:
+  #image: *image-properties
+  enableSubchart: false
+  nameOverride: mist
 
 # Options for rabbitmq subchart.
 rabbitmq:

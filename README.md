@@ -308,6 +308,34 @@ same Docker volumes.
 4. Check that everything is in order by running `docker-compose ps`. Also check
 if your Mist portal works as expected.
 
+## Backups
+
+Mist can automatically backup itself to an S3 bucket. To set this up, first create a bucket for the backups on your S3 provider (AWS, MinIO, etc).
+
+Then go to settings/setting.py of your Mist installation and edit the following part accordingly:
+```
+BACKUP_INTERVAL = 24  # hours between each backup
+BACKUP = {
+    'host': '',  # eg s3.amazonaws.com
+    'key': '',
+    'secret': '',
+    'bucket': '',
+    'gpg': {
+        'recipient': '',
+        'public': '',
+        'private': '',
+    }
+}
+```
+Providing a GPG key is optional but strongly recommended. If you provide it, your backups will be encrypted before getting uploaded to your bucket.
+Mist also offers a set of manual commands for backing up, listing backups and restoring backups:
+```
+docker-compose exec api ./bin/backup
+docker-compose exec api ./bin/list-backups
+docker-compose exec api ./bin/restore {{myBackupName}}
+```
+Finally, please keep in mind that backups include MongoDB and InfluxDB data. Mist logs are stored in Elasticsearch. If you would like to backup these as well, please check out https://www.elastic.co/guide/en/elasticsearch/reference/current/backup-cluster.html.
+
 ## Staging version
 
 If you want to install the latest bleeding edge build of mist,
