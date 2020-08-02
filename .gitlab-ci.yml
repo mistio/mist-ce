@@ -26,6 +26,7 @@ stages:
 discover submodules:
   stage: discover
   image: alpine:3.8
+  retry: 1  # sometimes gitlab api returns 500
   before_script:
     - apk add --no-cache git
   script:
@@ -201,6 +202,7 @@ build elasticsearch-manage: *docker_build_template
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
 retag tests: *docker_retag_template
+retag tsfdb: *docker_retag_template
 
 
 compose:
@@ -509,10 +511,19 @@ UI:ip-whitelisting:
     - chrome
   when: manual
 
-MP:multiprovisioning-1: *multiprovisioning_test_template
-MP:multiprovisioning-2: *multiprovisioning_test_template
-MP:multiprovisioning-3: *multiprovisioning_test_template
 
+MP:aliyun-provisioning: *multiprovisioning_test_template
+MP:azure-provisioning: *multiprovisioning_test_template
+MP:digital-ocean-provisioning: *multiprovisioning_test_template
+MP:ec2-provisioning: *multiprovisioning_test_template
+MP:gce-provisioning: *multiprovisioning_test_template
+MP:kvm-provisioning: *multiprovisioning_test_template
+MP:linode-provisioning: *multiprovisioning_test_template
+# MP:openstack-provisioning: *multiprovisioning_test_template
+MP:packet-provisioning: *multiprovisioning_test_template
+MP:rackspace-provisioning: *multiprovisioning_test_template
+
+# MP:volumes-provisioning: *multiprovisioning_test_template
 #################### UNDEPLOY STAGE ####################
 
 .undeploy_template: &undeploy_template
