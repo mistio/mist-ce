@@ -206,6 +206,17 @@ services:
     expose:
       - 8764
 
+  vault:
+    image: vault:latest
+    ports:
+      - "8200"
+    volumes:
+      - ./docker/vault/file:/vault/file:rw
+      - ./docker/vault/config:/vault/config:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config=/vault/config/vault.json
+
 volumes:
   elasticsearch: {}
   influxdb: {}
