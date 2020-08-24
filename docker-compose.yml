@@ -186,20 +186,22 @@ services:
     expose:
       - 8764
 
-<<<<<<< HEAD
-
-=======
   vault:
     image: vault:latest
     ports:
       - "8200"
+    restart: always
     volumes:
       - ./docker/vault/file:/vault/file:rw
       - ./docker/vault/config:/vault/config:rw
+      - ./docker/vault/policies:/vault/policies:rw
+      - ./docker/vault/vault-play.sh:/vault/vault-play.sh:rw
+    environment:
+        - VAULT_ADDR=http://127.0.0.1:8200
+        - VAULT_API_ADDR=http://127.0.0.1:8200
     cap_add:
       - IPC_LOCK
-    entrypoint: vault server -config=/vault/config/vault.json
->>>>>>> Vault container integration and mock config
+    entrypoint: ./vault/vault-play.sh
 
 volumes:
   elasticsearch: {}
