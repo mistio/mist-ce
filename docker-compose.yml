@@ -221,7 +221,7 @@ services:
         - VAULT_API_ADDR=http://127.0.0.1:8200
     cap_add:
       - IPC_LOCK
-    entrypoint: ./vault/vault-play.sh
+    entrypoint: /vault/vault-play.sh
 
 volumes:
   elasticsearch: {}
