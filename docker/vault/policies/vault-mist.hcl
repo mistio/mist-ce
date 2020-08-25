@@ -1,10 +1,19 @@
-# Map the mist user 
-path "secret/data/mist-user/*" {
-  capabilities = ["create", "update", "read", "delete"]
+# Grant permissions on kv1 engine
+path "kv1/*" {
+    capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
-# 
-path "secret/metadata/mist-user/*" {
+# For Web UI usage
+path "kv1/metadata" {
   capabilities = ["list"]
 }
 
+# Grant permissions on kv2 engine
+path "secret/*" {
+    capabilities = [ "create", "update", "read", "delete", "list" ]
+}
+
+# For Web UI usage
+path "secret/metadata" {
+  capabilities = ["list"]
+}
