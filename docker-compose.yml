@@ -188,21 +188,28 @@ services:
 
   vault:
     image: vault:latest
-    ports:
+    expose:
       - "8200"
     restart: on-failure:5
     volumes:
       - ./docker/vault/file:/vault/file:rw
       - ./docker/vault/config:/vault/config:rw
       - ./docker/vault/policies:/vault/policies:rw
-      - ./docker/vault/vault-play.sh:/etc/init.d/vault-play.sh:rw
-    environment:
-      - VAULT_ADDR=http://127.0.0.1:8200
-      - VAULT_API_ADDR=http://127.0.0.1:8200
+    #environment:
+      #- VAULT_ADDR=http://127.0.0.1:8200
+      #- VAULT_API_ADDR=http://127.0.0.1:8200
     cap_add:
       - IPC_LOCK
-    #command: /vault/vault-play.sh
-    entrypoint: /etc/init.d/vault-play.sh 
+    entrypoint: vault server -config=/vault/config/vault.json
+
+  vault-init:
+    image: vault:latest
+    volumes:
+      - ./docker/vault/vault-play.sh:/etc/init.d/vault-play.sh:ro
+      - ./docker/vault:/vault:rw
+    environment:
+      - VAULT_ADDR=http://vault:8200
+    command: sh /etc/init.d/vault-play.sh
 
 volumes:
   elasticsearch: {}
