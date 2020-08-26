@@ -7,12 +7,7 @@ UNSEAL_TOKEN=/vault/config/unseal_token
 #export VAULT_ADDR=http://127.0.0.1:8200
 
 echo "Installing dependencies"
-apk add vim grep socat
-
-echo "Starting vault server"
-vault server -config="$VAULT_CONFIG" &
-sleep 3
-echo "Vault server started"
+apk add vim grep #socat vault
 
 # TODO: This is problematic
 # Exists && Is_Bigger_Than_One
@@ -20,7 +15,8 @@ echo "Vault server started"
 if [ -f "$UNSEAL_TOKEN" ]; then
 
 	# Big brain hack
-	socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN
+	# socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN
+	vault operator unseal $Unseal_Key
 
 else
 	echo "Initializing Vault server"
@@ -38,7 +34,8 @@ else
 	export Root_Token=$(grep -Po "(?<=^Initial Root Token: ).*" "$INIT_LOG")
 
 	# Big brain hack
-	socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN
+	#echo vault operator unseal $Unseal_Key
+	vault operator unseal $Unseal_Key
 	vault login $Root_Token
 
 	vault secrets enable -path="kv1" kv
