@@ -517,6 +517,7 @@ MP:azure-provisioning: *multiprovisioning_test_template
 MP:digital-ocean-provisioning: *multiprovisioning_test_template
 MP:ec2-provisioning: *multiprovisioning_test_template
 MP:gce-provisioning: *multiprovisioning_test_template
+MP:kubevirt-provisioning: *multiprovisioning_test_template
 MP:kvm-provisioning: *multiprovisioning_test_template
 MP:linode-provisioning: *multiprovisioning_test_template
 MP:lxd-provisioning: *multiprovisioning_test_template
