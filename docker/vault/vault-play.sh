@@ -7,7 +7,7 @@ UNSEAL_TOKEN=/vault/config/unseal_token
 #export VAULT_ADDR=http://127.0.0.1:8200
 
 echo "Installing dependencies"
-apk add vim grep #socat vault
+apk add vim grep socat
 
 # TODO: This is problematic
 # Exists && Is_Bigger_Than_One
@@ -15,8 +15,8 @@ apk add vim grep #socat vault
 if [ -f "$UNSEAL_TOKEN" ]; then
 
 	# Big brain hack
-	# socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN
-	vault operator unseal $Unseal_Key
+	socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN
+	# vault operator unseal $Unseal_Key
 
 else
 	echo "Initializing Vault server"
