@@ -1,5 +1,5 @@
 # Grant permissions on kv1 engine
-path "kv1/*" {
+path "+/*" {
     capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
@@ -9,7 +9,7 @@ path "kv1/metadata" {
 }
 
 # Grant permissions on kv2 engine
-path "secret/*" {
+path "secret/+/*" {
     capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
