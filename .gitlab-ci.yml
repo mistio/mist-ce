@@ -416,6 +416,7 @@ deploy master:
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
   dependencies: []
 
+# API Integration tests #
 
 .api_test_template: &api_test_template
   <<: *test_template
@@ -454,6 +455,8 @@ API:main:volumes: *api_test_template
     when: on_failure
   tags:
     - chrome
+
+# UI Integration tests #
 
 UI:clouds-add-1/2: *ui_test_template
 UI:clouds-add-2/2: *ui_test_template
@@ -496,6 +499,8 @@ UI:ip-whitelisting:
   <<: *ui_test_template
   retry: 1
 
+# Machine Provisioning tests #
+
 .multiprovisioning_test_template: &multiprovisioning_test_template
   <<: *test_template
   script:
@@ -525,7 +530,13 @@ MP:openstack-provisioning: *multiprovisioning_test_template
 MP:packet-provisioning: *multiprovisioning_test_template
 MP:rackspace-provisioning: *multiprovisioning_test_template
 
-# MP:volumes-provisioning: *multiprovisioning_test_template
+# Volume Provisioning tests #
+VP:aliyun-volume-create: *multiprovisioning_test_template
+VP:azure-volume-create: *multiprovisioning_test_template
+VP:digital-ocean-volume-create: *multiprovisioning_test_template
+VP:ec2-volume-create: *multiprovisioning_test_template
+VP:gce-volume-create: *multiprovisioning_test_template
+# VP:openstack-volume-create: *multiprovisioning_test_template
 #################### UNDEPLOY STAGE ####################
 
 .undeploy_template: &undeploy_template
