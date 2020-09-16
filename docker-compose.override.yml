@@ -6,6 +6,23 @@
 version: '2.0'
 
 services:
+  api-v2:
+    image: mist/api-v2
+    depends_on:
+      - memcached
+      - mongodb
+      - elasticsearch
+      - rabbitmq
+    volumes:
+      - ./settings:$CONF_DIR/settings
+      - ./defaults.py:$CONF_DIR/defaults.py:ro
+      - ./api:/mist.api:rw
+      - ./api-v2:/usr/src/app:rw
+    environment:
+      SETTINGS_FILE: $CONF_DIR/settings/settings.py
+    stdin_open: true
+    tty: true
+    restart: on-failure:5
 
   elasticsearch:
     ports:
