@@ -199,7 +199,17 @@ build elasticsearch-manage: *docker_build_template
     - echo "Will retag image $img from submodule $submodule."
     - docker_retag_submodule $submodule $img
 
-retag landing: *docker_retag_template
+#TODO: Revert when polymer3 branch in landing repo gets merged
+retag landing:
+  <<: *docker_retag_template
+  script:
+    - export arg1=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
+    - export arg2=$(echo "$CI_JOB_NAME" | cut -d " " -f3)
+    - export img="${SUBMODULES_IMAGE:-mist}/${arg1}:polymer3" 
+    - export submodule="${arg2:-$arg1}"
+    - echo "Will retag image $img from submodule $submodule."
+    - docker_retag_submodule $submodule $img
+
 retag ui: *docker_retag_template
 retag tests: *docker_retag_template
 retag tsfdb: *docker_retag_template
@@ -329,6 +339,7 @@ compose:
           while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
             sleep 5 && echo 'Environment not ready yet...'
           done
+          echo "Environment ready at $CI_ENVIRONMENT_URL"
         }
   script:
     - echo "$values" > values.yaml
