@@ -694,6 +694,7 @@ helm_chart_release:
   only:
     # only for references that match a version string (v1.2.3)
     - /^v\d+\.\d+\.\d+$/
+  dependencies: []
   except:
     # Except branches, meaning it'll only apply to git tags
     - branches
