@@ -599,8 +599,8 @@ deployment:
     autoscaling: *autoscaling
     resources:
       requests:
-        memory: 20Mi
+        memory: 50Mi
         cpu: 10m
       limits:
-        memory: 50Mi
+        memory: 250Mi
         cpu: 200m
