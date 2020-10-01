@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}-swagger
+  name: {{ include "chart.fullname" . }}-wsproxy
   labels:
-    app: swagger
+    app: wsproxy
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -15,20 +15,17 @@ spec:
   template:
     metadata:
       labels:
-        app: swagger
+        app: wsproxy
         release: {{ .Release.Name }}
     spec:
       containers:
-      - name: swagger
-        env:
-        - name: API_URL
-          value: /api/v1/spec
-        image: mist/swagger-ui
+      - name: wsproxy
+        image: mist/wsproxy
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
-            memory: 50Mi
-            cpu: 200m
+            memory: 500Mi
+            cpu: 500m
           requests:
             memory: 20Mi
             cpu: 1m

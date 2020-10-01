@@ -50,6 +50,7 @@ data:
       {{- end }}
     }
 
+    TSFDB_URI = {{ if .Values.tsfdb.enableSubchart }} "http://{{ include "chart.fullname" . }}-tsfdb:8080" {{ else }} "" {{ end }}
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
@@ -90,7 +91,7 @@ data:
   {{- if .Values.mongodb.host }}
     MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
   {{- else }}
-    MONGO_URI = "{{ include "chart.fullname" . }}-fdbdoc:27017"
+    MONGO_URI = "{{ .Release.Name }}-mongodb:27017"
   {{- end }}
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"

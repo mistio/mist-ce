@@ -119,6 +119,20 @@ data:
                 proxy_set_header  X-Real-IP  $remote_addr;
             }
 
+            location /proxy {
+                proxy_pass http://{{ include "chart.fullname" . }}-huproxy:8086;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+
+            location /wsproxy {
+                proxy_pass http://{{ include "chart.fullname" . }}-wsproxy:8764;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+
             # location /manage/ui/ {
             #     proxy_pass http://{{ include "chart.fullname" . }}-manage/;
             #     proxy_set_header  X-Real-IP  $remote_addr;

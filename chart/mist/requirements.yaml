@@ -3,4 +3,13 @@ dependencies:
     condition: rabbitmq.enabled
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: rabbitmq-ha
-    version: 1.25.0
+    version: 1.46.4
+  - alias: mongodb
+    condition: eq .Values.mongodb.host ""
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: mongodb
+    version: 7.8.10
+  - name: tsfdb
+    version: 0.0.2
+    condition: tsfdb.enableSubchart
+    repository: https://mist-charts.storage.googleapis.com/

@@ -3,7 +3,7 @@
 productShortName: mist
 
 # Settings for docker images used in the chart.
-image:
+image: &image-properties
   registry: mistce
   tag: master
   pullPolicy: Always
@@ -18,6 +18,7 @@ http:
   tlsSecret: ''
   tlsHosts: []
   tlsAnnotations: {}
+  tlsClusterIssuer: ''
 
 # Email settings. Change this to connect to a real SMTP server.
 smtp:
@@ -42,6 +43,13 @@ influxdb:
   host: ''
   port: 8086
   db: telegraf
+  monitoring: true
+
+# TSFDB settings.
+tsfdb:
+  #image: *image-properties
+  enableSubchart: false
+  nameOverride: mist
 
 fdb:
   host: ''
@@ -64,9 +72,9 @@ rabbitmq:
   nodeSelector: {}
   prometheus:
     exporter:
-      enabled: true
+      enabled: false
     operator:
-      enabled: true
+      enabled: false
   updateStrategy: RollingUpdate
   extraConfig: |-
     tcp_listen_options.keepalive = true
@@ -114,6 +122,7 @@ rabbitmqExternal:
 mongodb:
   host: ''
   port: 27017
+  usePassword: false
 
 # Docker settings (used by orchestration plugin). This has to be configured for
 # orchestration to work.
@@ -212,9 +221,9 @@ preemptible:
 
 # Configure prometheus exporters. Subcharts may require separate configuration.
 prometheus:
-  enabled: true
+  enabled: false
   operator:
-    enabled: true
+    enabled: false
     serviceMonitor:
       interval: 20s
       namespace: monitoring
@@ -238,7 +247,7 @@ deployment:
       pool: prefork
       replicas: 1
       autoscaling: &autoscaling
-        enabled: true
+        enabled: false
         minReplicas: 1
         maxReplicas: 20
         targetCPUUtilizationPercentage: 95
