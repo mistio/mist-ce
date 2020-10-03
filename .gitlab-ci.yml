@@ -355,7 +355,7 @@ deploy test:
           certmanager.k8s.io/acme-challenge-type: dns01
           certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: true
-      jsBuild: false
+      #jsBuild: false
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
