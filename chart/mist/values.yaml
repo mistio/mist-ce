@@ -575,11 +575,11 @@ deployment:
     autoscaling: *autoscaling
     resources:
       requests:
-        memory: 30Mi
+        memory: 50Mi
         cpu: 10m
       limits:
-        memory: 50Mi
-        cpu: 100m
+        memory: 250Mi
+        cpu: 500m
 
   # Nginx deployment settings.
   nginx:
