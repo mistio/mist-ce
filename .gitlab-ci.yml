@@ -526,7 +526,7 @@ MP:kvm-machine-create: *multiprovisioning_test_template
 MP:linode-machine-create: *multiprovisioning_test_template
 MP:lxd-machine-create: *multiprovisioning_test_template
 # MP:openstack-machine-create: *multiprovisioning_test_template
-MP:packet-machine-create: *multiprovisioning_test_template
+MP:equinix-metal-machine-create: *multiprovisioning_test_template
 MP:rackspace-machine-create: *multiprovisioning_test_template
 
 # Machine Provisioning tests #
