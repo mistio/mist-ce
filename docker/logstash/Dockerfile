@@ -11,8 +11,8 @@ ENV ELASTIC_URI=http://elasticsearch:9200 \
     RABBITMQ_PASSWORD=guest \
     INFLUXDB_HOST=influxdb \
     INFLUXDB_PORT=8086 \
-    TSFDB_URI=tsfdb
+    TSFDB_URI=http://tsfdb:8080/v1/metering/datapoints
 
-RUN logstash-plugin install logstash-output-influxdb
+RUN logstash-plugin install logstash-output-http
 
 COPY ./config /config-dir
