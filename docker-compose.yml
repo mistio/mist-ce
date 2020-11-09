@@ -127,6 +127,10 @@ services:
   dramatiq:
     <<: *backend
     command: bin/wait-all bin/dramatiq
+  
+  apscheduler:
+    <<: *backend
+    command: bin/wait-all bin/apscheduler
 
   ui:
     image: $IMG_REGISTRY/ui:$IMG_TAG

@@ -43,6 +43,7 @@ services:
   sockjs: *backend
   apply-migrations: *backend
   dramatiq: *backend
+  apscheduler: *backend
 
   ui:
     volumes:
