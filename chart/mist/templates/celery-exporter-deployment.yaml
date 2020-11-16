@@ -28,7 +28,7 @@ spec:
         args:
         - --broker
         {{ if .Values.rabbitmq.enabled -}}
-        - "amqp://{{ .Values.rabbitmq.rabbitmqUsername }}:{{ .Values.rabbitmq.rabbitmqPassword }}@{{ .Release.Name }}-rabbitmq:5672/"
+        - "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ .Release.Name }}-rabbitmq:5672/"
         {{- else -}}
         - "amqp://{{ .Values.rabbitmqExternal.username }}:{{ .Values.rabbitmqExternal.password }}@{{ .Values.rabbitmqExternal.host }}:{{ .Values.rabbitmqExternal.port }}/"
         {{- end }}

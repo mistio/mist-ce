@@ -54,9 +54,13 @@ tsfdb:
 # Options for rabbitmq subchart.
 rabbitmq:
   enabled: true
-  rabbitmqUsername: guest
-  rabbitmqPassword: guest
-  replicaCount: 1
+  auth:
+    username: guest
+    password: guest
+    erlangCookie: guest
+  metrics:
+    enabled: true
+  replicas: 1
   resources:
     requests:
       memory: 250Mi
@@ -119,7 +123,8 @@ rabbitmqExternal:
 mongodb:
   host: ''
   port: 27017
-  usePassword: false
+  auth:
+    enabled: false
 
 # Docker settings (used by orchestration plugin). This has to be configured for
 # orchestration to work.
