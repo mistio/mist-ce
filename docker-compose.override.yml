@@ -59,6 +59,7 @@ services:
   api: *backend
   sockjs: *backend
   apply-migrations: *backend
+  dramatiq: *backend
 
   ui:
     volumes:
