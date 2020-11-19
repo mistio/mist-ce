@@ -482,6 +482,7 @@ API:main:machines: *api_test_template
 API:main:networks: *api_test_template
 API:main:schedules: *api_test_template
 API:main:scripts: *api_test_template
+API:main:secrets: *api_test_template
 API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template
