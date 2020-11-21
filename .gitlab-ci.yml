@@ -297,7 +297,6 @@ compose:
             rm -rf $tls_tmpdir
           fi
 
-          helm init --client-only
           helm repo update
           helm dependency update ./chart/mist/
 
@@ -634,8 +633,6 @@ helm_chart_release:
           local repo_url="${3?Specify repo url}"
           local sync_dir="${repo_dir}-sync"
           local index_dir="${repo_dir}-index"
-
-          helm init --client-only
 
           echo "Syncing repo '$repo_dir'..."
 
