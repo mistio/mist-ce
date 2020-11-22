@@ -36,7 +36,7 @@ stringData:
           "priority": 0,
           "definition": {
             "ha-mode": "exactly",
-            "ha-params": 2
+            "ha-params": {{ .Values.rabbitmq.replicationFactor }}
           }
         },
         {

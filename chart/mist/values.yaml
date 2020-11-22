@@ -60,7 +60,8 @@ rabbitmq:
     erlangCookie: guest
   metrics:
     enabled: true
-  replicaCount: 3
+  replicaCount: 1
+  replicationFactor: 1
   clustering:
     forceBoot: true
   resources:
@@ -78,43 +79,6 @@ rabbitmq:
     tcp_listen_options.keepalive = true
     cluster_formation.node_cleanup.only_log_warning = true
     load_definitions = /app/load_definition.json
-  extraSecrets:
-    load-definition:
-      load_definition.json: |
-        {
-          "policies": [
-            {
-              "name": "ha-all",
-              "pattern": ".*",
-              "vhost": "/",
-              "priority": 0,
-              "definition": {
-                "ha-mode": "exactly",
-                "ha-params": 2
-              }
-            },
-            {
-              "name": "autoexpire-celeryev-queues",
-              "pattern": "celeryev\\..*",
-              "vhost": "/",
-              "priority": 10,
-              "apply-to": "queues",
-              "definition": {
-                "expires": 300000
-              }
-            },
-            {
-              "name": "autoexpire-celerypidbox-queues",
-              "pattern": ".*\\.celery\\.pidbox",
-              "vhost": "/",
-              "priority": 10,
-              "apply-to": "queues",
-              "definition": {
-                "expires": 300000
-              }
-            }
-          ]
-        }
   loadDefinition:
     enabled: true
     existingSecret: rabbitmq-definition-{{ .Release.Name }}
