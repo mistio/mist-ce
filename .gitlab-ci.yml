@@ -331,6 +331,7 @@ compose:
           while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
             sleep 5 && echo 'Environment not ready yet...'
           done
+          echo "Environment ready at $CI_ENVIRONMENT_URL"
         }
   script:
     - echo "$values" > values.yaml
