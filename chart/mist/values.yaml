@@ -61,6 +61,8 @@ rabbitmq:
   metrics:
     enabled: true
   replicaCount: 3
+  clustering:
+    forceBoot: true
   resources:
     requests:
       memory: 250Mi
@@ -77,7 +79,7 @@ rabbitmq:
     cluster_formation.node_cleanup.only_log_warning = true
     load_definitions = /app/load_definition.json
   extraSecrets:
-    load-definition:
+    load-definition-{{ .Release.Name }}:
       load_definition.json: |
         {
           "policies": [
