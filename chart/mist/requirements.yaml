@@ -3,7 +3,7 @@ dependencies:
     condition: rabbitmq.enabled
     repository: https://charts.bitnami.com/bitnami
     name: rabbitmq
-    version: 7.6.9
+    version: 8.0.5
   - alias: mongodb
     condition: eq .Values.mongodb.host ""
     repository: https://charts.bitnami.com/bitnami
