@@ -546,7 +546,7 @@ VP:gce-volume-create: *multiprovisioning_test_template
   variables:
     GIT_STRATEGY: none
   script:
-    - helm delete --purge $release
+    - helm uninstall $release
   allow_failure: true
   dependencies: []
 
