@@ -1,40 +1,6 @@
 apiVersion: v1
 data:
-  load_definition.json: |
-    {
-      "policies": [
-        {
-          "name": "ha-all",
-          "pattern": ".*",
-          "vhost": "/",
-          "priority": 0,
-          "definition": {
-            "ha-mode": "exactly",
-            "ha-params": 2
-          }
-        },
-        {
-          "name": "autoexpire-celeryev-queues",
-          "pattern": "celeryev\\..*",
-          "vhost": "/",
-          "priority": 10,
-          "apply-to": "queues",
-          "definition": {
-            "expires": 300000
-          }
-        },
-        {
-          "name": "autoexpire-celerypidbox-queues",
-          "pattern": ".*\\.celery\\.pidbox",
-          "vhost": "/",
-          "priority": 10,
-          "apply-to": "queues",
-          "definition": {
-            "expires": 300000
-          }
-        }
-      ]
-    }
+  load_definition.json: ewogICJwb2xpY2llcyI6IFsKICAgIHsKICAgICAgIm5hbWUiOiAiaGEtYWxsIiwKICAgICAgInBhdHRlcm4iOiAiLioiLAogICAgICAidmhvc3QiOiAiLyIsCiAgICAgICJwcmlvcml0eSI6IDAsCiAgICAgICJkZWZpbml0aW9uIjogewogICAgICAgICJoYS1tb2RlIjogImV4YWN0bHkiLAogICAgICAgICJoYS1wYXJhbXMiOiAyCiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJuYW1lIjogImF1dG9leHBpcmUtY2VsZXJ5ZXYtcXVldWVzIiwKICAgICAgInBhdHRlcm4iOiAiY2VsZXJ5ZXZcXC4uKiIsCiAgICAgICJ2aG9zdCI6ICIvIiwKICAgICAgInByaW9yaXR5IjogMTAsCiAgICAgICJhcHBseS10byI6ICJxdWV1ZXMiLAogICAgICAiZGVmaW5pdGlvbiI6IHsKICAgICAgICAiZXhwaXJlcyI6IDMwMDAwMAogICAgICB9CiAgICB9LAogICAgewogICAgICAibmFtZSI6ICJhdXRvZXhwaXJlLWNlbGVyeXBpZGJveC1xdWV1ZXMiLAogICAgICAicGF0dGVybiI6ICIuKlxcLmNlbGVyeVxcLnBpZGJveCIsCiAgICAgICJ2aG9zdCI6ICIvIiwKICAgICAgInByaW9yaXR5IjogMTAsCiAgICAgICJhcHBseS10byI6ICJxdWV1ZXMiLAogICAgICAiZGVmaW5pdGlvbiI6IHsKICAgICAgICAiZXhwaXJlcyI6IDMwMDAwMAogICAgICB9CiAgICB9CiAgXQp9Cg==
 kind: Secret
 metadata:
   name: rabbitmq-definition-{{ include "chart.fullname" . }}
