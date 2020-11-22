@@ -1,0 +1,44 @@
+apiVersion: v1
+data:
+  load_definition.json: |
+    {
+      "policies": [
+        {
+          "name": "ha-all",
+          "pattern": ".*",
+          "vhost": "/",
+          "priority": 0,
+          "definition": {
+            "ha-mode": "exactly",
+            "ha-params": 2
+          }
+        },
+        {
+          "name": "autoexpire-celeryev-queues",
+          "pattern": "celeryev\\..*",
+          "vhost": "/",
+          "priority": 10,
+          "apply-to": "queues",
+          "definition": {
+            "expires": 300000
+          }
+        },
+        {
+          "name": "autoexpire-celerypidbox-queues",
+          "pattern": ".*\\.celery\\.pidbox",
+          "vhost": "/",
+          "priority": 10,
+          "apply-to": "queues",
+          "definition": {
+            "expires": 300000
+          }
+        }
+      ]
+    }
+kind: Secret
+metadata:
+  name: rabbitmq-definition-{{ include "chart.fullname" . }}
+  labels:
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+type: Opaque

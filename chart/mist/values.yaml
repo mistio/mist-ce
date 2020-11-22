@@ -79,7 +79,7 @@ rabbitmq:
     cluster_formation.node_cleanup.only_log_warning = true
     load_definitions = /app/load_definition.json
   extraSecrets:
-    load-definition-{{ .Release.Name }}:
+    load-definition:
       load_definition.json: |
         {
           "policies": [
@@ -117,7 +117,7 @@ rabbitmq:
         }
   loadDefinition:
     enabled: true
-    existingSecret: load-definition
+    existingSecret: rabbitmq-definition-{{ .Release.Name }}
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.enabled` is false.
