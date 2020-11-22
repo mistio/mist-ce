@@ -3,12 +3,12 @@ dependencies:
     condition: rabbitmq.enabled
     repository: https://charts.bitnami.com/bitnami
     name: rabbitmq
-    version: 7.6.9
+    version: 8.0.5
   - alias: mongodb
     condition: eq .Values.mongodb.host ""
     repository: https://charts.bitnami.com/bitnami
     name: mongodb
-    version: 9.2.5
+    version: 10.0.5
   - name: tsfdb
     version: 0.0.2
     condition: tsfdb.enableSubchart
