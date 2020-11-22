@@ -81,7 +81,8 @@ rabbitmq:
     load_definitions = /app/load_definition.json
   loadDefinition:
     enabled: true
-    existingSecret: rabbitmq-definition-{{ .Release.Name }}
+    existingSecret: |-
+      {{ include "chart.fullname" . }}-rabbitmq-definition
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.enabled` is false.

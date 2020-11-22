@@ -63,7 +63,7 @@ stringData:
     }
 kind: Secret
 metadata:
-  name: rabbitmq-definition-{{ include "chart.fullname" . }}
+  name: {{ include "chart.fullname" . }}-rabbitmq-definition
   labels:
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
