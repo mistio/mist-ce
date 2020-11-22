@@ -20,7 +20,7 @@ stringData:
           "user": "guest",
           "vhost": "/",
           "write": ".*"
-      }],q
+      }],
       "vhosts": [{
         "limits": [],
         "metadata": {
