@@ -304,7 +304,7 @@ compose:
           helm dependency update ./chart/mist/
 
           helm upgrade --install --namespace $namespace \
-            --wait --timeout=600 \
+            --wait --timeout=10m \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
             --set image.registry="$REGISTRY_IMAGE" \
