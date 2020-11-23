@@ -542,7 +542,7 @@ VP:gce-volume-create: *multiprovisioning_test_template
 
 .undeploy_template: &undeploy_template
   stage: undeploy
-  image: dtzar/helm-kubectl:2.10.0
+  image: dtzar/helm-kubectl:3.4.0
   variables:
     GIT_STRATEGY: none
   script:
