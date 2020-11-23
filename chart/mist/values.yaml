@@ -82,7 +82,7 @@ rabbitmq:
   loadDefinition:
     enabled: true
     existingSecret: |-
-      {{ include "chart.fullname" . }}-definition
+      {{ .Release.Name }}-rabbitmq-definition
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.enabled` is false.
