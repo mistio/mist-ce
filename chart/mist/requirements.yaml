@@ -10,6 +10,6 @@ dependencies:
     name: mongodb
     version: 7.8.10
   - name: tsfdb
-    version: 0.0.1
+    version: 0.0.2
     condition: tsfdb.enableSubchart
     repository: https://mist-charts.storage.googleapis.com/

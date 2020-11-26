@@ -16,3 +16,6 @@
 [submodule "tsfdb"]
 	path = tsfdb
 	url = ../tsfdb-server
+[submodule "api-v2"]
+	path = api-v2
+	url = ../mist-api-v2
