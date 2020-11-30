@@ -156,7 +156,7 @@ services:
 
 
   influxdb:
-    image: influxdb
+    image: quay.io/influxdb/influxdb:2.0.0-rc
     environment:
       INFLUXDB_DB: telegraf
       INFLUXDB_BIND_ADDRESS: "0.0.0.0:8088"
