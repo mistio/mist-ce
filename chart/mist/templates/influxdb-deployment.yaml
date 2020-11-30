@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: influxdb
-        image: influxdb
+        image: quay.io/influxdb/influxdb:2.0.0-rc
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: INFLUXDB_DB
