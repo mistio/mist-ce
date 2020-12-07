@@ -1,15 +1,15 @@
 dependencies:
   - alias: rabbitmq
     condition: rabbitmq.enabled
-    repository: https://kubernetes-charts.storage.googleapis.com/
-    name: rabbitmq-ha
-    version: 1.46.4
+    repository: https://charts.bitnami.com/bitnami
+    name: rabbitmq
+    version: 8.0.5
   - alias: mongodb
     condition: eq .Values.mongodb.host ""
-    repository: https://kubernetes-charts.storage.googleapis.com/
+    repository: https://charts.bitnami.com/bitnami
     name: mongodb
-    version: 7.8.10
+    version: 10.0.5
   - name: tsfdb
-    version: 0.0.1
+    version: 0.0.3
     condition: tsfdb.enableSubchart
     repository: https://mist-charts.storage.googleapis.com/

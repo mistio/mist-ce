@@ -1,0 +1,70 @@
+apiVersion: v1
+stringData:
+  load_definition.json:  |-
+    {
+      "users": [
+        {
+          "name": "user",
+          "password": "user",
+          "tags": "administrator"
+        },
+        {
+          "name": "guest",
+          "password": "guest",
+          "tags": "administrator"
+        }
+      ],
+      "permissions": [{
+          "configure": ".*",
+          "read": ".*",
+          "user": "guest",
+          "vhost": "/",
+          "write": ".*"
+      }],
+      "vhosts": [{
+        "limits": [],
+        "metadata": {
+          "description": "Default virtual host",
+          "tags": []
+        },
+        "name": "/"
+      }],
+      "policies": [{
+          "name": "ha-all",
+          "pattern": ".*",
+          "vhost": "/",
+          "priority": 0,
+          "definition": {
+            "ha-mode": "exactly",
+            "ha-params": {{ .Values.rabbitmq.replicationFactor }}
+          }
+        },
+        {
+          "name": "autoexpire-celeryev-queues",
+          "pattern": "celeryev\\..*",
+          "vhost": "/",
+          "priority": 10,
+          "apply-to": "queues",
+          "definition": {
+            "expires": 300000
+          }
+        },
+        {
+          "name": "autoexpire-celerypidbox-queues",
+          "pattern": ".*\\.celery\\.pidbox",
+          "vhost": "/",
+          "priority": 10,
+          "apply-to": "queues",
+          "definition": {
+            "expires": 300000
+          }
+        }
+      ]
+    }
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-rabbitmq-definition
+  labels:
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+type: Opaque

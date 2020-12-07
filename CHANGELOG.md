@@ -1,5 +1,10 @@
 # Changelog
 
+## v4.3.8 (26 Aug 2020)
+
+ - Bugfix: Fix machine provisioning issue on OpenStack
+ - Bugfix: Fix machine provisioning on KubeVirt
+
 ## v4.3.7 (22 July 2020)
 
  - Bugfix: Fix KVM add cloud with custom SSH port
