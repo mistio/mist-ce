@@ -75,6 +75,8 @@ data:
       {{- end }}
     }
 
+    VAULT_TOKEN = "{{ .Values.vault.token }}"
+
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
     STRIPE_PUBLIC_APIKEY = "{{ .Values.stripe.publicApiKey }}"
 
