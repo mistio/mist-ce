@@ -323,7 +323,7 @@ compose:
             --set image.registry="$REGISTRY_IMAGE" \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
-            --set vault.token="$VAULT_TOKEN"
+            --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
