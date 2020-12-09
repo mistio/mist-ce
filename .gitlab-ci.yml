@@ -327,6 +327,7 @@ compose:
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
+            --set vault.token="$VAULT_TOKEN" \
             --set docker.port="$DOCKER_PORT" \
             --set docker.key="$DOCKER_KEY" \
             --set docker.cert="$DOCKER_CERT" \
