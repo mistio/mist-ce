@@ -10,6 +10,9 @@ metadata:
 spec:
   ports:
   - port: 80
+    name: bundled
+  - port: 8000
+    name: unbundled
   selector:
     app: landing
     release: {{ .Release.Name }}
