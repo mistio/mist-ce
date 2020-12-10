@@ -6,7 +6,6 @@
 version: '2.0'
 
 services:
-
   elasticsearch:
     ports:
       - 9200:9200
@@ -40,6 +39,7 @@ services:
   beat: *backend
   hubshell: *backend
   api: *backend
+  api-v2: *backend
   sockjs: *backend
   apply-migrations: *backend
 
@@ -50,7 +50,6 @@ services:
   landing:
     volumes:
       - ./landing:/landing:rw
-
   nginx:
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
