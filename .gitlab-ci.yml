@@ -174,7 +174,7 @@ build api:
 build api-v2:
   <<: *docker_template
   script:
-    - SRC_IMG="$CI_PROJECT_NAME/api:$CI_COMMIT_SHA"
+    - SRC_IMG="$DOCKERHUB_USER/api:$CI_COMMIT_SHA"
     - docker_pull $SRC_IMG
     - |
         docker build \
@@ -183,7 +183,7 @@ build api-v2:
           --build-arg MIST_VERSION_SHA=$CI_COMMIT_SHA \
           --build-arg MIST_VERSION_NAME=$CI_COMMIT_REF_NAME \
           .
-    - docker_push $CI_PROJECT_NAME/api-v2:$CI_COMMIT_SHA api
+    - docker_push $CI_PROJECT_NAME/api-v2:$CI_COMMIT_SHA api-v2
 
 .docker_build_template: &docker_build_template
   <<: *docker_template
