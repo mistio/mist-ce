@@ -546,7 +546,7 @@ VP:gce-volume-create: *multiprovisioning_test_template
   variables:
     GIT_STRATEGY: none
   script:
-    - helm uninstall $release
+    - helm uninstall $release -n $namespace
   allow_failure: true
   dependencies: []
 
@@ -558,7 +558,7 @@ undeploy test:
   variables:
     GIT_STRATEGY: none
     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-
+    namespace: test-$CI_PROJECT_NAME
 undeploy review:
   <<: *undeploy_template
   environment:
@@ -567,6 +567,7 @@ undeploy review:
   variables:
     GIT_STRATEGY: none
     release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+    namespace: $CI_PROJECT_NAME
   when: manual
   except:
     - master
