@@ -54,9 +54,16 @@ tsfdb:
 # Options for rabbitmq subchart.
 rabbitmq:
   enabled: true
-  rabbitmqUsername: guest
-  rabbitmqPassword: guest
+  auth:
+    username: guest
+    password: guest
+    erlangCookie: guest
+  metrics:
+    enabled: true
   replicaCount: 1
+  replicationFactor: 1
+  clustering:
+    forceBoot: true
   resources:
     requests:
       memory: 250Mi
@@ -67,45 +74,15 @@ rabbitmq:
   service:
     clusterIP: ''
   nodeSelector: {}
-  prometheus:
-    exporter:
-      enabled: false
-    operator:
-      enabled: false
   updateStrategy: RollingUpdate
-  extraConfig: |-
+  extraConfiguration: |-
     tcp_listen_options.keepalive = true
-  policies: |
-    {
-      "name": "ha-all",
-      "pattern": ".*",
-      "vhost": "/",
-      "priority": 0,
-      "definition": {
-        "ha-mode": "exactly",
-        "ha-params": 2
-      }
-    },
-    {
-      "name": "autoexpire-celeryev-queues",
-      "pattern": "celeryev\\..*",
-      "vhost": "/",
-      "priority": 10,
-      "apply-to": "queues",
-      "definition": {
-        "expires": 300000
-      }
-    },
-    {
-      "name": "autoexpire-celerypidbox-queues",
-      "pattern": ".*\\.celery\\.pidbox",
-      "vhost": "/",
-      "priority": 10,
-      "apply-to": "queues",
-      "definition": {
-        "expires": 300000
-      }
-    }
+    cluster_formation.node_cleanup.only_log_warning = true
+    load_definitions = /app/load_definition.json
+  loadDefinition:
+    enabled: true
+    existingSecret: |-
+      {{ .Release.Name }}-rabbitmq-definition
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.enabled` is false.
@@ -119,7 +96,8 @@ rabbitmqExternal:
 mongodb:
   host: ''
   port: 27017
-  usePassword: false
+  auth:
+    enabled: false
 
 # Docker settings (used by orchestration plugin). This has to be configured for
 # orchestration to work.

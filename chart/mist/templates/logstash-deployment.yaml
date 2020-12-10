@@ -43,9 +43,9 @@ spec:
         - name: RABBITMQ_PORT
           value: "{{ if .Values.rabbitmq.enabled }}5672{{ else }}{{ .Values.rabbitmqExternal.port }}{{ end }}"
         - name: RABBITMQ_USERNAME
-          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.rabbitmqUsername }}{{ else }}{{ .Values.rabbitmqExternal.username }}{{ end }}
+          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.auth.username }}{{ else }}{{ .Values.rabbitmqExternal.username }}{{ end }}
         - name: RABBITMQ_PASSWORD
-          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.rabbitmqPassword }}{{ else }}{{ .Values.rabbitmqExternal.password }}{{ end }}
+          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.auth.password }}{{ else }}{{ .Values.rabbitmqExternal.password }}{{ end }}
         - name: INFLUXDB_HOST
           value: {{ if .Values.influxdb.host }}{{ .Values.influxdb.host }}{{ else }}{{ include "chart.fullname" . }}-influxdb{{ end }}
         - name: INFLUXDB_PORT
