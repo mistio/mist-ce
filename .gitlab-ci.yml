@@ -309,6 +309,7 @@ compose:
             --set image.pullPolicy=IfNotPresent \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
+            --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
@@ -436,6 +437,7 @@ API:main:machines: *api_test_template
 API:main:networks: *api_test_template
 API:main:schedules: *api_test_template
 API:main:scripts: *api_test_template
+API:main:secrets: *api_test_template
 API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template

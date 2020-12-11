@@ -13,3 +13,6 @@ pip-selfcheck.json
 keys
 /chart/mist/charts
 /chart/mist/requirements.lock
+/docker/vault/file/sys/
+/docker/vault/file/logical/
+/docker/vault/file/core/
