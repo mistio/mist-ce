@@ -171,7 +171,6 @@ build api:
           .
     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
-
 .docker_build_template: &docker_build_template
   <<: *docker_template
   script:
@@ -228,7 +227,7 @@ compose:
 
 .deploy_template: &deploy_template
   stage: deploy
-  image: dtzar/helm-kubectl:2.16.1
+  image: dtzar/helm-kubectl:3.4.0
   before_script:
     - |
         set -e
@@ -297,12 +296,13 @@ compose:
             rm -rf $tls_tmpdir
           fi
 
-          helm init --client-only
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add mist-charts https://mist-charts.storage.googleapis.com/
           helm repo update
           helm dependency update ./chart/mist/
 
           helm upgrade --install --namespace $namespace \
-            --wait --timeout=600 \
+            --wait --timeout=10m \
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
             --set image.registry="$REGISTRY_IMAGE" \
@@ -329,6 +329,7 @@ compose:
           while !(curl -sSLf "$CI_ENVIRONMENT_URL" >/dev/null); do
             sleep 5 && echo 'Environment not ready yet...'
           done
+          echo "Environment ready at $CI_ENVIRONMENT_URL"
         }
   script:
     - echo "$values" > values.yaml
@@ -540,11 +541,11 @@ VP:gce-volume-create: *multiprovisioning_test_template
 
 .undeploy_template: &undeploy_template
   stage: undeploy
-  image: dtzar/helm-kubectl:2.10.0
+  image: dtzar/helm-kubectl:3.4.0
   variables:
     GIT_STRATEGY: none
   script:
-    - helm delete --purge $release
+    - helm uninstall $release -n $namespace
   allow_failure: true
   dependencies: []
 
@@ -556,7 +557,7 @@ undeploy test:
   variables:
     GIT_STRATEGY: none
     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
-
+    namespace: test-$CI_PROJECT_NAME
 undeploy review:
   <<: *undeploy_template
   environment:
@@ -565,6 +566,7 @@ undeploy review:
   variables:
     GIT_STRATEGY: none
     release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
+    namespace: $CI_PROJECT_NAME
   when: manual
   except:
     - master
@@ -634,8 +636,6 @@ helm_chart_release:
           local repo_url="${3?Specify repo url}"
           local sync_dir="${repo_dir}-sync"
           local index_dir="${repo_dir}-index"
-
-          helm init --client-only
 
           echo "Syncing repo '$repo_dir'..."
 

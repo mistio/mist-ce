@@ -25,8 +25,18 @@ spec:
 {{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - name: api-v2
-        image: {{ .Values.image.registry }}/api-v2:{{ .Values.image.tag }}
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+        - /usr/local/bin/uwsgi
+        - --plugins=python3
+        - --http=0.0.0.0:8080
+        - --wsgi-file=v2/mist_api_v2/__main__.py
+        - --callable=application
+        - --master
+        - --processes=8
+        - --max-requests=100
+        - --honour-stdin
         resources:
           requests:
             memory: {{ .Values.deployment.api.resources.requests.memory | default "500Mi" }}
