@@ -309,9 +309,11 @@ compose:
             --set image.pullPolicy=IfNotPresent \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
+            --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
+            --set vault.token="$VAULT_TOKEN" \
             --set docker.port="$DOCKER_PORT" \
             --set docker.key="$DOCKER_KEY" \
             --set docker.cert="$DOCKER_CERT" \
