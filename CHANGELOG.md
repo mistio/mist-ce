@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.4.0 ()
+
+ - Change: Upgrade to Polymer3 / Web Components v1
+ - Feature: Add RBAC on images (EE/HS only)
+ - Feature: Add power_cycle action for DigitalOcean
+ - Feature: Extend supported constraints on machine size
+ - Feature: Add rename & clone actions for vSphere machines
+ - Feature: Introduce API v2 (experimental)
+ - Feature: Add support for volumes in Linode
+ - Change: Support Linode API v4
+ - Change: Rename Packet to EquinixMetal
+ - Change: Drop experimental support for Gig G8 clouds
+ - Bugfix: Numerous minor bugfixes & UX improvements
+
 ## v4.3.8 (26 Aug 2020)
 
  - Bugfix: Fix machine provisioning issue on OpenStack

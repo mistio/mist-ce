@@ -372,14 +372,13 @@ landing page dependencies before you can access the Mist UI.
 
 Install all front-end dependencies with the following commands
 
-    docker-compose exec landing bower install
-    docker-compose exec ui bower install
+    docker-compose exec landing npm install
+    docker-compose exec ui npm install
 
 And then build the landing & ui bundles
 
-    docker-compose exec landing polymer build
-    docker-compose exec ui node --max_old_space_size=4096 /usr/local/bin/polymer build
-    docker-compose exec ui cp bower_components/echarts/dist/echarts.common.min.js build/bundled/bower_components/echarts/dist/
+    docker-compose exec landing npm run build
+    docker-compose exec ui npm run build
 
 When doing front-end development, it's usually more convenient to serve the 
 source code instead of the bundles. To do that, edit settings/settings.py and 

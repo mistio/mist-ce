@@ -29,11 +29,11 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: {{ .Values.deployment.ui.resources.requests.memory | default "30Mi" }}
+            memory: {{ .Values.deployment.ui.resources.requests.memory | default "50Mi" }}
             cpu: {{ .Values.deployment.ui.resources.requests.cpu | default "1m" }}
           limits:
-            memory: {{ .Values.deployment.ui.resources.limits.memory | default "50Mi" }}
-            cpu: {{ .Values.deployment.ui.resources.limits.cpu | default "100m" }}
+            memory: {{ .Values.deployment.ui.resources.limits.memory | default "250Mi" }}
+            cpu: {{ .Values.deployment.ui.resources.limits.cpu | default "500m" }}
         lifecycle:
           preStop:
             exec:

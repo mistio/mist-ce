@@ -355,6 +355,7 @@ deploy test:
           certmanager.k8s.io/acme-challenge-type: dns01
           certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: true
+      #jsBuild: false
 
 .deploy_review_template: &deploy_review_template
   <<: *deploy_template
@@ -527,7 +528,7 @@ MP:kvm-machine-create: *multiprovisioning_test_template
 MP:linode-machine-create: *multiprovisioning_test_template
 MP:lxd-machine-create: *multiprovisioning_test_template
 # MP:openstack-machine-create: *multiprovisioning_test_template
-MP:packet-machine-create: *multiprovisioning_test_template
+MP:equinix-metal-machine-create: *multiprovisioning_test_template
 MP:rackspace-machine-create: *multiprovisioning_test_template
 
 # Machine Provisioning tests #
