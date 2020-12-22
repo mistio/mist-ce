@@ -31,11 +31,11 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: {{ .Values.deployment.api.resources.requests.memory | default "500Mi" }}
-            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "100m" }}
+            memory: {{ .Values.deployment.dramatiq.resources.requests.memory | default "500Mi" }}
+            cpu: {{ .Values.deployment.dramatiq.resources.requests.cpu | default "100m" }}
           limits:
-            memory: {{ .Values.deployment.api.resources.limits.memory | default "1000Mi" }}
-            cpu: {{ .Values.deployment.api.resources.limits.cpu | default "2000m" }}
+            memory: {{ .Values.deployment.dramatiq.resources.limits.memory | default "1000Mi" }}
+            cpu: {{ .Values.deployment.dramatiq.resources.limits.cpu | default "2000m" }}
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
