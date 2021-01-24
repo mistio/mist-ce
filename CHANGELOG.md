@@ -1,9 +1,11 @@
 # Changelog
 
-## v4.4.0 ()
+## v4.4.0 (28 Jan 2021)
 
  - Change: Upgrade to Polymer3 / Web Components v1
  - Feature: Add RBAC on images (EE/HS only)
+ - Feature: Add support for Microsoft 365 sign on (EE only)
+ - Feature: Hide sidebar sections when the user has no permission to access them (EE/HS only)
  - Feature: Add power_cycle action for DigitalOcean
  - Feature: Extend supported constraints on machine size
  - Feature: Add rename & clone actions for vSphere machines
