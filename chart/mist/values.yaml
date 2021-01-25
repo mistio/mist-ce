@@ -542,9 +542,9 @@ deployment:
     resources:
       requests:
         memory: 200Mi
-        cpu: 300m
+        cpu: 100m
       limits:
-        memory: 400Mi
+        memory: 800Mi
         cpu: 1000m
 
   # Sockjs deployment settings.
