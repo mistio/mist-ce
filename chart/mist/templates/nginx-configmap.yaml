@@ -21,6 +21,8 @@ data:
     worker_rlimit_nofile    20000;  #each connection needs a filehandle (or 2 if you are proxying)
 
     http {
+        proxy_cache_path /data/nginx/cache keys_zone=one:10m loader_threshold=300 
+                        loader_files=200 max_size=200m;
 
         types_hash_bucket_size 128;
         types_hash_max_size 2048;
