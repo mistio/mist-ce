@@ -506,10 +506,10 @@ deployment:
     resources:
       requests:
         memory: 100Mi
-        cpu: 50m
+        cpu: 40m
       limits:
         memory: 300Mi
-        cpu: 400m
+        cpu: 300m
 
   # Gocky deployment settings.
   gocky:
