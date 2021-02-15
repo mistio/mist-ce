@@ -21,6 +21,8 @@ data:
     worker_rlimit_nofile    20000;  #each connection needs a filehandle (or 2 if you are proxying)
 
     http {
+        proxy_cache_path /tmp/cache keys_zone=one:10m loader_threshold=300 
+                        loader_files=200 max_size=200m;
 
         types_hash_bucket_size 128;
         types_hash_max_size 2048;
@@ -127,11 +129,29 @@ data:
                 proxy_buffering off;
             }
 
+            location /landing/build/ {
+                proxy_cache one;
+                expires 30d;
+                proxy_pass http://{{ include "chart.fullname" . }}-landing/build/;
+                proxy_read_timeout 600s;
+                proxy_connect_timeout 200s;
+                proxy_buffering off;
+            }
+
+            location /landing/images/ {
+                proxy_cache one;
+                expires 1d;
+                proxy_pass http://{{ include "chart.fullname" . }}-landing/images/;
+                proxy_read_timeout 600s;
+                proxy_connect_timeout 200s;
+                proxy_buffering off;
+            }
+
             location /ingress/ {
                 proxy_pass http://{{ include "chart.fullname" . }}-traefik/;
             }
 
-            location /proxy {
+            location ~ ^/(ssh|proxy)/ {
                 proxy_pass http://{{ include "chart.fullname" . }}-huproxy:8086;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
@@ -153,5 +173,15 @@ data:
                 proxy_buffering off;
             }
 
+            {{ if .Values.tsfdb.enableSubchart }}
+            location /tsfdb/ {
+                if ($tsfdb_access = 0) {
+                    return 403;
+                }
+                proxy_pass http://{{ include "chart.fullname" . }}-tsfdb:8080/;
+                proxy_read_timeout 600;
+                proxy_connect_timeout 200;
+            }
+            {{ end }}
         }
     }

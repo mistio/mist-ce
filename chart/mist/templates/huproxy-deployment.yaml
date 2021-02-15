@@ -27,9 +27,9 @@ spec:
         env:
         - name: MONGO_URI
         {{- if .Values.mongodb.host }}
-          value: mongodb://{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
+          value: {{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
         {{- else }}
-          value: mongodb://{{ .Release.Name }}-mongodb:27017
+          value: {{ .Release.Name }}-mongodb:27017
         {{- end }}
         - name: SECRET
           value: {{ .Values.internalKeys.secret }}

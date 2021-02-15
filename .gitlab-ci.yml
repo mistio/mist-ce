@@ -44,9 +44,9 @@ discover submodules:
 
 .dind_template: &docker_template
   stage: build
-  image: docker:18.09-git
+  image: docker:18.09.7-git
   services:
-    - docker:dind
+    - docker:18.09.7-dind
   variables: &docker_variables
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://localhost:2375/
@@ -306,7 +306,6 @@ compose:
             -f values.yaml \
             --set image.tag="$CI_COMMIT_SHA" \
             --set image.registry="$REGISTRY_IMAGE" \
-            --set image.pullPolicy=IfNotPresent \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
@@ -530,6 +529,7 @@ MP:lxd-machine-create: *multiprovisioning_test_template
 # MP:openstack-machine-create: *multiprovisioning_test_template
 MP:equinix-metal-machine-create: *multiprovisioning_test_template
 MP:rackspace-machine-create: *multiprovisioning_test_template
+MP:cloudsigma-machine-create: *multiprovisioning_test_template
 
 # Machine Provisioning tests #
 VP:aliyun-volume-create: *multiprovisioning_test_template
@@ -537,6 +537,7 @@ VP:azure-volume-create: *multiprovisioning_test_template
 VP:digital-ocean-volume-create: *multiprovisioning_test_template
 VP:ec2-volume-create: *multiprovisioning_test_template
 VP:gce-volume-create: *multiprovisioning_test_template
+VP:cloudsigma-volume-create: *multiprovisioning_test_template
 # VP:openstack-volume-create: *multiprovisioning_test_template
 #################### UNDEPLOY STAGE ####################
 
