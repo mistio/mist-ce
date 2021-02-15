@@ -30,11 +30,11 @@ spec:
           value: telegraf
         resources:
           requests:
-            memory: 200Mi
-            cpu: 50m
+            memory: 100Mi
+            cpu: 25m
           limits:
-            memory: 500Mi
-            cpu: 1000m
+            memory: 400Mi
+            cpu: 750m
         volumeMounts:
         - name: influxdb-config
           mountPath: /etc/influxdb/influxdb.conf

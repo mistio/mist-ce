@@ -34,10 +34,10 @@ spec:
         resources:
           limits:
             memory: 250Mi
-            cpu: 200m
+            cpu: 150m
           requests:
-            memory: 150Mi
-            cpu: 50m
+            memory: 100Mi
+            cpu: 25m
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
