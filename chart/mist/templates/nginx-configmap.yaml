@@ -79,7 +79,11 @@ data:
             location /static/ {
                 root /srv/www;
             }
-
+ 
+            location /robots.txt {
+                alias /srv/www/static/robots.txt;
+            }
+ 
             location /socket/ {
                 proxy_pass http://{{ include "chart.fullname" . }}-sockjs:8081;
                 proxy_read_timeout 600;
