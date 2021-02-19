@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.4.0 (18 Feb 2021)
+## v4.4.0 (19 Feb 2021)
 
  - Change: Upgrade to Polymer3 / Web Components v1
  - Feature: Add support for CloudSigma clouds
