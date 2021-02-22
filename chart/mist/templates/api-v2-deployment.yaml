@@ -39,11 +39,11 @@ spec:
         - --honour-stdin
         resources:
           requests:
-            memory: {{ .Values.deployment.api.resources.requests.memory | default "500Mi" }}
-            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "100m" }}
+            memory: {{ .Values.deployment.api.resources.requests.memory | default "100Mi" }}
+            cpu: {{ .Values.deployment.api.resources.requests.cpu | default "50m" }}
           limits:
-            memory: {{ .Values.deployment.api.resources.limits.memory | default "1000Mi" }}
-            cpu: {{ .Values.deployment.api.resources.limits.cpu | default "2000m" }}
+            memory: {{ .Values.deployment.api.resources.limits.memory | default "200Mi" }}
+            cpu: {{ .Values.deployment.api.resources.limits.cpu | default "100m" }}
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py

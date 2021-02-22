@@ -254,11 +254,11 @@ deployment:
       pool: gevent
       resources:
         requests:
-          memory: 150Mi
-          cpu: 200m
+          memory: 100Mi
+          cpu: 30m
         limits:
-          memory: 250Mi
-          cpu: 1000m
+          memory: 200Mi
+          cpu: 600m
       gracePeriod: 3600
       queues:
         - scripts
@@ -274,10 +274,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 400Mi
-          cpu: 500m
+          memory: 500Mi
+          cpu: 100m
         limits:
-          memory: 1000Mi
+          memory: 1200Mi
           cpu: 1000m
       queues:
         - celery
@@ -453,11 +453,11 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 400Mi
-          cpu: 200m
+          memory: 150Mi
+          cpu: 100m
         limits:
-          memory: 700Mi
-          cpu: 2000m
+          memory: 500Mi
+          cpu: 1500m
       preemptible: true
       scheduler: mist.api.poller.schedulers.PollingScheduler
     owners:
@@ -530,10 +530,10 @@ deployment:
     resources:
       requests:
         memory: 500Mi
-        cpu: 300m
+        cpu: 50m
       limits:
         memory: 1000Mi
-        cpu: 2000m
+        cpu: 1500m
 
   # Dramatiq deployment settings.
   dramatiq:
@@ -542,10 +542,10 @@ deployment:
     resources:
       requests:
         memory: 200Mi
-        cpu: 300m
+        cpu: 20m
       limits:
         memory: 400Mi
-        cpu: 1000m
+        cpu: 300m
 
   # Sockjs deployment settings.
   sockjs:
@@ -554,10 +554,10 @@ deployment:
     resources:
       requests:
         memory: 100Mi
-        cpu: 100m
+        cpu: 50m
       limits:
         memory: 300Mi
-        cpu: 1000m
+        cpu: 500m
 
   # UI deployment settings.
   ui:
@@ -578,10 +578,10 @@ deployment:
     resources:
       requests:
         memory: 30Mi
-        cpu: 50m
+        cpu: 20m
       limits:
         memory: 60Mi
-        cpu: 1000m
+        cpu: 70m
 
   # Landing deployment settings.
   landing:
@@ -593,4 +593,4 @@ deployment:
         cpu: 10m
       limits:
         memory: 250Mi
-        cpu: 200m
+        cpu: 100m

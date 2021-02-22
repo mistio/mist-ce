@@ -28,10 +28,10 @@ spec:
         resources:
           limits:
             memory: 50Mi
-            cpu: 200m
+            cpu: 50m
           requests:
-            memory: 20Mi
-            cpu: 1m
+            memory: 12Mi
+            cpu: 5m
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
