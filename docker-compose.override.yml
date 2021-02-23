@@ -65,16 +65,12 @@ services:
     volumes:
       - ./docker/influxdb:/etc/influxdb
 
-  #fdb:
-  #  image: mist/fdb
-  #  restart: on-failure:5
-  #  volumes:
-  #    - foundationdb:/var/lib/foundationdb/data:rw
-  #    - fdbetc:/etc/foundationdb/:rw
-
-  #tsfdb:
-  #  image: $IMG_REGISTRY/tsfdb:$IMG_TAG
-  #  restart: on-failure:5
-  #  volumes:
-  #    - fdbetc:/etc/foundationdb/:rw
-  #    - ./tsfdb:/usr/src/app
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics
+    volumes:
+      - victoria_metrics:/etc/victoria_metrics
+    command:
+      - '--graphiteListenAddr=:2003'
+      #- '--influxListenAddr=:8089'
+    ports:
+      - 2003
