@@ -3,7 +3,9 @@ name = "all_backends"
 bind-addr = "0.0.0.0:9096"
 output = [
     { name="influxdb", location = "http://influxdb:8086/write", type="influxdb" },
+    { name="victoria", location = "http://victoria-metrics:8428/write", type="influxdb" },
 ]
+#{ name="victoria", location = "victoria-metrics:2003", type="graphite" }
 #{ name="tsfdb", location="http://tsfdb:8080/v1/datapoints", type="influxdb" },
 
 its-all-good-man = true
