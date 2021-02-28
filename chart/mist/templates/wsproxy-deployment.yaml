@@ -24,10 +24,10 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
-            memory: 500Mi
-            cpu: 500m
+            memory: 300Mi
+            cpu: 300m
           requests:
-            memory: 20Mi
+            memory: 30Mi
             cpu: 1m
 {{- if .Values.nodeSelector }}
       nodeSelector:
