@@ -166,7 +166,7 @@ services:
 
 
   influxdb:
-    image: influxdb
+    image: influxdb:1.8.4
     environment:
       INFLUXDB_DB: telegraf
       INFLUXDB_BIND_ADDRESS: "0.0.0.0:8088"
