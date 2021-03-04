@@ -6,6 +6,7 @@
  - Bugfix: Fix display of tags with empty value
  - Bugfix: Fix constraint enforcement on create machine form (EE/HS only)
  - Bugfix: Do not display sign in disabled message when MS365 SSO is the only one available (EE only)
+ - Change: Update requests & limits in helm chart
 
 ## v4.4.0 (19 Feb 2021)
 

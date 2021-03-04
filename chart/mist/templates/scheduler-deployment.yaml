@@ -36,7 +36,7 @@ spec:
             memory: 100Mi
             cpu: 10m
           limits:
-            memory: 30Mi
+            memory: 400Mi
             cpu: 1000m
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
