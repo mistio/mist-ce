@@ -23,18 +23,18 @@ spec:
     spec:
       containers:
       - name: influxdb
-        image: influxdb
+        image: influxdb:1.8.4
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: INFLUXDB_DB
           value: telegraf
         resources:
           requests:
-            memory: 200Mi
-            cpu: 50m
+            memory: 50Mi
+            cpu: 30m
           limits:
-            memory: 500Mi
-            cpu: 1000m
+            memory: 2048Mi
+            cpu: 2000m
         volumeMounts:
         - name: influxdb-config
           mountPath: /etc/influxdb/influxdb.conf
