@@ -7,4 +7,4 @@ docker run -p 5900:5900 -p 8222:8222 --rm -it \
       --shm-size=1g \
       --network=$DOCKER_NETWORK \
       -e VNC=$VNC \
-      -e MIST_URL=$MIST_URI -- gcr.io/mist-ops/tests_base /mist.tests/container/trigger_tests.sh $@
+      -e MIST_URL=$MIST_URI -- mist/tests /mist.tests/container/trigger_tests.sh $@
