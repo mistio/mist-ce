@@ -201,7 +201,6 @@ build elasticsearch-manage: *docker_build_template
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
 retag tests: *docker_retag_template
-retag tsfdb: *docker_retag_template
 
 
 compose:
