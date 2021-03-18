@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.4.2 (18 Mar 2021)
+
+ - Bugfix: Fix UI RBAC checking issue (EE/HS only)
+ - Bugfix: Fix LDAP URI stripping issue (EE/HS only)
+ - Change: Allow LDAP login from multiple OU's (EE/HS only)
+ - Change: Update pre-starred AWS & Azure images
+
 ## v4.4.1 (4 Mar 2021)
 
  - Bugfix: Pin influxdb image to v1.8.4
