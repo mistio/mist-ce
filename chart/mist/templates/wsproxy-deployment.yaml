@@ -18,9 +18,11 @@ spec:
         app: wsproxy
         release: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - name: wsproxy
-        image: mist/wsproxy
+        image: {{ .Values.image.registry }}/wsproxy:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
