@@ -13,6 +13,3 @@
 [submodule "docker/nginx/static/novnc"]
 	path = docker/nginx/static/novnc
 	url = https://github.com/novnc/noVNC.git
-[submodule "tsfdb"]
-	path = tsfdb
-	url = ../tsfdb-server

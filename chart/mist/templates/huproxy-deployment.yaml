@@ -18,6 +18,8 @@ spec:
         app: huproxy
         release: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - name: huproxy
         args:
@@ -33,12 +35,12 @@ spec:
         {{- end }}
         - name: SECRET
           value: {{ .Values.internalKeys.secret }}
-        image: mist/huproxy
+        image: {{ .Values.image.registry }}/huproxy:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
-            memory: 500Mi
-            cpu: 500m
+            memory: 300Mi
+            cpu: 1000m
           requests:
             memory: 20Mi
             cpu: 1m

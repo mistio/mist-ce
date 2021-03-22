@@ -31,11 +31,11 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 100Mi
+            memory: 80Mi
             cpu: 10m
           limits:
-            memory: 200Mi
-            cpu: 1000m
+            memory: 240Mi
+            cpu: 500m
         volumeMounts:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py

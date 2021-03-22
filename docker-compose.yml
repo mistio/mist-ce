@@ -166,7 +166,7 @@ services:
 
 
   influxdb:
-    image: influxdb
+    image: influxdb:1.8.4
     environment:
       INFLUXDB_DB: telegraf
       INFLUXDB_BIND_ADDRESS: "0.0.0.0:8088"
@@ -204,7 +204,7 @@ services:
       - 8041:8080
 
   huproxy:
-    image: mist/huproxy
+    image: $IMG_REGISTRY/huproxy:$IMG_TAG
     command: /app --listen 0.0.0.0:8086
     environment:
       MONGO_URI: mongodb://mongodb:27017
@@ -212,7 +212,7 @@ services:
       - 8086
 
   wsproxy:
-    image: mist/wsproxy
+    image: $IMG_REGISTRY/wsproxy:$IMG_TAG
     expose:
       - 8764
 

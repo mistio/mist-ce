@@ -18,16 +18,18 @@ spec:
         app: wsproxy
         release: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
       containers:
       - name: wsproxy
-        image: mist/wsproxy
+        image: {{ .Values.image.registry }}/wsproxy:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
-            memory: 500Mi
-            cpu: 500m
+            memory: 300Mi
+            cpu: 300m
           requests:
-            memory: 20Mi
+            memory: 30Mi
             cpu: 1m
 {{- if .Values.nodeSelector }}
       nodeSelector:

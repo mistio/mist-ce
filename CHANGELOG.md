@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.4.2 (18 Mar 2021)
+
+ - Bugfix: Fix UI RBAC checking issue (EE/HS only)
+ - Bugfix: Fix LDAP URI stripping issue (EE/HS only)
+ - Change: Allow LDAP login from multiple OU's (EE/HS only)
+ - Change: Update pre-starred AWS & Azure images
+
+## v4.4.1 (4 Mar 2021)
+
+ - Bugfix: Pin influxdb image to v1.8.4
+ - Bugfix: Fix display of tags with empty value
+ - Bugfix: Fix constraint enforcement on create machine form (EE/HS only)
+ - Bugfix: Do not display sign in disabled message when MS365 SSO is the only one available (EE only)
+ - Change: Update requests & limits in helm chart
+
 ## v4.4.0 (19 Feb 2021)
 
  - Change: Upgrade to Polymer3 / Web Components v1
