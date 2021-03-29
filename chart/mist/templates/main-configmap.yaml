@@ -117,7 +117,7 @@ data:
     CUSTOMERIO_SITEID = "{{ .Values.customerio.siteId }}"
     CUSTOMERIO_APIKEY = "{{ .Values.customerio.apiKey }}"
     GOOGLE_ANALYTICS_ID = "{{ .Values.googleAnalyticsId }}"
-    OLARK_ID = "{{ .Values.olarkId }}"
+    CHATWOOT_TOKEN = "{{ .Values.olarkId }}"
     SENDGRID_EMAIL_NOTIFICATIONS_KEY = "{{ .Values.sendgridEmailNotificationsKey }}"
 
     INTERNAL_API_URL = "http://{{ include "chart.fullname" . }}-api"
