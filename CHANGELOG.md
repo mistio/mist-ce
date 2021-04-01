@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.4.3 (1 Apr 2021)
+
+ - Change: Add support for CI Logon SSO (EE only)
+ - Change: Upgrade echarts & load them only when needed
+ - Change: Add new DB indexes on Images & Sizes to increase query performance
+ - Bugfix: Allow image formats other than .img when cloning KVM machine
+ 
 ## v4.4.2 (18 Mar 2021)
 
  - Bugfix: Fix UI RBAC checking issue (EE/HS only)
