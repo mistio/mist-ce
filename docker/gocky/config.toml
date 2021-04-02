@@ -10,4 +10,4 @@ output = [
 
 its-all-good-man = true
 #max-datapoints-per-request = 100
-split-request-per-datapoints = 200
+#split-request-per-datapoints = 200
