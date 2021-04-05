@@ -77,7 +77,7 @@ services:
       - vault-init
     volumes:
       - ./settings:$CONF_DIR/settings
-      - approle-token:/approle.token
+      - approle:/approle
     environment:
       SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
@@ -242,7 +242,7 @@ services:
     image: $IMG_REGISTRY/vault:$IMG_TAG
     volumes:
       - vault-policies:/vault/policies:rw
-      - approle-token:/approle.token
+      - approle:/approle
     entrypoint: /init/vault-init.sh
 
     environment:
@@ -257,4 +257,4 @@ volumes:
   vault-data: {}
   vault-config: {}
   vault-policies: {}
-  approle-token: {}
+  approle: {}

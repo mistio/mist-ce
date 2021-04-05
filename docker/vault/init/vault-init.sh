@@ -10,7 +10,7 @@ fi
 INIT_LOG=/vault/init.log
 UNSEAL_TOKEN_PATH=/vault/config/unseal_token
 ROOT_TOKEN_PATH=/vault/config/root_token
-ROLE_TOKEN_PATH=/approle.token
+ROLE_TOKEN_PATH=/approle/token
 
 if [ -f "$UNSEAL_TOKEN_PATH" ]; then
     echo "Unsealing vault"
