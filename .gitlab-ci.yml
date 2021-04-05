@@ -199,6 +199,7 @@ build logstash: *docker_build_template
 build elasticsearch-manage: *docker_build_template
 build huproxy: *docker_build_template
 build wsproxy: *docker_build_template
+build vault: *docker_build_template
 
 
 .docker_retag_template: &docker_retag_template
@@ -336,11 +337,11 @@ compose:
             --set image.registry="$REGISTRY_IMAGE" \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
+            --set vault.address="$VAULT_ADDR" \
             --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
-            --set vault.token="$VAULT_TOKEN" \
             --set docker.port="$DOCKER_PORT" \
             --set docker.key="$DOCKER_KEY" \
             --set docker.cert="$DOCKER_CERT" \

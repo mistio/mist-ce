@@ -76,7 +76,8 @@ services:
       - rabbitmq
     volumes:
       - ./settings:$CONF_DIR/settings
-    environment:
+      - approle-token:/approle.token
+      environment:
       SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
     tty: true
@@ -223,26 +224,25 @@ services:
       - 8764
 
   vault:
-    image: vault:latest
+    image: $IMG_REGISTRY/vault:$IMG_TAG
     expose:
       - "8200"
     restart: on-failure:5
     volumes:
-      - ./docker/vault/file:/vault/file:rw
-      - ./docker/vault/config:/vault/config:rw
-      - ./docker/vault/policies:/vault/policies:rw
-    #environment:
-      #- VAULT_ADDR=http://127.0.0.1:8200
-      #- VAULT_API_ADDR=http://127.0.0.1:8200
+      - vault-data:/vault/data:rw
+      - vault-config:/vault/config:rw
     cap_add:
       - IPC_LOCK
-    entrypoint: vault server -config=/vault/config/vault.json
+    entrypoint: /init/vault-init.sh
 
   vault-init:
-    image: vault:latest
+    depends_on: vault
+    image: $IMG_REGISTRY/vault:$IMG_TAG
     volumes:
-      - ./docker/vault/vault-play.sh:/etc/init.d/vault-play.sh:ro
-      - ./docker/vault:/vault:rw
+      - vault-policies:/vault/policies:rw
+      - approle-token:/approle.token
+    entrypoint: /vault-start.sh
+
     environment:
       - VAULT_ADDR=http://vault:8200
     command: sh /etc/init.d/vault-play.sh
@@ -252,3 +252,6 @@ volumes:
   influxdb: {}
   mongodb: {}
   victoria-metrics: {}
+  vault-data: {}
+  vault-config: {}
+  vault-policies: {}
