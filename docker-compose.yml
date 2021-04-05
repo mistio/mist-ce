@@ -74,10 +74,11 @@ services:
       - mongodb
       - elasticsearch
       - rabbitmq
+      - vault-init
     volumes:
       - ./settings:$CONF_DIR/settings
       - approle-token:/approle.token
-      environment:
+    environment:
       SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
     tty: true
@@ -233,15 +234,16 @@ services:
       - vault-config:/vault/config:rw
     cap_add:
       - IPC_LOCK
-    entrypoint: /init/vault-init.sh
+    entrypoint: /vault-start.sh
 
   vault-init:
-    depends_on: vault
+    depends_on:
+    - vault
     image: $IMG_REGISTRY/vault:$IMG_TAG
     volumes:
       - vault-policies:/vault/policies:rw
       - approle-token:/approle.token
-    entrypoint: /vault-start.sh
+    entrypoint: /init/vault-init.sh
 
     environment:
       - VAULT_ADDR=http://vault:8200
@@ -255,3 +257,4 @@ volumes:
   vault-data: {}
   vault-config: {}
   vault-policies: {}
+  approle-token: {}
