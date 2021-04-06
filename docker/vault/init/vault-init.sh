@@ -26,6 +26,7 @@ else
 	vault operator init -key-shares=1 -key-threshold=1 -format=json > "$INIT_LOG"
 	export UNSEAL_TOKEN=$(cat $INIT_LOG | jq .unseal_keys_b64[0] -r)
     export ROOT_TOKEN=$(cat $INIT_LOG | jq .root_token -r)
+    echo "$ROOT_TOKEN" > "$ROOT_TOKEN_PATH"
 	echo "$UNSEAL_TOKEN" > "$UNSEAL_TOKEN_PATH"
 	vault operator unseal $UNSEAL_TOKEN
 	vault login $ROOT_TOKEN
