@@ -241,6 +241,7 @@ services:
     - vault
     image: $IMG_REGISTRY/vault:$IMG_TAG
     volumes:
+      - vault-config:/vault/config:rw
       - vault-policies:/vault/policies:rw
       - approle:/approle
     entrypoint: /init/vault-init.sh
