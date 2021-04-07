@@ -17,6 +17,7 @@ if [ -f "$UNSEAL_TOKEN_PATH" ]; then
 	socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN_PATH
     vault login $ROOT_TOKEN
     vault policy write mist /vault/policies/vault-mist.hcl
+    vault write auth/approle/role/mist token_num_uses=0 token_policies=mist
     ROLE_ID=$(vault read auth/approle/role/mist/role-id -format=json |jq .data.role_id -r)
     SECRET_ID=$(vault write -f auth/approle/role/mist/secret-id -format=json | jq .data.secret_id -r)
     ROLE_TOKEN=$(vault write auth/approle/login secret_id=$SECRET_ID role_id=$ROLE_ID -format=json | jq .auth.client_token -r)
@@ -33,7 +34,7 @@ else
 	vault secrets enable -path="kv1" kv
 	vault policy write mist /vault/policies/vault-mist.hcl
     vault auth enable approle
-    vault write auth/approle/role/mist token_num_uses=0
+    vault write auth/approle/role/mist token_num_uses=0 token_policies=mist
     ROLE_ID=$(vault read auth/approle/role/mist/role-id -format=json |jq .data.role_id -r)
     SECRET_ID=$(vault write -f auth/approle/role/mist/secret-id -format=json | jq .data.secret_id -r)
     ROLE_TOKEN=$(vault write auth/approle/login secret_id=$SECRET_ID role_id=$ROLE_ID -format=json | jq .auth.client_token -r)
