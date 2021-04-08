@@ -70,7 +70,11 @@ services:
     volumes:
       - victoria_metrics:/etc/victoria_metrics
     command:
-      - '--graphiteListenAddr=:2003'
-      #- '--influxListenAddr=:8089'
+      # Show the most recent datapoints without any latency
+      - '--search.latencyOffset=0s'
+      # Don't cache the last 15m because they may be backfilled by telegraf
+      - '--search.cacheTimestampOffset=15m'
+      # Save space by converting timestamps from milliseconds to seconds
+      - '--influxTrimTimestamp=1s'
     ports:
       - 2003
