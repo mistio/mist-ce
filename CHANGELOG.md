@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.4.4 (14 Apr 2021)
+
+ - Bugfix: Fix validation error when adding new host in KVM clouds
+ - Bugfix: Remember custom sort order & field widths in lists
+ - Bugfix: Always fetch permissions & constraints in machine-create form
+ - Bugfix: Prevent occasional exceptions when listing images in vSphere
+ - Change: Dont use asyncio by default when listing vSphere nodes
+
 ## v4.4.3 (1 Apr 2021)
 
  - Change: Add support for CI Logon SSO (EE only)
