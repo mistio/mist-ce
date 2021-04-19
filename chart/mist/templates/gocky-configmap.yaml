@@ -20,7 +20,7 @@ data:
         { name="influxdb", location = "http://{{ include "chart.fullname" . }}-influxdb:8086/write", type="influxdb"},
       {{- end }}
       {{- end }}
-      {{- if .Values.tsfdb.enableSubchart }}
-        { name="tsfdb", location="http://{{ include "chart.fullname" . }}-tsfdb:8080/v1/datapoints", type="influxdb"},
+      {{- if index .Values "victoria-metrics-cluster" "enabled" }}
+        { name="victoriametrics", location="http://{{ .Release.Name }}-victoria-metrics-cluster-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/0/influx/write", type="influxdb"},
       {{- end }}
     ]

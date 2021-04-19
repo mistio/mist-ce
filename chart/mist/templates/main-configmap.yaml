@@ -50,7 +50,7 @@ data:
       {{- end }}
     }
 
-    TSFDB_URI = {{ if .Values.tsfdb.enableSubchart }} "http://{{ include "chart.fullname" . }}-tsfdb:8080" {{ else }} "" {{ end }}
+    VICTORIAMETRICS_URI = {{- if index .Values "victoria-metrics-cluster" "enabled" }} "http://{{ .Release.Name }}-victoria-metrics-cluster-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/0/prometheus" {{ else }} "" {{ end }}
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",

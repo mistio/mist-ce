@@ -45,11 +45,41 @@ influxdb:
   db: telegraf
   monitoring: true
 
-# TSFDB settings.
-tsfdb:
-  #image: *image-properties
-  enableSubchart: false
-  nameOverride: mist
+victoria-metrics-cluster:
+  enabled: true
+  vmselect:
+    replicaCount: 1
+    extraArgs:
+      search.latencyOffset: 0s
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  vminsert:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  vmstorage:
+    replicaCount: 1
+    retentionPeriod: 12
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    persistentVolume:
+      size: 8Gi
+      storageClass: standard
 
 # Options for rabbitmq subchart.
 rabbitmq:
@@ -110,7 +140,7 @@ docker:
 
 # Monitoring settings.
 monitoring:
-  defaultMethod: telegraf-influxdb
+  defaultMethod: telegraf-victoriametrics
 
 # Allow registration of dev users, used for testing purposes.
 enableDevUsers: false
