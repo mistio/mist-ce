@@ -54,7 +54,10 @@ vmcluster:
   vmselect:
     replicaCount: 1
     extraArgs:
+      # Show the most recent datapoints without any latency
       search.latencyOffset: 0s
+      # Don't cache the last 15m because they may be backfilled by telegraf
+      search.cacheTimestampOffset: 15m
     resources:
       limits:
         cpu: 50m
@@ -63,6 +66,9 @@ vmcluster:
         cpu: 50m
         memory: 64Mi
   vminsert:
+    extraArgs:
+      # Save space by converting timestamps from milliseconds to seconds
+      influxTrimTimestamp: 1s
     replicaCount: 1
     resources:
       limits:
