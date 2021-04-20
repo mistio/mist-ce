@@ -176,6 +176,21 @@ services:
     volumes:
       - influxdb:/var/lib/influxdb
 
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics
+    command:
+      # Show the most recent datapoints without any latency
+      - '--search.latencyOffset=0s'
+      # Don't cache the last 15m because they may be backfilled by telegraf
+      - '--search.cacheTimestampOffset=15m'
+      # Save space by converting timestamps from milliseconds to seconds
+      - '--influxTrimTimestamp=1s'
+      - '--storageDataPath=/var/lib/victoria-metrics-data'
+    ports:
+      - 2003
+    volumes:
+      - victoria-metrics:/var/lib/victoria-metrics-data
+
   gocky:
     image: $IMG_REGISTRY/gocky:$IMG_TAG
     command: -config /etc/gocky/config.toml
@@ -222,4 +237,4 @@ volumes:
   elasticsearch: {}
   influxdb: {}
   mongodb: {}
-  victoria_metrics: {}
+  victoria-metrics: {}

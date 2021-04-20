@@ -65,16 +65,3 @@ services:
     volumes:
       - ./docker/influxdb:/etc/influxdb
 
-  victoria-metrics:
-    image: victoriametrics/victoria-metrics
-    volumes:
-      - victoria_metrics:/etc/victoria_metrics
-    command:
-      # Show the most recent datapoints without any latency
-      - '--search.latencyOffset=0s'
-      # Don't cache the last 15m because they may be backfilled by telegraf
-      - '--search.cacheTimestampOffset=15m'
-      # Save space by converting timestamps from milliseconds to seconds
-      - '--influxTrimTimestamp=1s'
-    ports:
-      - 2003
