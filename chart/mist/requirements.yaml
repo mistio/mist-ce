@@ -9,8 +9,8 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     name: mongodb
     version: 10.0.5
-  - alias: victoria-metrics-cluster
+  - alias: vmcluster
     name: victoria-metrics-cluster
-    condition: victoria-metrics-cluster.enabled
+    condition: vmcluster.doNotOverride
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.8.24
