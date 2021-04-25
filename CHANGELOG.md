@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.4.5 (24 Apr 2021)
+## v4.4.5 (25 Apr 2021)
 
  - Bugfix: Fix post-deploy ssh login
  - Bugfix: Use num of cpu cores in Equnix CloudSize object
