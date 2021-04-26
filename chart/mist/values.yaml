@@ -150,7 +150,7 @@ docker:
 
 # Monitoring settings.
 monitoring:
-  defaultMethod: telegraf-victoriametrics
+  defaultMethod: telegraf-influxdb
 
 # Allow registration of dev users, used for testing purposes.
 enableDevUsers: false
