@@ -620,6 +620,10 @@ helm_chart_release:
     - |
         #! /usr/bin/env bash
 
+        export CHART_VERSION=${CI_COMMIT_TAG:1}
+        echo "CHART_VERSION=$CHART_VERSION"
+        envsubst < ./chart/mist/Chart.yaml > ./chart/mist/Chart.yaml
+
         gcloud auth activate-service-account --key-file=$GCLOUD_SERVICE_KEY
         set -o errexit
         set -o nounset
