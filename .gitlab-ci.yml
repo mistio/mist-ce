@@ -228,10 +228,20 @@ compose:
 
 .deploy_template: &deploy_template
   stage: deploy
-  image: dtzar/helm-kubectl:3.4.0
+  image: mist/helm-automation
   before_script:
     - |
         set -e
+
+        function set_chart_version() {
+          if [ -n "$CI_COMMIT_TAG" ]; then
+            CHART_VERSION=${CI_COMMIT_TAG:1}
+          else
+            CHART_VERSION=0.0.0
+          fi
+          export CHART_VERSION
+          envsubst < ./chart/mist/Chart.yaml > ./chart/mist/Chart.yaml
+        }
 
         function set_if_not_empty() {
           key="$1"
@@ -296,6 +306,8 @@ compose:
             export tls_settings="--set http.tlsSecret=https"
             rm -rf $tls_tmpdir
           fi
+
+          set_chart_version
 
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add mist-charts https://mist-charts.storage.googleapis.com/
@@ -701,6 +713,8 @@ helm_chart_release:
   only:
     # only for references that match a version string (v1.2.3)
     - /^v\d+\.\d+\.\d+$/
+    # only for references that match a prelease version string (v1.2.3-beta)
+    - /^v\d+\.\d+\.\d+-.+$/
   dependencies: []
   except:
     # Except branches, meaning it'll only apply to git tags
