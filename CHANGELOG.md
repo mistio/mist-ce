@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.4.5 (25 Apr 2021)
+
+ - Bugfix: Fix post-deploy ssh login
+ - Bugfix: Use num of cpu cores in Equnix CloudSize object
+ - Bugfix: Allow monitoring API calls on terminated machines
+ - Bugfix: Update RBAC mappings after adding machine in KVM/Other cloud (EE/HS only)
+ - Bugfix: Fix excessive log filtering for non owners (EE/HS only)
+ - Change: Use double quotes for exact match & support math operators in APIv2 calls
+
 ## v4.4.4 (14 Apr 2021)
 
  - Bugfix: Fix validation error when adding new host in KVM clouds

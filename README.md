@@ -12,7 +12,7 @@ Service include plugins for Governance, Role Based Access Control & Cost
 Insights. They are available for purchase at __https://mist.io__. Paid support 
 plans are available for any edition.
 
-<img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768">
+<a href="https://www.youtube.com/watch?v=7oYyC-FIaAM" source="_blank"><img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768"></a>
 
 # Who needs Mist?
 
