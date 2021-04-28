@@ -50,7 +50,14 @@ data:
       {{- end }}
     }
 
-    VICTORIAMETRICS_URI = {{- if .Values.vmcluster.enabled }} {{- if .Values.vmcluster.readEndpoint }} "{{ .Values.vmcluster.readEndpoint }}" {{ else }} "http://{{ .Release.Name }}-vmcluster-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/0/prometheus" {{ end }} {{ else }} "" {{ end }}
+    {{ if .Values.victoriametricscluster.enabled -}}
+    VICTORIAMETRICS_URI = "http://{{ .Release.Name }}-vmcluster-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/0/prometheus"
+    {{- else if .Values.victoriametrics.enabled -}}
+    VICTORIAMETRICS_URI = "{{ .Values.victoriametrics.readEndpoint }}"
+    {{- else -}}
+    VICTORIAMETRICS_URI = ""
+    {{- end }}
+
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",

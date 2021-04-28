@@ -45,12 +45,15 @@ influxdb:
   db: telegraf
   monitoring: true
 
-# Victoria Metrics settings. Change endpoints and change the doNotOverride flag to use a remote Victoria Metrics cluster.
-vmcluster:
-  enabled: true
-  doNotOverride: true
+# Victoria Metrics settings. Use a remote Victoria Metrics cluster
+victoriametrics:
+  enabled: false
   readEndpoint: ''
   writeEndpoint: ''
+
+# Victoria Metrics settings. Deploy a Victoria Metrics cluster
+victoriametricscluster:
+  enabled: false
   vmselect:
     replicaCount: 1
     extraArgs:
