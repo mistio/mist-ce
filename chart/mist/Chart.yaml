@@ -1,4 +1,4 @@
-name: mist
+name: mist-ce
 description: A Helm Chart for Mist CE.
 version: $CHART_VERSION
 appVersion: "$CHART_VERSION"
