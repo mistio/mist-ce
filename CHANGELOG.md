@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.5.0 (30 Apr 2021)
+
+ - Feature: Add read-only objectstorage support for AWS & OpenStack clouds
+ - Feature: Extend size & field constraints, enabling owners to configure available create-machine form fields & sizes (EE/HS only)
+ - Feature: Web UI for configuring constraints (EE/HS only)
+ - Feature: Helm chart
+ - Change: Do not require password when creating API token, send notification email instead
+
 ## v4.4.5 (25 Apr 2021)
 
  - Bugfix: Fix post-deploy ssh login
