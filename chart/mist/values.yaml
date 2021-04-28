@@ -45,12 +45,6 @@ influxdb:
   db: telegraf
   monitoring: true
 
-# TSFDB settings.
-tsfdb:
-  #image: *image-properties
-  enableSubchart: false
-  nameOverride: mist
-
 # Options for rabbitmq subchart.
 rabbitmq:
   enabled: true
