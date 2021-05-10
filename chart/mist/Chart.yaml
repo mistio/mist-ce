@@ -4,3 +4,14 @@ version: $CHART_VERSION
 appVersion: "$CHART_VERSION"
 apiVersion: v1
 icon: https://raw.githubusercontent.com/mistio/mist.ui/master/assets/app-icon-32.png
+dependencies:
+  - alias: rabbitmq
+    condition: rabbitmq.enabled
+    repository: https://charts.bitnami.com/bitnami
+    name: rabbitmq
+    version: 8.0.5
+  - alias: mongodb
+    condition: mongodb.enabled
+    repository: https://charts.bitnami.com/bitnami
+    name: mongodb
+    version: 10.0.5
