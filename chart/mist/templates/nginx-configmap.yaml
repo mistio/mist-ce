@@ -178,15 +178,5 @@ data:
                 proxy_buffering off;
             }
 
-            {{ if .Values.tsfdb.enableSubchart }}
-            location /tsfdb/ {
-                if ($sfdb_access = 0) {
-                    return 403;
-                }
-                proxy_pass http://{{ include "chart.fullname" . }}-tsfdb:8080/;
-                proxy_read_timeout 600;
-                proxy_connect_timeout 200;
-            }
-            {{ end }}
         }
     }

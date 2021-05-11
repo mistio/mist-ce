@@ -45,12 +45,6 @@ influxdb:
   db: telegraf
   monitoring: true
 
-# TSFDB settings.
-tsfdb:
-  #image: *image-properties
-  enableSubchart: false
-  nameOverride: mist
-
 # Options for rabbitmq subchart.
 rabbitmq:
   enabled: true
@@ -94,6 +88,7 @@ rabbitmqExternal:
 
 # MongoDB settings. Change this to use a remote MongoDB cluster.
 mongodb:
+  enabled: true
   host: ''
   port: 27017
   auth:

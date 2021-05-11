@@ -50,7 +50,6 @@ data:
       {{- end }}
     }
 
-    TSFDB_URI = {{ if .Values.tsfdb.enableSubchart }} "http://{{ include "chart.fullname" . }}-tsfdb:8080" {{ else }} "" {{ end }}
     INFLUX = {
       {{- if .Values.influxdb.host }}
         'host': "http://{{ .Values.influxdb.host }}:{{ .Values.influxdb.port }}",
