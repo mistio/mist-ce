@@ -28,10 +28,10 @@ spec:
         - 0.0.0.0:8086
         env:
         - name: MONGO_URI
-        {{- if .Values.mongodb.host }}
-          value: {{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
-        {{- else }}
+        {{- if .Values.mongodb.deploy }}
           value: {{ .Release.Name }}-mongodb:27017
+        {{- else }}
+          value: {{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
         {{- end }}
         - name: SECRET
           value: {{ .Values.internalKeys.secret }}

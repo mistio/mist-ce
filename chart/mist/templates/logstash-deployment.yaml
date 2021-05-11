@@ -39,13 +39,13 @@ spec:
           value: ''
       {{- end }}
         - name: RABBITMQ_HOST
-          value: {{ if .Values.rabbitmq.enabled }}{{ .Release.Name }}-rabbitmq{{ else }}{{ .Values.rabbitmqExternal.host }}{{ end }}
+          value: {{ if .Values.rabbitmq.deploy }}{{ .Release.Name }}-rabbitmq{{ else }}{{ .Values.rabbitmqExternal.host }}{{ end }}
         - name: RABBITMQ_PORT
-          value: "{{ if .Values.rabbitmq.enabled }}5672{{ else }}{{ .Values.rabbitmqExternal.port }}{{ end }}"
+          value: "{{ if .Values.rabbitmq.deploy }}5672{{ else }}{{ .Values.rabbitmqExternal.port }}{{ end }}"
         - name: RABBITMQ_USERNAME
-          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.auth.username }}{{ else }}{{ .Values.rabbitmqExternal.username }}{{ end }}
+          value: {{ if .Values.rabbitmq.deploy }}{{ .Values.rabbitmq.auth.username }}{{ else }}{{ .Values.rabbitmqExternal.username }}{{ end }}
         - name: RABBITMQ_PASSWORD
-          value: {{ if .Values.rabbitmq.enabled }}{{ .Values.rabbitmq.auth.password }}{{ else }}{{ .Values.rabbitmqExternal.password }}{{ end }}
+          value: {{ if .Values.rabbitmq.deploy }}{{ .Values.rabbitmq.auth.password }}{{ else }}{{ .Values.rabbitmqExternal.password }}{{ end }}
         - name: INFLUXDB_HOST
           value: {{ if .Values.influxdb.host }}{{ .Values.influxdb.host }}{{ else }}{{ include "chart.fullname" . }}-influxdb{{ end }}
         - name: INFLUXDB_PORT

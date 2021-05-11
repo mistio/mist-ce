@@ -29,7 +29,7 @@ spec:
         - --listen-address
         - 0.0.0.0:8888
         - --broker-url
-        {{ if .Values.rabbitmq.enabled -}}
+        {{ if .Values.rabbitmq.deploy -}}
         - "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ .Release.Name }}-rabbitmq:5672/"
         {{- else -}}
         - "amqp://{{ .Values.rabbitmqExternal.username }}:{{ .Values.rabbitmqExternal.password }}@{{ .Values.rabbitmqExternal.host }}:{{ .Values.rabbitmqExternal.port }}/"
