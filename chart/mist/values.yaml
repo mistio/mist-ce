@@ -47,7 +47,7 @@ influxdb:
 
 # Options for rabbitmq subchart.
 rabbitmq:
-  enabled: true
+  deploy: true
   auth:
     username: guest
     password: guest
@@ -79,7 +79,7 @@ rabbitmq:
       {{ .Release.Name }}-rabbitmq-definition
 
 # Use an external rabbitmq. This will only be used
-# if `rabbitmq.enabled` is false.
+# if `rabbitmq.deploy` is false.
 rabbitmqExternal:
   host: rabbitmq
   port: 5672
@@ -88,7 +88,7 @@ rabbitmqExternal:
 
 # MongoDB settings. Change this to use a remote MongoDB cluster.
 mongodb:
-  enabled: true
+  deploy: true
   host: ''
   port: 27017
   auth:
