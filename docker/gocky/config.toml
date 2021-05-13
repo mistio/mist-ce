@@ -4,8 +4,9 @@ bind-addr = "0.0.0.0:9096"
 output = [
     { name="influxdb", location = "http://influxdb:8086/write", type="influxdb" },
     #{ name="victoria", location = "http://victoria-metrics:8428/write", type="influxdb" },
+    { name="victoria", location = "http://vminsert:8480/insert/<org_id>/influx/write", type="victoria-metrics" },
 ]
 
-its-all-good-man = true
+#its-all-good-man = true
 #max-datapoints-per-request = 100
 #split-request-per-datapoints = 200
