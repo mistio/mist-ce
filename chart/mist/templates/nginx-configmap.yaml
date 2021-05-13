@@ -65,8 +65,9 @@ data:
             add_header X-Content-Type-Options nosniff;
             add_header X-XSS-Protection "1; mode=block";
 
-            client_max_body_size 4096m;
             client_body_timeout 300s;
+            client_body_buffer_size     10M;
+            client_max_body_size        10M;
 
             location / {
                 proxy_pass http://{{ include "chart.fullname" . }}-api;

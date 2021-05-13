@@ -73,7 +73,7 @@ data:
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
     STRIPE_PUBLIC_APIKEY = "{{ .Values.stripe.publicApiKey }}"
 
-    {{ if .Values.rabbitmq.enabled -}}
+    {{ if .Values.rabbitmq.deploy -}}
     AMQP_URI = "{{ .Release.Name }}-rabbitmq:5672"
     BROKER_URL = "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ .Release.Name }}-rabbitmq:5672/"
     {{- else -}}
@@ -95,10 +95,10 @@ data:
 
     DEFAULT_MONITORING_METHOD = "{{ .Values.monitoring.defaultMethod }}"
 
-  {{- if .Values.mongodb.host }}
-    MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
-  {{- else }}
+  {{- if .Values.mongodb.deploy }}
     MONGO_URI = "{{ .Release.Name }}-mongodb:27017"
+  {{- else }}
+    MONGO_URI = "{{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}"
   {{- end }}
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
