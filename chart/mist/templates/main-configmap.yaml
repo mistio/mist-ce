@@ -51,7 +51,7 @@ data:
     }
 
     {{ if .Values.victoriametricscluster.enabled -}}
-    VICTORIAMETRICS_URI = "http://{{ .Release.Name }}-vmcluster-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/0/prometheus"
+    VICTORIAMETRICS_URI = "http://{{ .Release.Name }}-vmcluster-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/<org_id>/prometheus"
     {{- else if .Values.victoriametrics.enabled -}}
     VICTORIAMETRICS_URI = "{{ .Values.victoriametrics.readEndpoint }}"
     {{- else -}}
