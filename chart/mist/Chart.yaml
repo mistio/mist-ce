@@ -9,7 +9,7 @@ dependencies:
     condition: rabbitmq.deploy
     repository: https://charts.bitnami.com/bitnami
     name: rabbitmq
-    version: 8.0.5
+    version: 8.15.0
   - alias: mongodb
     condition: mongodb.deploy
     repository: https://charts.bitnami.com/bitnami
