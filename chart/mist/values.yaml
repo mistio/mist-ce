@@ -215,7 +215,7 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 1
+      replicas: 4
       autoscaling: &autoscaling
         enabled: false
         minReplicas: 1
