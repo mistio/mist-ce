@@ -537,15 +537,15 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 1
+    replicas: 2
     autoscaling: *autoscaling
     resources:
       requests:
         memory: 500Mi
-        cpu: 50m
+        cpu: 250m
       limits:
-        memory: 1000Mi
-        cpu: 1500m
+        memory: 1500Mi
+        cpu: 2500m
 
   # Dramatiq deployment settings.
   dramatiq:
