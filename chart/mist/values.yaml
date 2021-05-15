@@ -215,7 +215,7 @@ deployment:
     prefork:
       enabled: true
       pool: prefork
-      replicas: 4
+      replicas: 2
       autoscaling: &autoscaling
         enabled: false
         minReplicas: 1
@@ -265,7 +265,7 @@ deployment:
 
     # Queue-specific runners. Off by default.
     celery:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -279,7 +279,7 @@ deployment:
       queues:
         - celery
     machines:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -442,7 +442,7 @@ deployment:
       queues:
         - zones
     buckets:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
