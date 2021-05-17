@@ -9,6 +9,7 @@
  - Change: Support Ansible 2.0, run playbooks in runner container
  - Change: Do not require password when creating API token, notify user by email
  - Change: Upgrade RabbitMQ, remove Memcached
+ - Change: Make portal name configurable in email subjects & bodies
 
 ## v4.4.5 (25 Apr 2021)
 
