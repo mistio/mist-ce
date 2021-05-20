@@ -80,7 +80,7 @@ data:
             }
 
             location = /api/v1 {
-                proxy_pass http://http://{{ include "chart.fullname" . }}-swagger:8080/;
+                proxy_pass http://{{ include "chart.fullname" . }}-swagger:8080/;
                 proxy_set_header  X-Real-IP  $remote_addr;
                 proxy_read_timeout 600s;
                 proxy_connect_timeout 200s;
