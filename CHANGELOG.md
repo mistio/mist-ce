@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.5.0 (19 May 2021)
+## v4.5.0 (20 May 2021)
 
  - Feature: Add read-only objectstorage support for AWS & OpenStack clouds
  - Feature: Extend size & field constraints, enabling owners to configure available create-machine form fields & sizes (EE/HS only)
