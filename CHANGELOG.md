@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.5.6 (25 May 2021)
+## v4.5.1 (26 May 2021)
 
  - Bugfix: Fix DNS hostname on provisioning
  - Change: Improve list_images performance on vSphere/vCenter clouds
