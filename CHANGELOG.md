@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.5.6 (25 May 2021)
+
+ - Bugfix: Fix DNS hostname on provisioning
+ - Change: Improve list_images performance on vSphere/vCenter clouds
+ - Change: Add human friendly name to custom sizes (EE/HS only)
+ - Change: Run update_mappings task on Dramatiq runner (EE/HS only)
+
 ## v4.5.0 (20 May 2021)
 
  - Feature: Add read-only objectstorage support for AWS & OpenStack clouds
