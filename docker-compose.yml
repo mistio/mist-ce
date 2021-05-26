@@ -13,13 +13,8 @@ services:
       - mongodb:/data/db:rw
 
   rabbitmq:
-    image: rabbitmq:3.6.6-management
+    image: rabbitmq:3.8.16-management
     restart: on-failure:5
-
-  memcached:
-    image: memcached
-    restart: on-failure:5
-
 
   elasticsearch:
     image: elasticsearch:5.6.10
@@ -50,7 +45,6 @@ services:
     depends_on:
       - elasticsearch
 
-
   socat:
     image: mist/docker-socat
     restart: on-failure:5
@@ -71,7 +65,6 @@ services:
   celery-prefork: &backend
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
-      - memcached
       - mongodb
       - elasticsearch
       - rabbitmq
@@ -152,7 +145,6 @@ services:
     expose:
       - 80
 
-
   nginx:
     image: $IMG_REGISTRY/nginx:$IMG_TAG
     restart: on-failure:5
@@ -163,7 +155,6 @@ services:
       - sockjs
       - landing
       - ui
-
 
   influxdb:
     image: influxdb:1.8.4
@@ -184,7 +175,6 @@ services:
       - 9097:9097
     depends_on:
       - rabbitmq
-
 
   traefik:
     image: traefik:v1.5

@@ -1,12 +1,22 @@
 # Changelog
 
-## v4.5.0 (30 Apr 2021)
+## v4.5.1 (26 May 2021)
+
+ - Bugfix: Fix DNS hostname on provisioning
+ - Change: Improve list_images performance on vSphere/vCenter clouds
+ - Change: Add human friendly name to custom sizes (EE/HS only)
+ - Change: Run update_mappings task on Dramatiq runner (EE/HS only)
+
+## v4.5.0 (20 May 2021)
 
  - Feature: Add read-only objectstorage support for AWS & OpenStack clouds
  - Feature: Extend size & field constraints, enabling owners to configure available create-machine form fields & sizes (EE/HS only)
  - Feature: Web UI for configuring constraints (EE/HS only)
  - Feature: Helm chart
+ - Change: Support Ansible 2.0, run playbooks in runner container
  - Change: Do not require password when creating API token, notify user by email
+ - Change: Upgrade RabbitMQ, remove Memcached
+ - Change: Make portal name configurable in email subjects & bodies
 
 ## v4.4.5 (25 Apr 2021)
 

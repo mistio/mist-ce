@@ -291,6 +291,8 @@ deployment:
         - mappings
         - networks
         - volumes
+        - zones
+        - buckets
     gevent:
       enabled: true
       replicas: 1
@@ -312,7 +314,7 @@ deployment:
 
     # Queue-specific runners. Off by default.
     celery:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -326,7 +328,7 @@ deployment:
       queues:
         - celery
     machines:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -444,7 +446,7 @@ deployment:
       queues:
         - rules
     networks:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -459,7 +461,7 @@ deployment:
       queues:
         - networks
     volumes:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -474,7 +476,7 @@ deployment:
       queues:
         - volumes
     zones:
-      enabled: false
+      enabled: true
       pool: prefork
       replicas: 1
       autoscaling: *autoscaling
@@ -488,6 +490,21 @@ deployment:
       preemptible: true
       queues:
         - zones
+    buckets:
+      enabled: true
+      pool: prefork
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 400Mi
+          cpu: 250m
+        limits:
+          memory: 1200Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - buckets
 
   # Poller deployment settings.
   poller:
@@ -518,7 +535,7 @@ deployment:
       preemptible: true
       scheduler: mist.api.poller.schedulers.ShardedOwnerScheduler
     clouds:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -531,7 +548,7 @@ deployment:
       preemptible: true
       scheduler: mist.api.poller.schedulers.ShardedCloudScheduler
     machines:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -569,15 +586,15 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 1
+    replicas: 2
     autoscaling: *autoscaling
     resources:
       requests:
         memory: 500Mi
-        cpu: 50m
+        cpu: 250m
       limits:
-        memory: 1000Mi
-        cpu: 1500m
+        memory: 1500Mi
+        cpu: 2500m
 
   # Dramatiq deployment settings.
   dramatiq:
