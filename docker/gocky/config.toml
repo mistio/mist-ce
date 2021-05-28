@@ -3,7 +3,7 @@ name = "all_backends"
 bind-addr = "0.0.0.0:9096"
 output = [
     { name="influxdb", location = "http://influxdb:8086/write", type="influxdb" },
-    { name="victoria", location = "http://vminsert:8480/insert/<org_id>/influx/write", type="victoria-metrics" },
+    #{ name="victoria", location = "http://vminsert:8480/insert/<org_id>/influx/write", type="victoria-metrics" },
 ]
 
 #its-all-good-man = true
