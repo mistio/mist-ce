@@ -45,6 +45,55 @@ influxdb:
   db: telegraf
   monitoring: true
 
+# Victoria Metrics settings. Use a remote Victoria Metrics cluster
+victoriametrics:
+  enabled: false
+  readEndpoint: ''
+  writeEndpoint: ''
+
+# Victoria Metrics settings. Deploy a Victoria Metrics cluster
+victoriametricscluster:
+  enabled: false
+  vmselect:
+    replicaCount: 1
+    extraArgs:
+      # Show the most recent datapoints without any latency
+      search.latencyOffset: 0s
+      # Don't cache the last 15m because they may be backfilled by telegraf
+      search.cacheTimestampOffset: 15m
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  vminsert:
+    extraArgs:
+      # Save space by converting timestamps from milliseconds to seconds
+      influxTrimTimestamp: 1s
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  vmstorage:
+    replicaCount: 1
+    retentionPeriod: 12
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    persistentVolume:
+      size: 8Gi
+      storageClass: standard
+
 # Options for rabbitmq subchart.
 rabbitmq:
   deploy: true

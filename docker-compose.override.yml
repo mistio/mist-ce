@@ -61,6 +61,35 @@ services:
       - ./docker/nginx/nginx-listen.conf:/etc/nginx/nginx-listen.conf:ro
       - ./docker/nginx/static:/srv/www/static:ro
 
+  vminsert:
+    image: victoriametrics/vminsert
+    command:
+      - '--influxTrimTimestamp=1s'
+      - '--storageNode=vmstorage:8400'
+    ports:
+      - 8480
+
+  vmstorage:
+    image: victoriametrics/vmstorage
+    command:
+      - '--retentionPeriod=12'
+      - '--storageDataPath=/var/lib/victoria-metrics-data'
+    ports:
+      - 8400
+      - 8401
+      - 8482
+    volumes:
+      - victoria-metrics:/var/lib/victoria-metrics-data
+
+  vmselect:
+    image: victoriametrics/vmselect
+    command:
+      - '--search.latencyOffset=0s'
+      - '--search.cacheTimestampOffset=15m'
+      - '--storageNode=vmstorage:8401'
+    ports:
+      - 8481
+
   gocky:
     volumes:
       - ./docker/gocky:/etc/gocky
@@ -69,16 +98,3 @@ services:
     volumes:
       - ./docker/influxdb:/etc/influxdb
 
-  #fdb:
-  #  image: mist/fdb
-  #  restart: on-failure:5
-  #  volumes:
-  #    - foundationdb:/var/lib/foundationdb/data:rw
-  #    - fdbetc:/etc/foundationdb/:rw
-
-  #tsfdb:
-  #  image: $IMG_REGISTRY/tsfdb:$IMG_TAG
-  #  restart: on-failure:5
-  #  volumes:
-  #    - fdbetc:/etc/foundationdb/:rw
-  #    - ./tsfdb:/usr/src/app

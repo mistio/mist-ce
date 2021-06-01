@@ -20,4 +20,9 @@ data:
         { name="influxdb", location = "http://{{ include "chart.fullname" . }}-influxdb:8086/write", type="influxdb"},
       {{- end }}
       {{- end }}
+      {{  if .Values.victoriametricscluster.enabled -}}
+        { name="victoriametrics", location="http://{{ .Release.Name }}-vmcluster-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/<org_id>/influx/write", type="victoria-metrics"},
+      {{- else if .Values.victoriametrics.enabled -}}
+        { name="victoriametrics", location="{{ .Values.victoriametrics.writeEndpoint }}", type="influxdb"},
+      {{- end }}
     ]
