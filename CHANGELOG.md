@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.5.2 (1 Jun 2021)
+
+  - Bugfix: Fix constraints field & expiration output
+  - Change: Don't update creation time on reboot for Azure machines
+  - Change: Add constraints tests (EE/HS only)
+  - Change: Improve apiv2 create machine spec
+  
 ## v4.5.1 (26 May 2021)
 
  - Bugfix: Fix DNS hostname on provisioning
