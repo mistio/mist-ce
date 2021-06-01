@@ -45,15 +45,14 @@ influxdb:
   db: telegraf
   monitoring: true
 
-# Victoria Metrics settings. Use a remote Victoria Metrics cluster
+# Victoria Metrics settings.
 victoriametrics:
   enabled: false
+  # Deploy a Victoria Metrics cluster
+  deploy: false
+  # Use existing Victoria Metrics cluster
   readEndpoint: ''
   writeEndpoint: ''
-
-# Victoria Metrics settings. Deploy a Victoria Metrics cluster
-victoriametricscluster:
-  enabled: false
   vmselect:
     replicaCount: 1
     extraArgs:
