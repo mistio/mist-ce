@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.5.3 (3 Jun 2021)
+
+  - Bugfix: Declare dramatiq broker on every actor
+
 ## v4.5.2 (1 Jun 2021)
 
   - Bugfix: Fix constraints field & expiration output
