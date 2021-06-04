@@ -62,7 +62,7 @@ services:
       - ./docker/nginx/static:/srv/www/static:ro
 
   vminsert:
-    image: victoriametrics/vminsert
+    image: victoriametrics/vminsert:v1.60.0-cluster
     command:
       - '--influxTrimTimestamp=1s'
       - '--storageNode=vmstorage:8400'
@@ -70,7 +70,7 @@ services:
       - 8480
 
   vmstorage:
-    image: victoriametrics/vmstorage
+    image: victoriametrics/vmstorage:v1.60.0-cluster
     command:
       - '--retentionPeriod=12'
       - '--storageDataPath=/var/lib/victoria-metrics-data'
@@ -82,7 +82,7 @@ services:
       - victoria-metrics:/var/lib/victoria-metrics-data
 
   vmselect:
-    image: victoriametrics/vmselect
+    image: victoriametrics/vmselect:v1.60.0-cluster
     command:
       - '--search.latencyOffset=0s'
       - '--search.cacheTimestampOffset=15m'
