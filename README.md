@@ -1,15 +1,15 @@
 # Mist Cloud Management Platform - Community Edition
 
-Mist is an open source platform for managing heterogeneous computing 
+Mist is an open source platform for managing heterogeneous computing
 infrastructure, aka a Multi-Cloud Management Platform.
 
-The managed computing resources may be running on any combination of public 
+The managed computing resources may be running on any combination of public
 clouds, private clouds, hypervisors, bare metal servers, container hosts.
 
-Mist is developed by Mist.io Inc. The code for the Community Edition is 
-provided under the Apache License. The Enterprise Edition and the Hosted 
-Service include plugins for Governance, Role Based Access Control & Cost 
-Insights. They are available for purchase at __https://mist.io__. Paid support 
+Mist is developed by Mist.io Inc. The code for the Community Edition is
+provided under the Apache License. The Enterprise Edition and the Hosted
+Service include plugins for Governance, Role Based Access Control & Cost
+Insights. They are available for purchase at __https://mist.io__. Paid support
 plans are available for any edition.
 
 <a href="https://www.youtube.com/watch?v=7oYyC-FIaAM" source="_blank"><img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768"></a>
@@ -19,8 +19,8 @@ plans are available for any edition.
 1. Organizations that depend on hybrid or multi-cloud infrastructure
 2. Organizations that provide infrastructure resources to their users on a self-service fashion
 
-They often end up building silos of distinct tools, processes & teams for each 
-supported platform, introducing operational complexities which can affect both 
+They often end up building silos of distinct tools, processes & teams for each
+supported platform, introducing operational complexities which can affect both
 security and efficiency.
 
 As the heterogeneity increases, it's becoming increasingly difficult to
@@ -32,9 +32,9 @@ As the heterogeneity increases, it's becoming increasingly difficult to
 - automate complex deployments
 - set up metering & billing
 
-Mist provides a unified way to operate, monitor & govern these resources. The 
-mission statement of the Mist platform is to help commoditize computing by 
-alleviating vendor lock-in. 
+Mist provides a unified way to operate, monitor & govern these resources. The
+mission statement of the Mist platform is to help commoditize computing by
+alleviating vendor lock-in.
 
 # Features
 
@@ -113,35 +113,30 @@ The most notable components are the following:
 
 ![Architecture.svg](Architecture.svg)
 
-The user interacts with the RESTful Mist API through client apps like the Mist 
-UI in the browser, or command line tools (e.g. cURL,  Mist CLI). The Mist UI, 
-apart from invoking the RESTful API, also establishes a WebSocket connection, 
-which is used to receive real time updates and to proxy shell connections to 
-machines. The Mist API server interacts with the respective API's of the 
-target clouds, either directly, or by adding tasks that get executed 
-asynchronously by Celery workers. The messaging is following the AMQP protocol 
-and gets coordinated by RabbitMQ. The main data store is MongoDB. Logs are 
-being stored in Elasticsearch. Time series data go to either Graphite, 
-InfluxDB or TSFDB, depending on the installation. Schedules and polling tasks 
-are triggered by Celery Beat. Whenever a shell connection is required (e.g. 
-SSH or Docker Shell), Hubshell establishes the connection and makes it 
+The user interacts with the RESTful Mist API through client apps like the Mist
+UI in the browser, or command line tools (e.g. cURL,  Mist CLI). The Mist UI,
+apart from invoking the RESTful API, also establishes a WebSocket connection,
+which is used to receive real time updates and to proxy shell connections to
+machines. The Mist API server interacts with the respective API's of the
+target clouds, either directly, or by adding tasks that get executed
+asynchronously by Celery workers. The messaging is following the AMQP protocol
+and gets coordinated by RabbitMQ. The main data store is MongoDB. Logs are
+being stored in Elasticsearch. Time series data go to either Graphite,
+InfluxDB or TSFDB, depending on the installation. Schedules and polling tasks
+are triggered by Celery Beat. Whenever a shell connection is required (e.g.
+SSH or Docker Shell), Hubshell establishes the connection and makes it
 available through the WebSocket API.
-
-## Hardware requirements
-
-Recommended hardware resources are:
-    4 CPU cores
-    8 GB RAM
-    10 GB disk (accessible to /var/lib/docker/)
-
 
 ## Installation
 
+### Hardware requirements
+
+We recommended setting up Mist in a machine with 4 CPU cores, 8GB RAM and 10GB disk (accessible to /var/lib/docker/).
 
 ### Single host
 
-The easiest way to get started with Mist is to install the latest release 
-using `docker-compose`. So, in order to run it, one needs to install a recent 
+The easiest way to get started with Mist is to install the latest release
+using `docker-compose`. So, in order to run it, one needs to install a recent
 version of [docker](https://docs.docker.com/engine/installation/) and
 [docker-compose](https://docs.docker.com/compose/install/).
 
@@ -155,6 +150,7 @@ be downloaded and started in the background.
 Run `docker-compose ps`. All containers should be in the UP state, except
 shortlived container elasticsearch-manage.
 
+Linode users can quickly set up Mist through Linode's One-Click App Marketplace. You can find Mist [here](https://www.linode.com/marketplace/apps/mist/mist-cloud-management-platform/) and a video about how it works [here](https://youtu.be/kPr-LFucNSo).
 
 ### Kubernetes cluster
 Add the mist chart repository and fetch available charts
@@ -392,9 +388,9 @@ directory, now there's also a `docker-compose.override.yml` file in the current
 directory in addition to `docker-compose.yml` and is used to modify the
 configuration for development mode.
 
-If you're not interested in frontend development, you can comment out the ui & 
-landing sections within the `docker-compose.override.yml` file and re-run 
-`docker-compose up -d`. Otherwise, you'll also need to install the ui & 
+If you're not interested in frontend development, you can comment out the ui &
+landing sections within the `docker-compose.override.yml` file and re-run
+`docker-compose up -d`. Otherwise, you'll also need to install the ui &
 landing page dependencies before you can access the Mist UI.
 
 Install all front-end dependencies with the following commands
@@ -407,9 +403,9 @@ And then build the landing & ui bundles
     docker-compose exec landing npm run build
     docker-compose exec ui npm run build
 
-When doing front-end development, it's usually more convenient to serve the 
-source code instead of the bundles. To do that, edit settings/settings.py and 
-set `JS_BUILD = False`. Restart the api container for the changes to take 
+When doing front-end development, it's usually more convenient to serve the
+source code instead of the bundles. To do that, edit settings/settings.py and
+set `JS_BUILD = False`. Restart the api container for the changes to take
 effect
 
     ./restart.sh api
