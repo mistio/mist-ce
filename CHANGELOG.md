@@ -1,8 +1,13 @@
 # Changelog
 
-## v4.5.3 (3 Jun 2021)
+## v4.5.3 (10 Jun 2021)
 
   - Bugfix: Declare dramatiq broker on every actor
+  - Bugfix: Get cached_machines before creating the machine, closes(#120)
+  - Bugfix: Fix schedule editing
+  - Bugfix: Fix bug when size disk is absent for check_size (EE/HS only)
+  - Change: Update snapshots dialog for vSphere machines
+  - Change: Add more tests on constraints (EE/HS only)
 
 ## v4.5.2 (1 Jun 2021)
 
