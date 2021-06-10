@@ -84,37 +84,37 @@ class Client(object):
         url = '%s/repos/%s/%s%s' % (api, self.owner, self.repo, url)
         headers = kwargs.pop('headers', {})
         headers.update({'Authorization': 'token %s' % self.token})
-        print "Will make %s request to %s: %s" % (method, url, kwargs)
+        print("Will make %s request to %s: %s" % (method, url, kwargs))
         resp = requests.request(method, url, headers=headers, **kwargs)
         if not resp.ok:
-            print resp.status_code
-            print resp.text
+            print(resp.status_code)
+            print(resp.text)
             raise Exception(resp.status_code)
         if parse_json_resp:
             try:
                 return resp.json()
             except Exception:
-                print "Error decoding json response"
-                print resp.text
+                print("Error decoding json response")
+                print(resp.text)
                 raise
         else:
             return resp
 
 
 def print_release(release):
-    print '-' * 60
+    print('-' * 60)
     for name, key in [('id', 'id'), ('name', 'name'),
                       ('tag', 'tag_name'), ('ref', 'target_commitish'),
                       ('draft', 'draft'), ('prerelease', 'prerelease')]:
-        print '%s: %s' % (name, release[key])
-    print 'assets:'
+        print('%s: %s' % (name, release[key]))
+    print('assets:')
     for asset in release['assets']:
-        print ' - %s' % asset['name']
+        print(' - %s' % asset['name'])
     if release['body']:
-        print 'msg: |'
+        print('msg: |')
         for line in release['body'].splitlines():
-            print '  %s' % line
-    print '-' * 60
+            print('  %s' % line)
+    print('-' * 60)
 
 
 def update_release(request, tag, msg=None, files=None,
@@ -129,10 +129,10 @@ def update_release(request, tag, msg=None, files=None,
     for item in resp:
         if item['name'] == tag:
             sha = item['commit']['sha']
-            print "Tag %s points to %s" % (tag, sha)
+            print("Tag %s points to %s" % (tag, sha))
             break
     else:
-        print "Tag %s doesn't exist" % tag
+        print("Tag %s doesn't exist" % tag)
         sys.exit(1)
 
     # Create or update github release.
@@ -144,26 +144,26 @@ def update_release(request, tag, msg=None, files=None,
         'draft': draft,
         'prerelease': prerelease,
     }
-    for key, val in data.items():
+    for key, val in list(data.items()):
         if val is None:
             data.pop(key)
     for release in request('/releases'):
         if release['tag_name'] == tag:
-            print "Found preexisting release."
+            print("Found preexisting release.")
             print_release(release)
-            for key in data.keys():
+            for key in list(data.keys()):
                 if data[key] == release[key]:
                     data.pop(key)
             if data:
-                print "Release already exists, updating."
+                print("Release already exists, updating.")
                 release = request('/releases/%s' % release['id'], 'PATCH',
                                   json=data)
                 print_release(release)
             else:
-                print "No need to modify release's metadata."
+                print("No need to modify release's metadata.")
             break
     else:
-        print "Creating a new release."
+        print("Creating a new release.")
         release = request('/releases', 'POST', json=data)
         print_release(release)
 
@@ -176,7 +176,7 @@ def update_release(request, tag, msg=None, files=None,
             if asset['name'] != name:
                 continue
             assets.pop(i)
-            print "Found already uploaded file '%s'" % path
+            print("Found already uploaded file '%s'" % path)
             md5 = hashlib.md5()
             resp = request('/releases/assets/%s' % asset['id'],
                            headers={'Accept': 'application/octet-stream'},
@@ -194,10 +194,10 @@ def update_release(request, tag, msg=None, files=None,
                     md5.update(chunk)
             md5sum_local = md5.hexdigest()
             if md5sum_local == md5sum_remote:
-                print "Preexisting file matches local file"
+                print("Preexisting file matches local file")
                 uploaded = True
                 break
-            print "Deleting preexisting different asset."
+            print("Deleting preexisting different asset.")
             request('/releases/assets/%s' % asset['id'], 'DELETE',
                     parse_json_resp=False)
         if not uploaded:
@@ -209,7 +209,7 @@ def update_release(request, tag, msg=None, files=None,
                         params={'name': name}, data=fobj)
     if remove_undefined_files:
         for asset in assets:
-            print "Deleting preexisting undefined asset %s." % asset['name']
+            print("Deleting preexisting undefined asset %s." % asset['name'])
             request('/releases/assets/%s' % asset['id'], 'DELETE',
                     parse_json_resp=False)
 
