@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.5.4 (15 Jun 2021)
+
+ - Bugfix: Fix clone action for vSphere machines
+ - Bugfix: Improve snapshot dialog for vSphere machines
+ - Change: Support security group selection when creating OpenStack machines
+ - Change: Revamp check_size implementation (EE/HS only)
+
 ## v4.5.3 (10 Jun 2021)
 
   - Bugfix: Declare dramatiq broker on every actor
