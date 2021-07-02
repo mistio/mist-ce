@@ -83,6 +83,12 @@ data:
     BROKER_URL = "amqp://{{ .Values.rabbitmqExternal.username }}:{{ .Values.rabbitmqExternal.password }}@{{ .Values.rabbitmqExternal.host }}:{{ .Values.rabbitmqExternal.port }}/"
     {{- end }}
 
+    {{- if .Values.memcached.host }}
+    MEMCACHED_HOST = ["{{ .Release.Name }}-memcached:11211"]
+    {{- else }}
+    MEMCACHED_HOST = ["{{ .Values.memcached.host }}"]
+    {{- end }}
+
     DOCKER_IP = "{{ .Values.docker.host }}"
     DOCKER_PORT = "{{ .Values.docker.port }}"
     DOCKER_TLS_KEY = """
