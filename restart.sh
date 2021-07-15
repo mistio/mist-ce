@@ -12,9 +12,14 @@ elif [ $# -eq 1 ] && [ "$@" = "api" ]; then
     docker-compose exec api-v2 sh -c "kill -HUP 1"
     echo "api-v2 \tDone"
     echo "---------------------------------------------------"
+elif [ $# -eq 1 ] && [ "$@" = "dramatiq" ]; then
+    echo "Sending HUP signal to dramatiq"
+    echo "---------------------------------------------------"
+    docker-compose exec dramatiq sh -c "kill -HUP 1"
+    echo "Done"
 else
     echo "Restarting $@"
     echo "---------------------------------------------------"
     docker-compose restart $@
-    echo "Done."
+    echo "Done"
 fi;

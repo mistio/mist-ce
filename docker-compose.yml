@@ -16,6 +16,10 @@ services:
     image: rabbitmq:3.8.16-management
     restart: on-failure:5
 
+  memcached:
+    image: memcached:1.6.9
+    restart: on-failure:5
+
   elasticsearch:
     image: elasticsearch:5.6.10
     restart: on-failure:5
@@ -62,7 +66,7 @@ services:
     restart: on-failure:5
 
 
-  celery-prefork: &backend
+  scheduler: &backend
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - mongodb
@@ -75,31 +79,7 @@ services:
     stdin_open: true
     tty: true
     restart: on-failure:5
-    command: bin/wait-all bin/celery-prefork
-
-  celery-gevent:
-    <<: *backend
-    command: bin/wait-all bin/celery-gevent
-
-  scheduler:
-    <<: *backend
     command: bin/wait-all bin/scheduler
-
-  poller:
-    <<: *backend
-    command: bin/wait-all bin/poller
-
-  cilia:
-    <<: *backend
-    command: bin/wait-all bin/cilia
-
-  beat:
-    <<: *backend
-    command: bin/wait-all bin/beat
-
-  hubshell:
-    <<: *backend
-    command: bin/wait-all bin/hubshell
 
   api:
     <<: *backend

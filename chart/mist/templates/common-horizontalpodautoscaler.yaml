@@ -1,6 +1,6 @@
 {{ $values := .Values -}}
 {{ range $name, $settings := $values.deployment -}}
-{{ if and (ne $name "celery") (ne $name "poller") ($settings.autoscaling) -}}
+{{ if and (ne $name "dramatiq") (ne $name "poller") ($settings.autoscaling) -}}
 {{ if default false $settings.autoscaling.enabled -}}
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
