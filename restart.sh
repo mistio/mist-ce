@@ -2,7 +2,7 @@
 if [ $# -eq 0 ]; then
     echo "Restarting all containers that import mist.api code"
     echo "---------------------------------------------------"
-    docker-compose restart api celery-prefork celery-gevent sockjs poller cilia hubshell beat scheduler
+    docker-compose restart api api-v2 dramatiq sockjs hubshell scheduler
     echo "Done."
 elif [ $# -eq 1 ] && [ "$@" = "api" ]; then
     echo "Sending HUP signal to uwsgi"
@@ -15,7 +15,7 @@ elif [ $# -eq 1 ] && [ "$@" = "api" ]; then
 elif [ $# -eq 1 ] && [ "$@" = "dramatiq" ]; then
     echo "Sending HUP signal to dramatiq"
     echo "---------------------------------------------------"
-    docker-compose exec dramatiq sh -c "kill -HUP 1"
+    docker-compose exec dramatiq sh -c "pkill -HUP python"
     echo "Done"
 else
     echo "Restarting $@"
