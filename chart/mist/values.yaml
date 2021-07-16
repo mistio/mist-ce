@@ -243,9 +243,9 @@ preemptible:
 
 # Configure prometheus exporters. Subcharts may require separate configuration.
 prometheus:
-  enabled: false
+  enabled: true
   operator:
-    enabled: false
+    enabled: true
     serviceMonitor:
       interval: 20s
       namespace: monitoring

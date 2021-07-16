@@ -1,0 +1,22 @@
+{{ if .Values.prometheus.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-dramatiq
+  labels:
+    app: dramatiq
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    prometheus.io/path: /
+    prometheus.io/port: "9191"
+    prometheus.io/scrape: "true"
+spec:
+  ports:
+  - name: dramatiq-exporter
+    port: 9191
+  selector:
+    app: dramatiq
+    release: {{ .Release.Name }}
+{{- end }}

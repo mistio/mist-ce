@@ -7,6 +7,10 @@ metadata:
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    prometheus.io/path: /
+    prometheus.io/port: "9191"
+    prometheus.io/scrape: "true"
 spec:
   replicas: {{ .Values.deployment.dramatiq.replicas | default "1" }}
   selector:
@@ -29,6 +33,13 @@ spec:
         - bin/dramatiq
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: prometheus_multiproc_dir
+          value: /tmp/dramatiq-prometheus
+        - name: dramatiq_prom_db
+          value: /tmp/dramatiq-prometheus
+        ports:
+        - containerPort: 9191
         resources:
           requests:
             memory: {{ .Values.deployment.dramatiq.resources.requests.memory | default "500Mi" }}
