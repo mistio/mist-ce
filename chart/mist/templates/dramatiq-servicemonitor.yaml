@@ -1,0 +1,27 @@
+{{ if .Values.prometheus.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "chart.fullname" . }}-dramatiq
+  namespace: {{ .Values.prometheus.operator.serviceMonitor.namespace }}
+  labels:
+    app: dramatiq
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.prometheus.operator.serviceMonitor.selector }}
+{{ toYaml .Values.prometheus.operator.serviceMonitor.selector | indent 4 }}
+{{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: dramatiq
+      release: {{ .Release.Name }}
+  endpoints:
+  - port: dramatiq-exporter
+    interval: {{ .Values.prometheus.operator.serviceMonitor.interval }}
+    path: /
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+{{ end }}
