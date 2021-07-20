@@ -2,7 +2,7 @@
 if [ $# -eq 0 ]; then
     echo "Restarting all containers that import mist.api code"
     echo "---------------------------------------------------"
-    docker-compose restart api api-v2 dramatiq sockjs hubshell scheduler
+    docker-compose restart api api-v2 dramatiq sockjs scheduler
     echo "Done."
 elif [ $# -eq 1 ] && [ "$@" = "api" ]; then
     echo "Sending HUP signal to uwsgi"
