@@ -53,11 +53,14 @@ data:
     {{ if .Values.victoriametrics.enabled -}}
     {{ if .Values.victoriametrics.deploy -}}
     VICTORIAMETRICS_URI = "http://{{ .Release.Name }}-vmcluster-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/<org_id>/prometheus"
+    VICTORIAMETRICS_WRITE_URI = "http://{{ .Release.Name }}-vmcluster-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/<org_id>/prometheus"
     {{- else -}}
     VICTORIAMETRICS_URI = "{{ .Values.victoriametrics.readEndpoint }}/select/<org_id>/prometheus"
+    VICTORIAMETRICS_WRITE_URI = "{{ .Values.victoriametrics.writeEndpoint }}/insert/<org_id>/prometheus"
     {{- end }}
     {{- else -}}
     VICTORIAMETRICS_URI = ""
+    VICTORIAMETRICS_WRITE_URI = ""
     {{- end }}
 
     INFLUX = {
