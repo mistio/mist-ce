@@ -22,7 +22,7 @@ data:
       {{- end }}
       {{- if .Values.victoriametrics.enabled }}
       {{  if .Values.victoriametrics.deploy -}}
-        { name="victoriametrics", location="http://{{ .Release.Name }}-vmcluster-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/<org_id>/influx/write", type="victoria-metrics"},
+        { name="victoriametrics", location="http://{{ .Release.Name }}-victoriametrics-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/<org_id>/influx/write", type="victoria-metrics"},
       {{- else -}}
         { name="victoriametrics", location="{{ .Values.victoriametrics.writeEndpoint }}/insert/<org_id>/influx/write", type="victoria-metrics"},
       {{- end }}
