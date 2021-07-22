@@ -53,10 +53,10 @@ data:
     {{ if .Values.victoriametrics.enabled -}}
     {{ if .Values.victoriametrics.deploy -}}
     VICTORIAMETRICS_URI = "http://{{ .Release.Name }}-victoriametrics-vmselect.{{ .Release.Namespace }}.svc.cluster.local:8481/select/<org_id>/prometheus"
-    VICTORIAMETRICS_WRITE_URI = "http://{{ .Release.Name }}-victoriametrics-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/<org_id>/prometheus"
+    VICTORIAMETRICS_WRITE_URI = "http://{{ .Release.Name }}-victoriametrics-vminsert.{{ .Release.Namespace }}.svc.cluster.local:8480/insert/<org_id>/prometheus/api/v1/import/prometheus"
     {{- else -}}
     VICTORIAMETRICS_URI = "{{ .Values.victoriametrics.readEndpoint }}/select/<org_id>/prometheus"
-    VICTORIAMETRICS_WRITE_URI = "{{ .Values.victoriametrics.writeEndpoint }}/insert/<org_id>/prometheus"
+    VICTORIAMETRICS_WRITE_URI = "{{ .Values.victoriametrics.writeEndpoint }}/insert/<org_id>/prometheus/api/v1/import/prometheus"
     {{- end }}
     {{- else -}}
     VICTORIAMETRICS_URI = ""
