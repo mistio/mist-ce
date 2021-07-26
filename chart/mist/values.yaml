@@ -47,9 +47,9 @@ influxdb:
 
 # Victoria Metrics settings.
 victoriametrics:
-  enabled: false
+  enabled: true
   # Deploy a Victoria Metrics cluster
-  deploy: false
+  deploy: true
   # Use existing Victoria Metrics cluster
   readEndpoint: ''
   writeEndpoint: ''
