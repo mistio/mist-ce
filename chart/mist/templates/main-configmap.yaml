@@ -87,9 +87,9 @@ data:
     {{- end }}
 
     {{- if .Values.memcached.host }}
-    MEMCACHED_HOST = ["{{ .Release.Name }}-memcached:11211"]
-    {{- else }}
     MEMCACHED_HOST = ["{{ .Values.memcached.host }}"]
+    {{- else }}
+    MEMCACHED_HOST = ["{{ .Release.Name }}-memcached:11211"]
     {{- end }}
 
     DOCKER_IP = "{{ .Values.docker.host }}"
