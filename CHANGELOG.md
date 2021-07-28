@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.5.5 (27 Jul 2021)
+
+ - Bugfix: Prevent loss of hosts when disabling KVM clouds
+ - Bugfix: Fix support of multiple locations & volume types on OpenStack clouds
+ - Bugfix: Fix network listing on OpenStack when IPv6 subnet exists
+ - Bugfix: Fix machine provisioning issue on OpenStack when attaching existing volume
+ - Bugfix: Update RBAC mappings for images & locations when cloud added by non-owner (EE/HS only)
+
 ## v4.5.4 (15 Jun 2021)
 
  - Bugfix: Fix clone action for vSphere machines
