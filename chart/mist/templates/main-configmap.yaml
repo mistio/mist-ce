@@ -75,6 +75,7 @@ data:
       {{- end }}
     }
 
+    VAULT_ADDR = "{{ .Values.vault.address }}"
     VAULT_TOKEN = "{{ .Values.vault.token }}"
 
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
