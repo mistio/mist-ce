@@ -67,8 +67,7 @@ services:
       API_URL: /api/v1/spec
     restart: on-failure:5
 
-
-  scheduler: &backend
+  apply-migrations: &boot
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - mongodb
@@ -83,6 +82,12 @@ services:
     stdin_open: true
     tty: true
     restart: on-failure:5
+    command: bin/wait-all bin/migrate
+
+  scheduler: &backend
+    <<: *boot
+    depends_on:
+      - apply-migrations
     command: bin/wait-all bin/scheduler
 
   hubshell:
@@ -106,10 +111,6 @@ services:
     command: bin/wait-all bin/sockjs
     expose:
       - 8081
-
-  apply-migrations:
-    <<: *backend
-    command: bin/wait-all bin/migrate
 
   dramatiq:
     <<: *backend
