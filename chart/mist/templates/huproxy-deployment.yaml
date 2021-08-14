@@ -35,6 +35,8 @@ spec:
         {{- end }}
         - name: SECRET
           value: {{ .Values.internalKeys.secret }}
+        - name: INTERNAL_API_URL
+          value: "http://{{ include "chart.fullname" . }}-api"
         image: {{ .Values.image.registry }}/huproxy:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
