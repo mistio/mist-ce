@@ -81,6 +81,7 @@ services:
       - '--search.latencyOffset=0s'
       - '--search.cacheTimestampOffset=15m'
       - '--storageNode=vmstorage:8401'
+      - '--search.maxQueryLen=1GiB'
     ports:
       - 8481
 
