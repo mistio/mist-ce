@@ -60,6 +60,7 @@ victoriametrics:
       search.latencyOffset: 0s
       # Don't cache the last 15m because they may be backfilled by telegraf
       search.cacheTimestampOffset: 15m
+      search.maxQueryLen: 1GiB
     resources:
       limits:
         cpu: 50m
