@@ -295,7 +295,7 @@ deployment:
 
   # Dramatiq deployment settings.
   dramatiq:
-    replicas: 1
+    replicas: 2
     autoscaling: *autoscaling
     resources:
       requests:
@@ -303,7 +303,7 @@ deployment:
         cpu: 20m
       limits:
         memory: 800Mi
-        cpu: 1000m
+        cpu: 2000m
 
   # Sockjs deployment settings.
   sockjs:
