@@ -33,6 +33,8 @@ smtp:
 vault:
   address: 'http://vault:8200'
   token: ''
+  roleId: ''
+  secretId: ''
   secret_engine_paths: {}
   kv_version: 2
   clouds_path: 'mist/clouds/'

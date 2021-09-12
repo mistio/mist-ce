@@ -76,7 +76,12 @@ data:
     }
 
     VAULT_ADDR = "{{ .Values.vault.address }}"
+    {{ if .Values.vault.roleId -}}
+    VAULT_ROLE_ID = "{{ .Values.vault.roleId}}"
+    VAULT_SECRET_ID = "{{ .Values.vault.secretId}}"
+    {{ - else -}}
     VAULT_TOKEN = "{{ .Values.vault.token }}"
+    {{- end }}
 
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"
     STRIPE_PUBLIC_APIKEY = "{{ .Values.stripe.publicApiKey }}"
