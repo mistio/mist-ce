@@ -1,13 +1,13 @@
 # Mist Cloud Management Platform - Community Edition
 
 Mist is an open source platform for managing heterogeneous computing
-infrastructure, aka a Multi-Cloud Management Platform.
+infrastructure, aka a Multicloud Management Platform.
 
 The managed computing resources may be running on any combination of public
 clouds, private clouds, hypervisors, bare metal servers, container hosts.
 
 Mist is developed by Mist.io Inc. The code for the Community Edition is
-provided under the Apache License. The Enterprise Edition and the Hosted
+provided under the Apache License v2. The Enterprise Edition and the Hosted
 Service include plugins for Governance, Role Based Access Control & Cost
 Insights. They are available for purchase at __https://mist.io__. Paid support
 plans are available for any edition.
@@ -17,7 +17,7 @@ plans are available for any edition.
 # Who needs Mist?
 
 1. Organizations that depend on hybrid or multi-cloud infrastructure
-2. Organizations that provide infrastructure resources to their users on a self-service fashion
+2. Organizations that provide computing resources to their users on a self-service fashion
 
 They often end up building silos of distinct tools, processes & teams for each
 supported platform, introducing operational complexities which can affect both
@@ -101,11 +101,11 @@ The most notable components are the following:
 - REST API that serves requests from clients
 - WebSocket API, sends real-time updates to connected clients and proxies shell connections
 - Hubshell service, opens SSH connections to machines or shell connections using the Docker API
-- Celery workers, running asynchronous jobs
-- Celery Beat schedulers & pollers that schedule polling tasks, as well as user defined scheduled actions
+- Dramatiq workers, running asynchronous jobs
+- APScheduler based scheduler that schedules polling tasks, rule checks, as well as user defined scheduled actions
 - Gocky as the relay to receive and pre-process monitoring metrics
 - RabbitMQ message queue service
-- InfluxDB, Graphite or FoundationDB as a time series database
+- InfluxDB, or VictoriaMetrics as a time series database
 - MongoDB or FoundationDB Document Layer as the main database
 - Elasticsearch for storing and searching logs
 - Logstash for routing logs to Elasticsearch
@@ -121,11 +121,11 @@ machines. The Mist API server interacts with the respective API's of the
 target clouds, either directly, or by adding tasks that get executed
 asynchronously by Celery workers. The messaging is following the AMQP protocol
 and gets coordinated by RabbitMQ. The main data store is MongoDB. Logs are
-being stored in Elasticsearch. Time series data go to either Graphite,
-InfluxDB or TSFDB, depending on the installation. Schedules and polling tasks
-are triggered by Celery Beat. Whenever a shell connection is required (e.g.
-SSH or Docker Shell), Hubshell establishes the connection and makes it
-available through the WebSocket API.
+being stored in Elasticsearch. Time series data go to either VictoriaMetrics or
+InfluxDB, depending on the installation. Rule checks, polling tasks & user
+tasks are triggered by the scheduler service. Whenever a shell connection is
+required (e.g. SSH or Docker Shell), Huproxy establishes the connection and
+makes it available through the WebSocket API.
 
 ## Installation
 
