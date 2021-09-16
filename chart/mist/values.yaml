@@ -63,8 +63,8 @@ victoriametrics:
       search.maxQueryLen: 1GiB
     resources:
       limits:
-        cpu: 50m
-        memory: 64Mi
+        cpu: 1
+        memory: 640Mi
       requests:
         cpu: 50m
         memory: 64Mi
@@ -75,8 +75,8 @@ victoriametrics:
     replicaCount: 1
     resources:
       limits:
-        cpu: 50m
-        memory: 64Mi
+        cpu: 1
+        memory: 640Mi
       requests:
         cpu: 50m
         memory: 64Mi
@@ -85,8 +85,8 @@ victoriametrics:
     retentionPeriod: 12
     resources:
       limits:
-        cpu: 500m
-        memory: 512Mi
+        cpu: 1
+        memory: 640Mi
       requests:
         cpu: 250m
         memory: 256Mi
