@@ -183,7 +183,7 @@ build tests:
         docker build \
           -t $CI_PROJECT_NAME/$IMG:$CI_COMMIT_SHA \
           --build-arg SRC_IMG=$SRC_IMG \
-          docker/tests/
+          -f docker/tests/Dockerfile .
     - docker_push $CI_PROJECT_NAME/$IMG:$CI_COMMIT_SHA $IMG
 
 .docker_build_template: &docker_build_template
