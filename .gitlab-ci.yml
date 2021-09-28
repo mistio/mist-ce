@@ -176,8 +176,7 @@ build tests:
   script:
     - git submodule sync --recursive api
     - git submodule update --init --recursive api
-    - export arg1=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
-    - export SRC_IMG="${SUBMODULES_IMAGE:-mist}/${arg1}"
+    - export SRC_IMG="${SUBMODULES_IMAGE:-mist}/tests:$(get_submodule_sha tests)"
     - export IMG=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
     - |
         docker build \
