@@ -470,7 +470,7 @@ API:main:volumes: *api_test_template
 API:main:v2:
   <<: *test_template
   script:
-    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/main/v2
+    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/main/v2/
 
 .API:plugin:orchestration: *api_test_template
 .API:plugin:tunnels: *api_test_template
