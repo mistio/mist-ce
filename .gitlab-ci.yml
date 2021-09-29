@@ -439,7 +439,7 @@ deploy master:
     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
     IMAP_HOST: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-mailmock.test-$CI_PROJECT_NAME.svc.cluster.local
   before_script:
-    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
+    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2-4 | tr : /)'
     - echo "Test argument is $TEST"
     - echo "Image used is $TESTS_IMAGE"
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
