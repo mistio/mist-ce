@@ -171,6 +171,20 @@ build api:
           .
     - docker_push $CI_PROJECT_NAME/api:$CI_COMMIT_SHA api
 
+build tests:
+  <<: *docker_template
+  script:
+    - git submodule sync --recursive api
+    - git submodule update --init --recursive api
+    - export SRC_IMG="${SUBMODULES_IMAGE:-mist}/tests:$(get_submodule_sha tests)"
+    - export IMG=$(echo "$CI_JOB_NAME" | cut -d " " -f2)
+    - |
+        docker build \
+          -t $CI_PROJECT_NAME/$IMG:$CI_COMMIT_SHA \
+          --build-arg SRC_IMG=$SRC_IMG \
+          -f docker/tests/Dockerfile .
+    - docker_push $CI_PROJECT_NAME/$IMG:$CI_COMMIT_SHA $IMG
+
 .docker_build_template: &docker_build_template
   <<: *docker_template
   script:
@@ -202,7 +216,6 @@ build wsproxy: *docker_build_template
 
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
-retag tests: *docker_retag_template
 
 
 compose:
@@ -426,7 +439,7 @@ deploy master:
     EMAIL: thingirl.tester.mist.io+${CI_JOB_ID}@gmail.com
     IMAP_HOST: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG-mailmock.test-$CI_PROJECT_NAME.svc.cluster.local
   before_script:
-    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2,3 | tr : /)'
+    - 'export TEST=$(echo "$CI_JOB_NAME" | cut -d/ -f1 | cut -d: -f2-4 | tr : /)'
     - echo "Test argument is $TEST"
     - echo "Image used is $TESTS_IMAGE"
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
@@ -453,6 +466,8 @@ API:main:scripts: *api_test_template
 API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template
+API:main:v2:test_clouds_controller: *api_test_template
+API:main:v2:test_clusters_controller: *api_test_template
 
 .API:plugin:orchestration: *api_test_template
 .API:plugin:tunnels: *api_test_template
