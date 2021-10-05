@@ -46,7 +46,7 @@ influxdb:
   monitoring: true
 
 # Victoria Metrics settings.
-victoriametrics:
+vm:
   enabled: true
   # Deploy a Victoria Metrics cluster
   deploy: true
