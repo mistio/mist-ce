@@ -295,15 +295,241 @@ deployment:
 
   # Dramatiq deployment settings.
   dramatiq:
-    replicas: 2
-    autoscaling: *autoscaling
-    resources:
-      requests:
-        memory: 200Mi
-        cpu: 20m
-      limits:
-        memory: 800Mi
-        cpu: 2000m
+    dramatiq:
+      enabled: true
+      replicas: 2
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      queues:
+        - default
+        - mappings
+        - scripts
+        - provisioning
+        - schedules
+        - sessions
+        - ping_probe
+        - ssh_probe
+        - rules
+        - polling
+        - machines
+        - clusters
+        - networks
+        - zones
+        - volumes
+        - buckets
+
+    # Queue-specific runners. Off by default.
+    default:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      queues:
+        - default
+    provisioning:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 1500m
+      queues:
+        - provisioning
+    polling:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - polling
+    machines:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - machines
+    clusters:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - clusters
+    networks:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - networks
+    zones:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - zones
+    volumes:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - volumes
+    buckets:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      preemptible: true
+      queues:
+        - buckets
+    mappings:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 2000m
+      queues:
+        - mappings
+        - sessions
+    scripts:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 1000Mi
+          cpu: 2000m
+      queues:
+        - scripts
+    probe:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 1000m
+      preemptible: true
+      queues:
+        - ssh_probe
+    ping:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 1000m
+      preemptible: true
+      queues:
+        - ping_probe
+    rules:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 1000m
+      queues:
+        - rules
+    schedules:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 1000m
+      queues:
+        - schedules
 
   # Sockjs deployment settings.
   sockjs:
@@ -352,3 +578,69 @@ deployment:
       limits:
         memory: 250Mi
         cpu: 200m
+
+  # APScheduler deployment settings
+  scheduler:
+    scheduler:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 10m
+        limits:
+          memory: 400Mi
+          cpu: 1000m
+      schedules:
+        - builtin
+        - user
+        - polling
+        - rules
+    builtin:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 10m
+        limits:
+          memory: 400Mi
+          cpu: 1000m
+      schedules:
+        - builtin
+    user:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 10m
+        limits:
+          memory: 400Mi
+          cpu: 1000m
+      schedules:
+        - user
+    polling:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 10m
+        limits:
+          memory: 400Mi
+          cpu: 1000m
+      schedules:
+        - polling 
+    rules:
+      enabled: false
+      replicas: 1
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 10m
+        limits:
+          memory: 400Mi
+          cpu: 1000m
+      schedules:
+        - rules
