@@ -1,61 +1,80 @@
+{{ range $name, $settings := $.Values.deployment.dramatiq -}}
+{{ if $settings.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}-dramatiq
+  name: {{ include "chart.fullname" $ }}-dramatiq-{{ $name }}
   labels:
-    app: dramatiq
-    chart: {{ include "chart.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: dramatiq-{{ $name }}
+    chart: {{ include "chart.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
   annotations:
     prometheus.io/path: /
     prometheus.io/port: "9191"
     prometheus.io/scrape: "true"
 spec:
-  replicas: {{ .Values.deployment.dramatiq.replicas | default "1" }}
+  replicas: {{ $settings.replicas | default "1" }}
   selector:
     matchLabels:
-      release: {{ .Release.Name }}
+      release: {{ $.Release.Name }}
   template:
     metadata:
       labels:
-        app: dramatiq
-        release: {{ .Release.Name }}
+        app: dramatiq-{{ $name }}
+        release: {{ $.Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
-        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") $ | sha256sum }}
     spec:
       imagePullSecrets:
-{{ toYaml .Values.image.secrets | indent 8 }}
+{{ toYaml $.Values.image.secrets | indent 8 }}
       containers:
-      - name: dramatiq
+      - name: dramatiq-{{ $name }}
         args:
         - bin/dramatiq
-        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ $.Values.image.registry }}/api:{{ $.Values.image.tag }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
         env:
         - name: prometheus_multiproc_dir
           value: /tmp/dramatiq-prometheus
         - name: dramatiq_prom_db
           value: /tmp/dramatiq-prometheus
+        - name: QUEUES
+          value: "{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
         ports:
         - containerPort: 9191
         resources:
           requests:
-            memory: {{ .Values.deployment.dramatiq.resources.requests.memory | default "500Mi" }}
-            cpu: {{ .Values.deployment.dramatiq.resources.requests.cpu | default "100m" }}
+            memory: {{ $settings.resources.requests.memory | default "500Mi" }}
+            cpu: {{ $settings.resources.requests.cpu | default "100m" }}
           limits:
-            memory: {{ .Values.deployment.dramatiq.resources.limits.memory | default "1000Mi" }}
-            cpu: {{ .Values.deployment.dramatiq.resources.limits.cpu | default "2000m" }}
+            memory: {{ $settings.resources.limits.memory | default "1000Mi" }}
+            cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
         volumeMounts:
-        - name: {{ .Values.productShortName }}-config
-          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+        - name: {{ $.Values.productShortName }}-config
+          mountPath: /etc/{{ $.Values.productShortName }}/settings/settings.py
           subPath: settings.py
+{{- if $settings.preemptible }}
+{{- if $.Values.preemptible.tolerations }}
+      tolerations:
+{{ toYaml $.Values.preemptible.tolerations | indent 8 }}
+{{- end }}
+{{- if $.Values.preemptible.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+{{ toYaml $.Values.preemptible.nodeAffinity | indent 10 }}
+{{- end }}
+{{- end }}
+      terminationGracePeriodSeconds: {{ $settings.gracePeriod | default 300 }}
       volumes:
-      - name: {{ .Values.productShortName }}-config
+      - name: {{ $.Values.productShortName }}-config
         configMap:
-          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
-{{- if .Values.nodeSelector }}
+          name: {{ include "chart.fullname" $ }}-{{ $.Values.productShortName }}
+{{- if $.Values.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+{{ toYaml $.Values.nodeSelector | indent 8 }}
+{{- end }}
+---
+{{ end }}
 {{- end }}
