@@ -1,52 +1,60 @@
+{{ range $name, $settings := $.Values.deployment.scheduler -}}
+{{ if $settings.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}-scheduler
+  name: {{ include "chart.fullname" $ }}-sheduler-{{ $name }}
   labels:
-    app: scheduler
-    chart: {{ include "chart.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: scheduler-{{ $name }}
+    chart: {{ include "chart.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
 spec:
-  replicas: 1
+  replicas: {{ $settings.replicas | default "1" }}
   selector:
     matchLabels:
-      release: {{ .Release.Name }}
+      release: {{ $.Release.Name }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: scheduler
-        release: {{ .Release.Name }}
+        app: scheduler-{{ $name }}
+        release: {{ $.Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
-        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/main-configmap.yaml") $ | sha256sum }}
     spec:
       imagePullSecrets:
-{{ toYaml .Values.image.secrets | indent 8 }}
+{{ toYaml $.Values.image.secrets | indent 8 }}
       containers:
       - name: scheduler
         args:
         - bin/scheduler
-        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ $.Values.image.registry }}/api:{{ $.Values.image.tag }}
+        imagePullPolicy: {{ $.Values.image.pullPolicy }}
+        env:
+        - name: SCHEDULES
+          value: "{{ range $i, $q := $settings.schedules }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
         resources:
           requests:
-            memory: 100Mi
-            cpu: 10m
+            memory: {{ $settings.resources.requests.memory | default "100Mi" }}
+            cpu: {{ $settings.resources.requests.cpu | default "10m" }}
           limits:
-            memory: 400Mi
-            cpu: 1000m
+            memory: {{ $settings.resources.limits.memory | default "400Mi" }}
+            cpu: {{ $settings.resources.limits.cpu | default "1000m" }}
         volumeMounts:
-        - name: {{ .Values.productShortName }}-config
-          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+        - name: {{ $.Values.productShortName }}-config
+          mountPath: /etc/{{ $.Values.productShortName }}/settings/settings.py
           subPath: settings.py
       volumes:
-      - name: {{ .Values.productShortName }}-config
+      - name: {{ $.Values.productShortName }}-config
         configMap:
-          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
-{{- if .Values.nodeSelector }}
+          name: {{ include "chart.fullname" $ }}-{{ $.Values.productShortName }}
+{{- if $.Values.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+{{ toYaml $.Values.nodeSelector | indent 8 }}
+{{- end }}
+---
+{{ end }}
 {{- end }}
