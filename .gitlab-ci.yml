@@ -345,6 +345,9 @@ compose:
             --set docker.ca="$DOCKER_CA" \
             --set awsAccessKey="$AWS_ACCESS_KEY" \
             --set awsSecretKey="$AWS_SECRET_KEY" \
+            --set victoriametrics.vminsert.fullnameOverride="$release-vminsert" \
+            --set victoriametrics.vmstorage.fullnameOverride="$release-vmstorage" \
+            --set victoriametrics.vmselect.fullnameOverride="$release-vmselect" \
             $tls_settings \
             $(elasticsearch_params) \
             $release ./chart/mist/
