@@ -6,6 +6,7 @@ metadata:
   name: {{ include "chart.fullname" $ }}-dramatiq-{{ $name }}
   labels:
     app: dramatiq-{{ $name }}
+    lapp: dramatiq
     chart: {{ include "chart.chart" $ }}
     release: {{ $.Release.Name }}
     heritage: {{ $.Release.Service }}
@@ -22,6 +23,7 @@ spec:
     metadata:
       labels:
         app: dramatiq-{{ $name }}
+        lapp: dramatiq
         release: {{ $.Release.Name }}
       annotations:
         # Trigger modification of deployment & restart of pods if config changes.
