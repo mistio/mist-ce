@@ -477,6 +477,7 @@ API:main:v2:test_jobs_controller: *api_test_template
 API:main:v2:test_keys_controller: *api_test_template
 API:main:v2:test_locations_controller: *api_test_template
 API:main:v2:test_orgs_controller: *api_test_template
+API:main:v2:test_scripts_controller: *api_test_template
 API:main:v2:test_sizes_controller: *api_test_template
 API:main:v2:test_users_controller: *api_test_template
 
