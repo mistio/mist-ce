@@ -296,7 +296,7 @@ deployment:
   # Dramatiq deployment settings.
   dramatiq:
     dramatiq:
-      enabled: true
+      enabled: false
       replicas: 2
       autoscaling: *autoscaling
       resources:
@@ -326,7 +326,7 @@ deployment:
 
     # Queue-specific runners. Off by default.
     default:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -339,7 +339,7 @@ deployment:
       queues:
         - default
     provisioning:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -352,7 +352,7 @@ deployment:
       queues:
         - dramatiq_provisioning
     polling:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -366,7 +366,7 @@ deployment:
       queues:
         - dramatiq_polling
     machines:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -380,7 +380,7 @@ deployment:
       queues:
         - dramatiq_machines
     clusters:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -394,7 +394,7 @@ deployment:
       queues:
         - dramatiq_clusters
     networks:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -408,7 +408,7 @@ deployment:
       queues:
         - dramatiq_networks
     zones:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -422,7 +422,7 @@ deployment:
       queues:
         - dramatiq_zones
     volumes:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -436,7 +436,7 @@ deployment:
       queues:
         - dramatiq_volumes
     buckets:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -450,7 +450,7 @@ deployment:
       queues:
         - dramatiq_buckets
     mappings:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -464,7 +464,7 @@ deployment:
         - dramatiq_mappings
         - dramatiq_sessions
     scripts:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -477,7 +477,7 @@ deployment:
       queues:
         - dramatiq_scripts
     probe:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -491,7 +491,7 @@ deployment:
       queues:
         - dramatiq_ssh_probe
     ping:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -505,7 +505,7 @@ deployment:
       queues:
         - dramatiq_ping_probe
     rules:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
@@ -518,7 +518,7 @@ deployment:
       queues:
         - dramatiq_rules
     schedules:
-      enabled: false
+      enabled: true
       replicas: 1
       autoscaling: *autoscaling
       resources:
