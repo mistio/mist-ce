@@ -189,6 +189,7 @@ backup:
   key: ''
   secret: ''
   bucket: ''
+  region: ''
   gpg:
     recipient: ''
     public: ''
