@@ -109,10 +109,10 @@ rabbitmq:
     forceBoot: true
   resources:
     requests:
-      memory: 250Mi
+      memory: 350Mi
       cpu: 1000m
     limits:
-      memory: 500Mi
+      memory: 1500Mi
       cpu: 2000m
   service:
     clusterIP: ''
