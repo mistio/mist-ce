@@ -1,5 +1,5 @@
 #!/bin/bash
-MIST_URI=${MIST_URI:-$(echo $"$(cat settings/settings.py)" $'\nprint(globals().get("CORE_URI"))'|python)}
+MIST_URI=${MIST_URI:-$(echo $"$(cat settings/settings.py)" $'\nprint(globals().get("CORE_URI"))'|python3)}
 CID=$(docker ps |grep api_|cut -d " " -f1)
 DOCKER_NETWORK=$(docker ps --format "{{.ID}} {{.Networks}}"|grep $CID|cut -d ' ' -f2)
 VAULT_CLIENT_TOKEN=$(vault token lookup|grep "^id"|tr -s ' ' |cut -d' ' -f2)

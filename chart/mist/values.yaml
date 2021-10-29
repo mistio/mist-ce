@@ -109,10 +109,10 @@ rabbitmq:
     forceBoot: true
   resources:
     requests:
-      memory: 250Mi
+      memory: 350Mi
       cpu: 1000m
     limits:
-      memory: 500Mi
+      memory: 1500Mi
       cpu: 2000m
   service:
     clusterIP: ''
@@ -189,6 +189,7 @@ backup:
   key: ''
   secret: ''
   bucket: ''
+  region: ''
   gpg:
     recipient: ''
     public: ''
@@ -301,10 +302,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
-          cpu: 20m
+          memory: 1170Mi
+          cpu: 50m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       queues:
         - default
