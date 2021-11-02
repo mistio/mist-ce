@@ -332,10 +332,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 500Mi
           cpu: 20m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       queues:
         - default
@@ -358,10 +358,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 500Mi
           cpu: 20m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       preemptible: true
       queues:
@@ -372,10 +372,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 500Mi
           cpu: 20m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       preemptible: true
       queues:
@@ -400,10 +400,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 500Mi
           cpu: 20m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       preemptible: true
       queues:
@@ -428,10 +428,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 500Mi
           cpu: 20m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       preemptible: true
       queues:
@@ -442,10 +442,10 @@ deployment:
       autoscaling: *autoscaling
       resources:
         requests:
-          memory: 200Mi
+          memory: 500Mi
           cpu: 20m
         limits:
-          memory: 800Mi
+          memory: 1700Mi
           cpu: 2000m
       preemptible: true
       queues:
