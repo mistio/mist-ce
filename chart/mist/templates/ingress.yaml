@@ -39,4 +39,5 @@ spec:
       - backend:
           service:
             name: {{ include "chart.fullname" . }}-nginx
-            port: 80
+            port:
+              number: 80
