@@ -37,5 +37,6 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: {{ include "chart.fullname" . }}-nginx
-          servicePort: 80
+          service:
+            name: {{ include "chart.fullname" . }}-nginx
+            port: 80
