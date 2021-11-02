@@ -17,6 +17,6 @@ spec:
   - name: dramatiq-exporter
     port: 9191
   selector:
-    app: dramatiq
+    lapp: dramatiq
     release: {{ .Release.Name }}
 {{- end }}
