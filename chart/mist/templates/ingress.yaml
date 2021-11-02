@@ -41,3 +41,4 @@ spec:
             name: {{ include "chart.fullname" . }}-nginx
             port:
               number: 80
+        pathType: ImplementationSpecific
