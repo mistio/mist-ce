@@ -37,6 +37,7 @@ spec:
         - --processes=8
         - --max-requests=100
         - --honour-stdin
+        - --enable-threads
         resources:
           requests:
             memory: {{ .Values.deployment.api.resources.requests.memory | default "100Mi" }}
