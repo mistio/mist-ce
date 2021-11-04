@@ -303,7 +303,7 @@ deployment:
       resources:
         requests:
           memory: 1170Mi
-          cpu: 50m
+          cpu: 250m
         limits:
           memory: 1700Mi
           cpu: 2000m
@@ -333,7 +333,7 @@ deployment:
       resources:
         requests:
           memory: 500Mi
-          cpu: 20m
+          cpu: 200m
         limits:
           memory: 1700Mi
           cpu: 2000m
@@ -587,10 +587,10 @@ deployment:
       replicas: 1
       resources:
         requests:
-          memory: 100Mi
-          cpu: 10m
+          memory: 200Mi
+          cpu: 100m
         limits:
-          memory: 400Mi
+          memory: 1000Mi
           cpu: 1000m
       schedules:
         - builtin
@@ -614,10 +614,10 @@ deployment:
       replicas: 1
       resources:
         requests:
-          memory: 100Mi
+          memory: 200Mi
           cpu: 10m
         limits:
-          memory: 400Mi
+          memory: 1000Mi
           cpu: 1000m
       schedules:
         - user
@@ -626,10 +626,10 @@ deployment:
       replicas: 1
       resources:
         requests:
-          memory: 100Mi
+          memory: 200Mi
           cpu: 10m
         limits:
-          memory: 400Mi
+          memory: 1000Mi
           cpu: 1000m
       schedules:
         - polling 
@@ -638,10 +638,10 @@ deployment:
       replicas: 1
       resources:
         requests:
-          memory: 100Mi
+          memory: 200Mi
           cpu: 10m
         limits:
-          memory: 400Mi
+          memory: 1000Mi
           cpu: 1000m
       schedules:
         - rules
