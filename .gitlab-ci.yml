@@ -487,6 +487,11 @@ API:main:v2:test_users_controller: *api_test_template
 
 .ui_test_template: &ui_test_template
   <<: *test_template
+  variables:
+    KUBERNETES_CPU_REQUEST: 3
+    KUBERNETES_CPU_LIMIT: 5
+    KUBERNETES_MEMORY_REQUEST: 2Gi
+    KUBERNETES_MEMORY_LIMIT: 4Gi
   script:
     - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
   artifacts:
