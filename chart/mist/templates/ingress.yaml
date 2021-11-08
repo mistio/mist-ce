@@ -17,6 +17,7 @@ metadata:
     {{- if .Values.http.tlsClusterIssuer }}
     cert-manager.io/cluster-issuer: {{ .Values.http.tlsClusterIssuer }}
     {{- end }}
+    nginx.org/websocket-services: {{ include "chart.fullname" . }}-nginx
 {{- end }}
 {{- if .Values.http.tlsAnnotations }}
 {{ toYaml .Values.http.tlsAnnotations | indent 4 }}

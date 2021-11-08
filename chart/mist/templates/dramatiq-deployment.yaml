@@ -38,6 +38,8 @@ spec:
         image: {{ $.Values.image.registry }}/api:{{ $.Values.image.tag }}
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         env:
+        - name: DRAMATIQ_CONTEXT
+          value: "true"
         - name: prometheus_multiproc_dir
           value: /tmp/dramatiq-prometheus
         - name: dramatiq_prom_db
