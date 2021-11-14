@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" $ }}-sheduler-{{ $name }}
+  name: {{ include "chart.fullname" $ }}-scheduler-{{ $name }}
   labels:
     app: scheduler-{{ $name }}
     chart: {{ include "chart.chart" $ }}
