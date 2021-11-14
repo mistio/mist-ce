@@ -1,5 +1,21 @@
 # Changelog
 
+## v4.6.0 (17 Nov 2021)
+
+ - Feature: Add support for VictoriaMetrics for storing monitoring & metering metrics
+ - Feature: Add standalone K8s/OpenShift cluster as cloud
+ - Feature: Add support managed K8s clusters on GCE, AWS clouds (API only)
+ - Feature: Display tree view on machines page
+ - Feature: Select security groups when creating machine on OpenStack clouds
+ - Feature: Add support for networks on Alibaba clouds
+ - Feature: Add support for Vexxhost clouds
+ - Change: Replace Celery with Dramatiq for async tasks
+ - Change: Replace Beat with APScheduler for scheduled tasks
+ - Change: Drop support for vCloud & GigG8 clouds
+ - Change: Support Vultr API v2
+ - Bugfix: Activate machine monitoring without requiring monitoring data request
+ - Bugfix: Numerous minor bugfixes & UX improvements
+ 
 ## v4.5.5 (27 Jul 2021)
 
  - Bugfix: Prevent loss of hosts when disabling KVM clouds
