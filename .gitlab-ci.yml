@@ -385,6 +385,11 @@ deploy test:
           certmanager.k8s.io/acme-challenge-type: dns01
           certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: true
+      sentry:
+        api: $SENTRY_API
+        apiv2: $SENTRY_API_V2
+        dramatiq: $SENTRY_DRAMATIQ
+        sockjs: $SENTRY_SOCKJS
       #jsBuild: false
 
 .deploy_review_template: &deploy_review_template
@@ -408,6 +413,11 @@ deploy test:
         starttls: true
         username: apikey
         password: $SENDGRID_PASSWORD
+      sentry:
+        api: $SENTRY_API
+        apiv2: $SENTRY_API_V2
+        dramatiq: $SENTRY_DRAMATIQ
+        sockjs: $SENTRY_SOCKJS
 
 deploy review:
   <<: *deploy_review_template
