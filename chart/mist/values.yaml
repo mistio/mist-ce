@@ -220,6 +220,12 @@ extraSettings: ''
 # subcharts.
 nodeSelector: {}
 
+sentry:
+  api: https://7fcf3b5065764e80acc6e660f408a90b@sentry.ops.mist.io/24
+  apiv2: https://a0573206922e4a3a94aceef545c39a41@sentry.ops.mist.io/25
+  dramatiq: https://e2dbec6bf1c44f5184638c35f1893149@sentry.ops.mist.io/27
+  sockjs: https://392954e5925c44fbb629ac6ff1817d2a@sentry.ops.mist.io/26
+
 preemptible:
   tolerations:
   - key: "preemptible"

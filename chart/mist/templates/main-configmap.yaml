@@ -154,4 +154,12 @@ data:
             "public":  """{{ .Values.backup.gpg.public | indent 4 }}""".strip()
         }
     }
+    SENTRY_CONFIG = {
+      'TRACES_SAMPLE_RATE': 0.2,
+      'API_V1_URL': "{{ .Values.sentry.api }}",
+      'API_V2_URL': "{{ .Values.sentry.apiv2 }}",
+      'SOCK_JS_URL': "{{ .Values.sentry.sockjs }}",
+      'DRAMATIQ_URL': "{{ .Values.sentry.dramatiq }}",
+      'ENVIRONMENT': "{{ .Release.Name }}",
+    }
 {{ .Values.extraSettings | indent 4 }}
