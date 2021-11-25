@@ -175,14 +175,14 @@ helm install mist-ce mist/mist-ce --set http.host=foo.bar.com  --http.tlsCluster
 
 #### Customizing
 In order to easily customize all available options:
-1. export default chart values
+1. Export default chart values
 ```
 helm show values mist/mist-ce > values.yaml
 ```
 2. Edit values.yaml according to your needs
-3. install using
+3. Install or upgrade release
 ```
-helm install mist-ce mist/mist-ce -f values.yaml
+helm upgrade --install mist-ce mist/mist-ce -f values.yaml
 ```
 
 ## Running Mist
@@ -358,6 +358,35 @@ docker-compose exec api ./bin/list-backups
 docker-compose exec api ./bin/restore {{myBackupName}}
 ```
 Finally, please keep in mind that backups include MongoDB and InfluxDB data. Mist logs are stored in Elasticsearch. If you would like to backup these as well, please check out https://www.elastic.co/guide/en/elasticsearch/reference/current/backup-cluster.html.
+
+### Monitoring methods
+
+Mist stores monitoring metrics in InfluxDB by default. Since v4.6 it's possible
+to use VictoriaMetrics instead. You can configure that in settings/settings.py
+
+```
+DEFAULT_MONITORING_METHOD = 'telegraf-victoriametrics'
+```
+
+Restart docker-compose for changes to take effect.
+
+```
+docker-compose restart
+```
+
+Once the restart is done, re-run the respective migration script.
+
+```
+docker-compose exec api python migrations/0016-migrate-monitoring.py
+```
+
+The above script will update all monitored machines to use the configured
+monitoring method. It will also update all rules on metrics to use the
+appropriate query format. It won't migrate past monitoring data between
+time series databases.
+
+If running on Kubernetes, configure monitoring.defaultMethod in values.yaml
+instead and use helm to upgrade your release as described above.
 
 ## Staging version
 

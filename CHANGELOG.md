@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.6.0 (25 Nov 2021)
+## v4.6.0 (26 Nov 2021)
 
  - Feature: Add support for VictoriaMetrics for storing monitoring & metering metrics
  - Feature: Add standalone K8s/OpenShift cluster as cloud
