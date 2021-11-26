@@ -359,7 +359,7 @@ docker-compose exec api ./bin/restore {{myBackupName}}
 ```
 Finally, please keep in mind that backups include MongoDB and InfluxDB data. Mist logs are stored in Elasticsearch. If you would like to backup these as well, please check out https://www.elastic.co/guide/en/elasticsearch/reference/current/backup-cluster.html.
 
-### Monitoring methods
+## Monitoring methods
 
 Mist stores monitoring metrics in InfluxDB by default. Since v4.6 it's possible
 to use VictoriaMetrics instead. You can configure that in settings/settings.py
@@ -374,7 +374,7 @@ Restart docker-compose for changes to take effect.
 docker-compose restart
 ```
 
-Once the restart is done, re-run the respective migration script.
+Then run the respective migration script.
 
 ```
 docker-compose exec api python migrations/0016-migrate-monitoring.py

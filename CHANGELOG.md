@@ -13,6 +13,7 @@
  - Change: Replace Beat with APScheduler for scheduled tasks
  - Change: Drop support for vCloud & GigG8 clouds
  - Change: Support Vultr API v2
+ - Change: Update Helm chart templates to work with k8s 1.22 or later.
  - Bugfix: Activate machine monitoring without requiring monitoring data request
  - Bugfix: Numerous minor bugfixes & UX improvements
  
