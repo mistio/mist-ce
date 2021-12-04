@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.6.1 (4 Dec 20201)
+
+ - Change: Improve custom metric dialog usability
+ - Change: Include DigitalOcean droplet snapshots in available images
+ - Bugfix: Prevent redundant CloudSize JSON patches emitted from WebSocket which were causing UI hangs
+ - Bugfix: Improve error handling in APIv2 listings
+ - Bugfix: Fix loading issue in size constraints form (EE/HS only)
+
 ## v4.6.0 (26 Nov 2021)
 
  - Feature: Add support for VictoriaMetrics for storing monitoring & metering metrics

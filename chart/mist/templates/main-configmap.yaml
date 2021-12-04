@@ -140,6 +140,7 @@ data:
 
     INTERNAL_API_URL = "http://{{ include "chart.fullname" . }}-api"
     INTERNAL_API_V2_URL = "http://{{ include "chart.fullname" . }}-api-v2:8080"
+    INTERNAL_SOCKJS_HOST = "{{ include "chart.fullname" . }}-sockjs-headless"
     UI_TEMPLATE_URL = "http://{{ include "chart.fullname" . }}-ui"
     LANDING_TEMPLATE_URL = "http://{{ include "chart.fullname" . }}-landing"
     TRAEFIK_API = "http://{{ include "chart.fullname" . }}-traefik:8080"
