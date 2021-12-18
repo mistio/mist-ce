@@ -21,7 +21,7 @@ services:
     restart: on-failure:5
 
   elasticsearch:
-    image: elasticsearch:5.6.11
+    image: elasticsearch:5.6.16
     restart: on-failure:5
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw

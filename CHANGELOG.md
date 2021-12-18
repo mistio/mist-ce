@@ -1,6 +1,22 @@
 # Changelog
 
-## v4.6.1 (4 Dec 20201)
+## v4.6.2 (18 Dec 2021)
+
+ - Change: Upgrade Elasticsearch & logstash, mitigates potential security issue
+ - Change: Add monthly portal maintenance schedule to merge or delete old ES indices
+ - Change: Improve API v2 exception handling
+ - Change: Support regex field selectors on schedules (API only)
+ - Change: Accelerate polling schedule after machine action
+ - Change: Use sudo defensively when running monitoring commands over ssh
+ - Change: Prioritize images tagged latest on docker create machine
+ - Bugfix: Fix auth context for scheduled scripts
+ - Bugfix: Allow multiple A record IPs on document validation
+ - Bugfix: Prevent potential parsing exception for Azure Networks
+ - Bugfix: Prevent UnboundLocalError when Azure machine listing API fails
+ - Bugfix: Decode libvirt command output & error defensively, prevents potential machine listing issue
+ - Bugfix: Pre-save rule before validating, prevents potential rule validation issue
+
+## v4.6.1 (4 Dec 2021)
 
  - Change: Improve custom metric dialog usability
  - Change: Include DigitalOcean droplet snapshots in available images
