@@ -357,7 +357,12 @@ docker-compose exec api ./bin/backup
 docker-compose exec api ./bin/list-backups
 docker-compose exec api ./bin/restore {{myBackupName}}
 ```
-Finally, please keep in mind that backups include MongoDB and InfluxDB data. Mist logs are stored in Elasticsearch. If you would like to backup these as well, please check out https://www.elastic.co/guide/en/elasticsearch/reference/current/backup-cluster.html.
+
+Backups on time series data stored on VictoriaMetrics will be incremental by default. To perform a full backup, use the `--no-incremental` flag:
+```
+docker-compose exec api ./bin/backup --db victoria --no-incremental
+```
+Finally, please keep in mind that backups include MongoDB, InfluxDB & VictoriaMetrics data. Mist logs are stored in Elasticsearch. If you would like to backup these as well, please check out https://www.elastic.co/guide/en/elasticsearch/reference/current/backup-cluster.html.
 
 ## Monitoring methods
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.6.2 (18 Dec 2021)
+## v4.6.2 (20 Dec 2021)
 
  - Change: Upgrade Elasticsearch & logstash, mitigates potential security issue
  - Change: Add monthly portal maintenance schedule to merge or delete old ES indices
