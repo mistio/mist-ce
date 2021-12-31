@@ -59,12 +59,12 @@ def add_templates(force=False):
 
         with open(tfile, 'r') as tf:
             template = json.loads(tf.read())
-            tname = template['template'].strip('*').strip('-')
+            tname = template['index_patterns'].strip('*').strip('-')
             if tname in EXCLUDED:
                 continue
             try:
                 print('Applying "%s" template...' % tname, end=' ')
-                if not es.indices.exists_template(tname) or force:
+                if not es.indices.exists_template(name=tname) or force:
                     es.indices.put_template(name=tname, body=template)
             except Exception:
                 print('ERROR')
