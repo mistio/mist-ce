@@ -7,12 +7,13 @@ services:
 
 
   mongodb:
-    image: mongo:3.2
+    image: mongo
     restart: on-failure:5
     volumes:
       - mongodb:/data/db:rw
 
   rabbitmq:
+    platform: linux/x86_64
     image: rabbitmq:3.8.16-management
     restart: on-failure:5
 
@@ -21,12 +22,17 @@ services:
     restart: on-failure:5
 
   elasticsearch:
-    image: elasticsearch:5.6.16
+    image: elasticsearch:7.16.2
     restart: on-failure:5
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
     environment:
-      ES_JAVA_OPTS: "-Dlog4j2.formatMsgNoLookups=true"
+      OPENSEARCH_JAVA_OPTS: "-Xms256M -Xmx256M"
+      ES_JAVA_OPTS: "-Xms256M -Xmx256M"
+      network.host: "172.18.0.2"
+      transport.host: "localhost"
+
+
 
   logstash:
     image: $IMG_REGISTRY/logstash:$IMG_TAG
@@ -36,6 +42,7 @@ services:
       - rabbitmq
 
   elasticsearch-manage:
+    platform: linux/x86_64
     image: $IMG_REGISTRY/elasticsearch-manage:$IMG_TAG
     command: ./scripts/add_templates.py
     restart: on-failure:5
@@ -44,6 +51,7 @@ services:
       - rabbitmq
 
   kibana:
+    platform: linux/x86_64
     image: kibana:5.6.10
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
@@ -52,16 +60,19 @@ services:
       - elasticsearch
 
   socat:
+    platform: linux/x86_64
     image: mist/docker-socat
     restart: on-failure:5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
 
   mailmock:
+    platform: linux/x86_64
     image: mist/mailmock
     restart: on-failure:5
 
   swagger:
+    platform: linux/x86_64
     image: mist/swagger-ui
     environment:
       API_URL: /api/v1/spec
@@ -69,6 +80,7 @@ services:
 
 
   scheduler: &backend
+    platform: linux/x86_64
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - mongodb
@@ -90,31 +102,37 @@ services:
   api:
     <<: *backend
     command: bin/wait-all bin/uwsgi
+    platform: linux/x86_64
     expose:
       - 80
 
   api-v2:
     <<: *backend
+    platform: linux/x86_64
     command: uwsgi --http 0.0.0.0:8080 --wsgi-file v2/mist_api_v2/__main__.py --callable application --master --processes 8 --max-requests 100 --honour-stdin --enable-threads
     expose:
       - 8080
 
   sockjs:
     <<: *backend
+    platform: linux/x86_64
     command: bin/wait-all bin/sockjs
     expose:
       - 8081
 
   apply-migrations:
     <<: *backend
+    platform: linux/x86_64
     command: bin/wait-all bin/migrate
 
   dramatiq:
     <<: *backend
+    platform: linux/x86_64
     command: bin/wait-all bin/dramatiq
 
   ui:
     image: $IMG_REGISTRY/ui:$IMG_TAG
+    platform: linux/x86_64
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -124,6 +142,7 @@ services:
 
   landing:
     image: $IMG_REGISTRY/landing:$IMG_TAG
+    platform: linux/x86_64
     command: sh /entry.sh
     stdin_open: true
     tty: true
@@ -133,6 +152,7 @@ services:
 
   nginx:
     image: $IMG_REGISTRY/nginx:$IMG_TAG
+    platform: linux/x86_64
     restart: on-failure:5
     ports:
       - 80:80
@@ -174,6 +194,7 @@ services:
 
   influxdb:
     image: influxdb:1.8.4
+    platform: linux/x86_64
     environment:
       INFLUXDB_DB: telegraf
       INFLUXDB_BIND_ADDRESS: "0.0.0.0:8088"
@@ -185,6 +206,7 @@ services:
 
   gocky:
     image: $IMG_REGISTRY/gocky:$IMG_TAG
+    platform: linux/x86_64
     command: -config /etc/gocky/config.toml
     ports:
       - 9096:9096
@@ -194,6 +216,7 @@ services:
 
   traefik:
     image: traefik:v1.5
+    platform: linux/x86_64
     command:
       # - --logLevel=INFO
       - --accesslog
@@ -211,6 +234,7 @@ services:
 
   huproxy:
     image: $IMG_REGISTRY/huproxy:$IMG_TAG
+    platform: linux/x86_64
     command: /app --listen 0.0.0.0:8086
     environment:
       MONGO_URI: mongodb://mongodb:27017
@@ -219,6 +243,7 @@ services:
 
   wsproxy:
     image: $IMG_REGISTRY/wsproxy:$IMG_TAG
+    platform: linux/x86_64
     expose:
       - 8764
 
