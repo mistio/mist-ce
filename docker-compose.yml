@@ -108,6 +108,8 @@ services:
   dramatiq:
     <<: *backend
     command: bin/wait-all bin/dramatiq
+    environment:
+      DRAMATIQ_CONTEXT: "true"
 
   ui:
     image: $IMG_REGISTRY/ui:$IMG_TAG
