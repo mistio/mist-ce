@@ -46,6 +46,8 @@ spec:
           value: /tmp/dramatiq-prometheus
         - name: QUEUES
           value: "{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
+        - name: dramatiq_delay_queue_prefetch
+          value: "100"
         ports:
         - containerPort: 9191
         resources:
