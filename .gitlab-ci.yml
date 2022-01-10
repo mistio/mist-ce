@@ -465,6 +465,12 @@ deploy master:
   script:
     - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
 
+.api_test_template_manual: &api_test_template_manual
+  <<: *test_template
+  script:
+    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
+  when: manual
+
 API:main:api_token: *api_test_template
 API:main:clouds: *api_test_template
 API:main:dns: *api_test_template
@@ -480,7 +486,7 @@ API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template
 API:main:v2:test_clouds_controller: *api_test_template
-API:main:v2:test_clusters_controller: *api_test_template
+API:main:v2:test_clusters_controller: *api_test_template_manual
 API:main:v2:test_datapoints_controller: *api_test_template
 API:main:v2:test_images_controller: *api_test_template
 API:main:v2:test_jobs_controller: *api_test_template
