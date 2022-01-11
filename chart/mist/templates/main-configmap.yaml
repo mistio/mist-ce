@@ -151,6 +151,7 @@ data:
         "key": "{{ .Values.backup.key }}",
         "secret": "{{ .Values.backup.secret }}",
         "bucket": "{{ .Values.backup.bucket }}",
+        "region": "{{ .Values.backup.region }}",
         "gpg": {
             "recipient": "{{ .Values.backup.gpg.recipient }}",
             "public":  """{{ .Values.backup.gpg.public | indent 4 }}""".strip()
