@@ -313,6 +313,8 @@ deployment:
         limits:
           memory: 1700Mi
           cpu: 2000m
+      processes: "2"
+      threads: "4"
       queues:
         - default
         - dramatiq_mappings
@@ -343,6 +345,8 @@ deployment:
         limits:
           memory: 1700Mi
           cpu: 2000m
+      processes: "2"
+      threads: "4"
       queues:
         - default
     provisioning:
@@ -356,6 +360,8 @@ deployment:
         limits:
           memory: 800Mi
           cpu: 1500m
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_provisioning
     polling:
@@ -370,6 +376,8 @@ deployment:
           memory: 1700Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_polling
     machines:
@@ -384,6 +392,8 @@ deployment:
           memory: 1700Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_machines
     clusters:
@@ -398,6 +408,8 @@ deployment:
           memory: 800Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_clusters
     networks:
@@ -412,6 +424,8 @@ deployment:
           memory: 1700Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_networks
     zones:
@@ -426,6 +440,8 @@ deployment:
           memory: 800Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_zones
     volumes:
@@ -440,6 +456,8 @@ deployment:
           memory: 1700Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_volumes
     buckets:
@@ -454,6 +472,8 @@ deployment:
           memory: 1700Mi
           cpu: 2000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_buckets
     mappings:
@@ -467,6 +487,8 @@ deployment:
         limits:
           memory: 800Mi
           cpu: 2000m
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_mappings
         - dramatiq_sessions
@@ -481,6 +503,8 @@ deployment:
         limits:
           memory: 1000Mi
           cpu: 2000m
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_scripts
     probe:
@@ -495,6 +519,8 @@ deployment:
           memory: 800Mi
           cpu: 1000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_ssh_probe
     ping:
@@ -509,6 +535,8 @@ deployment:
           memory: 800Mi
           cpu: 1000m
       preemptible: true
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_ping_probe
     rules:
@@ -522,6 +550,8 @@ deployment:
         limits:
           memory: 800Mi
           cpu: 1000m
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_rules
     schedules:
@@ -535,6 +565,8 @@ deployment:
         limits:
           memory: 800Mi
           cpu: 1000m
+      processes: "2"
+      threads: "4"
       queues:
         - dramatiq_schedules
 
