@@ -48,6 +48,10 @@ spec:
           value: "{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
         - name: dramatiq_delay_queue_prefetch
           value: "100"
+        - name: DRAMATIQ_PROCESSES
+          value: {{ $settings.processes | default "2" | quote}}
+        - name: DRAMATIQ_THREADS
+          value: {{ $settings.threads | default "4" | quote}}
         ports:
         - containerPort: 9191
         resources:
