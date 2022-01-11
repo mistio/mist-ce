@@ -21,10 +21,12 @@ services:
     restart: on-failure:5
 
   elasticsearch:
-    image: elasticsearch:5.6.10
+    image: elasticsearch:5.6.16
     restart: on-failure:5
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
+    environment:
+      ES_JAVA_OPTS: "-Dlog4j2.formatMsgNoLookups=true"
 
   logstash:
     image: $IMG_REGISTRY/logstash:$IMG_TAG
