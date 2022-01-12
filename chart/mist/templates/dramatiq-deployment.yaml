@@ -52,6 +52,21 @@ spec:
           value: {{ $settings.processes | default "2" | quote}}
         - name: DRAMATIQ_THREADS
           value: {{ $settings.threads | default "4" | quote}}
+        livenessProbe:
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          exec:
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              processes=$(("${DRAMATIQ_PROCESSES}" + 2))
+              running=$(ps -A | grep dramatiq | wc -l)
+              if [ $processes=$running ]; then
+                exit 0
+              else
+                exit 1
+              fi
         ports:
         - containerPort: 9191
         resources:
