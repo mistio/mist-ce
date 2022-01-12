@@ -51,7 +51,7 @@ spec:
         - name: DRAMATIQ_PROCESSES
           value: {{ $settings.processes | default "2" | quote}}
         - name: DRAMATIQ_THREADS
-          value: {{ $settings.threads | default "4" | quote}}
+          value: {{ $settings.threads | default "8" | quote}}
         livenessProbe:
           initialDelaySeconds: 120
           periodSeconds: 60
