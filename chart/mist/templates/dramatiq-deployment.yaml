@@ -55,14 +55,15 @@ spec:
         livenessProbe:
           initialDelaySeconds: 120
           periodSeconds: 60
+          timeoutSeconds: 3
           exec:
             command:
             - "/bin/sh"
             - "-c"
             - |
-              processes=$(("${DRAMATIQ_PROCESSES}" + 2))
-              running=$(ps -A | grep dramatiq | wc -l)
-              if [ $processes=$running ]; then
+              processes=$((${DRAMATIQ_PROCESSES} + 2))
+              running=$(pgrep -c dramatiq)
+              if [ "$processes" = "$running" ]; then
                 exit 0
               else
                 exit 1
