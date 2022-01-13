@@ -122,6 +122,7 @@ rabbitmq:
     tcp_listen_options.keepalive = true
     cluster_formation.node_cleanup.only_log_warning = true
     load_definitions = /app/load_definition.json
+    prometheus.return_per_object_metrics = true
   loadDefinition:
     enabled: true
     existingSecret: |-
