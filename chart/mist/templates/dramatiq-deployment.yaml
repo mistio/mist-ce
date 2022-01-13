@@ -48,6 +48,26 @@ spec:
           value: "{{ range $i, $q := $settings.queues }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
         - name: dramatiq_delay_queue_prefetch
           value: "100"
+        - name: DRAMATIQ_PROCESSES
+          value: {{ $settings.processes | default "2" | quote}}
+        - name: DRAMATIQ_THREADS
+          value: {{ $settings.threads | default "8" | quote}}
+        livenessProbe:
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 3
+          exec:
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              processes=$((${DRAMATIQ_PROCESSES} + 2))
+              running=$(pgrep -c dramatiq)
+              if [ "$processes" = "$running" ]; then
+                exit 0
+              else
+                exit 1
+              fi
         ports:
         - containerPort: 9191
         resources:
