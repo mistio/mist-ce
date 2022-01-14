@@ -53,9 +53,9 @@ spec:
         - name: DRAMATIQ_THREADS
           value: {{ $settings.threads | default "8" | quote}}
         livenessProbe:
-          initialDelaySeconds: 120
+          initialDelaySeconds: 300
           periodSeconds: 60
-          timeoutSeconds: 3
+          timeoutSeconds: 10
           exec:
             command:
             - "/bin/sh"
