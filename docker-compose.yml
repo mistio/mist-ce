@@ -83,6 +83,10 @@ services:
     restart: on-failure:5
     command: bin/wait-all bin/scheduler
 
+  sheller:
+    <<: *backend
+    command: bin/wait-all bin/hubshell
+  
   api:
     <<: *backend
     command: bin/wait-all bin/uwsgi
