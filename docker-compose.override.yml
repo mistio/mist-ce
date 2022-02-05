@@ -37,7 +37,7 @@ services:
       - ./api:/mist.api:rw
       - ./keys:/keys
 
-  sheller: *backend
+  hubshell: *backend
   api: *backend
   api-v2: *backend
   sockjs: *backend
