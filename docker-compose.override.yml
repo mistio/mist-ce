@@ -36,6 +36,8 @@ services:
       - ./defaults.py:$CONF_DIR/defaults.py:ro
       - ./api:/mist.api:rw
       - ./keys:/keys
+
+  hubshell: *backend
   api: *backend
   api-v2: *backend
   sockjs: *backend
