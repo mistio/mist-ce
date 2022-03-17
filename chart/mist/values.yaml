@@ -123,6 +123,7 @@ rabbitmq:
     cluster_formation.node_cleanup.only_log_warning = true
     load_definitions = /app/load_definition.json
     prometheus.return_per_object_metrics = true
+    consumer_timeout = 3600000
   loadDefinition:
     enabled: true
     existingSecret: |-
