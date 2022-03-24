@@ -102,11 +102,7 @@ services:
 
   api-v2:
     <<: *backend
-<<<<<<< HEAD
     command: uwsgi --http 0.0.0.0:8080 --wsgi-file v2/mist_api_v2/__main__.py --callable application --master --processes 8 --max-requests 100 --honour-stdin --enable-threads
-=======
-    command: sh -c "while ping -c1 apply-migrations &> /dev/null; do sleep 1; done; echo \"Migration job finished!\" && uwsgi --http 0.0.0.0:8080 --wsgi-file v2/mist_api_v2/__main__.py --callable application --master --processes 8 --max-requests 100 --honour-stdin"
->>>>>>> 31cb146cd (Wait for migration job to finish before starting services)
     expose:
       - 8080
 

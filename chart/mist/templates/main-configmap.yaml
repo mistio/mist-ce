@@ -79,7 +79,7 @@ data:
     {{ if .Values.vault.roleId -}}
     VAULT_ROLE_ID = "{{ .Values.vault.roleId}}"
     VAULT_SECRET_ID = "{{ .Values.vault.secretId}}"
-    {{ - else -}}
+    {{- else -}}
     VAULT_TOKEN = "{{ .Values.vault.token }}"
     {{- end }}
 
