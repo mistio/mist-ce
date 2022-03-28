@@ -88,7 +88,7 @@ services:
     <<: *boot
     depends_on:
       - apply-migrations
-    command: sh -c "while ping -c1 apply-migrations &> /dev/null; do sleep 1; done; echo \"Migration job finished!\" && bin/wait-all bin/scheduler"
+    command: bin/wait-all bin/scheduler
 
   hubshell:
     <<: *backend
@@ -96,7 +96,7 @@ services:
   
   api:
     <<: *backend
-    command: sh -c "while ping -c1 apply-migrations &> /dev/null; do sleep 1; done; echo \"Migration job finished!\" && bin/wait-all bin/uwsgi"
+    command: bin/wait-all bin/uwsgi
     expose:
       - 80
 
@@ -108,13 +108,13 @@ services:
 
   sockjs:
     <<: *backend
-    command: sh -c "while ping -c1 apply-migrations &> /dev/null; do sleep 1; done; echo \"Migration job finished!\" && bin/wait-all bin/sockjs"
+    command: bin/wait-all bin/sockjs
     expose:
       - 8081
 
   dramatiq:
     <<: *backend
-    command: sh -c "while ping -c1 apply-migrations &> /dev/null; do sleep 1; done; echo \"Migration job finished!\" && bin/wait-all bin/dramatiq"
+    command: bin/wait-all bin/dramatiq
 
   ui:
     image: $IMG_REGISTRY/ui:$IMG_TAG
