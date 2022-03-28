@@ -363,6 +363,17 @@ compose:
             sleep 5 && echo 'Environment not ready yet...'
           done
           echo "Environment ready at $CI_ENVIRONMENT_URL"
+          if [ $(curl -LI $VAULT_ADDR/v1/sys/sealed -o /dev/null -w '%{http_code}\n' -s) = 503 ]; then
+            echo "Vault is sealed"
+            curl --request POST -d "{\"key\":\"$VAULT_UNSEAL_1\"}" $VAULT_ADDR/v1/sys/unseal
+            curl --request POST -d "{\"key\":\"$VAULT_UNSEAL_2\"}" $VAULT_ADDR/v1/sys/unseal
+            curl --request POST -d "{\"key\":\"$VAULT_UNSEAL_3\"}" $VAULT_ADDR/v1/sys/unseal
+            if [ $(curl -LI $VAULT_ADDR/v1/sys/sealed -o /dev/null -w '%{http_code}\n' -s) == 503 ]; then
+              echo "Failed to unseal"
+            else
+              echo "Unsealed"
+            fi
+          fi
         }
   script:
     - echo "$values" > values.yaml
