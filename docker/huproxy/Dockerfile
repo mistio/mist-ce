@@ -1,1 +1,0 @@
-FROM mist/huproxy:secrets

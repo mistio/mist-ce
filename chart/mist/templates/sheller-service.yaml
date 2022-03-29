@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "chart.fullname" . }}-huproxy
+  name: {{ include "chart.fullname" . }}-sheller
   labels:
-    app: huproxy
+    app: sheller
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -11,5 +11,5 @@ spec:
   ports:
     - port: 8086
   selector:
-    app: huproxy
+    app: sheller
     release: {{ .Release.Name }}
