@@ -26,8 +26,8 @@ spec:
         image: elasticsearch:5.6.16
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-          name: ES_JAVA_OPTS
-          value: "-Dlog4j2.formatMsgNoLookups=true"
+          - name: ES_JAVA_OPTS
+            value: "-Dlog4j2.formatMsgNoLookups=true"
         resources:
           requests:
             memory: 2500Mi
