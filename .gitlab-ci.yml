@@ -160,6 +160,11 @@ discover submodules:
 build api:
   <<: *docker_template
   script:
+    - |
+        for submodule in orchestration; do
+          git submodule sync $submodule
+          git submodule update --init $submodule
+        done
     - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha api)"
     - docker_pull $SRC_IMG
     - |
@@ -503,7 +508,7 @@ API:main:v2:test_zones_controller: *api_test_template
 API:main:v2:test_snapshots_controller: *api_test_template
 API:main:v2:test_machines_controller: *api_test_template
 
-.API:plugin:orchestration: *api_test_template
+API:plugin:orchestration: *api_test_template
 .API:plugin:tunnels: *api_test_template
 
 
@@ -560,7 +565,7 @@ UI:ip-whitelisting:
 .UI:rbac-2/4: *ui_test_template
 .UI:rbac-3/4: *ui_test_template
 .UI:rbac-4/4: *ui_test_template
-.UI:orchestration: *ui_test_template
+UI:orchestration: *ui_test_template
 .UI:insights:
   <<: *ui_test_template
   retry: 1
