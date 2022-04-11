@@ -67,20 +67,27 @@ services:
       API_URL: /api/v1/spec
     restart: on-failure:5
 
-
-  scheduler: &backend
+  apply-migrations: &boot
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - mongodb
       - elasticsearch
       - rabbitmq
+      - vault-init
     volumes:
       - ./settings:$CONF_DIR/settings
+      - approle:/approle
     environment:
       SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
     tty: true
     restart: on-failure:5
+    command: bin/wait-all bin/migrate
+
+  scheduler: &backend
+    <<: *boot
+    depends_on:
+      - apply-migrations
     command: bin/wait-all bin/scheduler
 
   hubshell:
@@ -104,10 +111,6 @@ services:
     command: bin/wait-all bin/sockjs
     expose:
       - 8081
-
-  apply-migrations:
-    <<: *backend
-    command: bin/wait-all bin/migrate
 
   dramatiq:
     <<: *backend
@@ -209,8 +212,8 @@ services:
       - 8040:80
       - 8041:8080
 
-  huproxy:
-    image: $IMG_REGISTRY/huproxy:$IMG_TAG
+  sheller:
+    image: $IMG_REGISTRY/sheller:$IMG_TAG
     command: /app --listen 0.0.0.0:8086
     environment:
       MONGO_URI: mongodb://mongodb:27017
@@ -222,10 +225,38 @@ services:
     expose:
       - 8764
 
+  vault:
+    image: $IMG_REGISTRY/vault:$IMG_TAG
+    expose:
+      - "8200"
+    restart: on-failure:5
+    volumes:
+      - vault-data:/vault/data:rw
+      - vault-config:/vault/config:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: /vault-start.sh
 
+  vault-init:
+    depends_on:
+    - vault
+    image: $IMG_REGISTRY/vault:$IMG_TAG
+    volumes:
+      - vault-config:/vault/config:rw
+      - vault-policies:/vault/policies:rw
+      - approle:/approle
+    entrypoint: /init/vault-init.sh
+
+    environment:
+      - VAULT_ADDR=http://vault:8200
+    command: sh /etc/init.d/vault-play.sh
 
 volumes:
   elasticsearch: {}
   influxdb: {}
   mongodb: {}
   victoria-metrics: {}
+  vault-data: {}
+  vault-config: {}
+  vault-policies: {}
+  approle: {}

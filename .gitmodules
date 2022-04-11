@@ -13,3 +13,6 @@
 [submodule "docker/nginx/static/novnc"]
 	path = docker/nginx/static/novnc
 	url = https://github.com/novnc/noVNC.git
+[submodule "orchestration"]
+	path = orchestration
+	url = ../mist.orchestration.git

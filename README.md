@@ -124,7 +124,7 @@ and gets coordinated by RabbitMQ. The main data store is MongoDB. Logs are
 being stored in Elasticsearch. Time series data go to either VictoriaMetrics or
 InfluxDB, depending on the installation. Rule checks, polling tasks & user
 tasks are triggered by the scheduler service. Whenever a shell connection is
-required (e.g. SSH or Docker Shell), Huproxy establishes the connection and
+required (e.g. SSH or Docker Shell), Sheller establishes the connection and
 makes it available through the WebSocket API.
 
 ## Installation

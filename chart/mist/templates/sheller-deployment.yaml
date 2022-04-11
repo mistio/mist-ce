@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}-huproxy
+  name: {{ include "chart.fullname" . }}-sheller
   labels:
-    app: huproxy
+    app: sheller
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -15,13 +15,13 @@ spec:
   template:
     metadata:
       labels:
-        app: huproxy
+        app: sheller
         release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
       containers:
-      - name: huproxy
+      - name: sheller
         args:
         - /app
         - --listen
@@ -35,7 +35,9 @@ spec:
         {{- end }}
         - name: SECRET
           value: {{ .Values.internalKeys.secret }}
-        image: {{ .Values.image.registry }}/huproxy:{{ .Values.image.tag }}
+        - name: INTERNAL_API_URL
+          value: "http://{{ include "chart.fullname" . }}-api"
+        image: {{ .Values.image.registry }}/sheller:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:

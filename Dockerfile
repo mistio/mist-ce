@@ -2,6 +2,9 @@
 ARG FROM_IMAGE=mist/mist:staging
 FROM $FROM_IMAGE
 
+# Install orchestration plugin
+COPY ./orchestration/ /opt/orchestration/
+RUN for plugin in orchestration; do pip install -e /opt/$plugin; pip install -r /opt/$plugin/requirements.txt 2>/dev/null || echo ok; done
 # Configure product defaults.
 ENV DEFAULTS_FILE=/etc/mist/defaults.py \
     SETTINGS_FILE=/etc/mist/settings/settings.py

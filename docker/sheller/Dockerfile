@@ -1,0 +1,1 @@
+FROM mist/sheller:master

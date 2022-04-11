@@ -160,6 +160,11 @@ discover submodules:
 build api:
   <<: *docker_template
   script:
+    - |
+        for submodule in orchestration; do
+          git submodule sync $submodule
+          git submodule update --init $submodule
+        done
     - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha api)"
     - docker_pull $SRC_IMG
     - |
@@ -197,8 +202,9 @@ build nginx: *docker_build_template
 build gocky: *docker_build_template
 build logstash: *docker_build_template
 build elasticsearch-manage: *docker_build_template
-build huproxy: *docker_build_template
+build sheller: *docker_build_template
 build wsproxy: *docker_build_template
+build vault: *docker_build_template
 
 
 .docker_retag_template: &docker_retag_template
@@ -336,6 +342,8 @@ compose:
             --set image.registry="$REGISTRY_IMAGE" \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
+            --set vault.address="$VAULT_ADDR" \
+            --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set docker.host="$DOCKER_HOST" \
@@ -360,6 +368,17 @@ compose:
             sleep 5 && echo 'Environment not ready yet...'
           done
           echo "Environment ready at $CI_ENVIRONMENT_URL"
+          if [ $(curl -LI $VAULT_ADDR/v1/sys/sealed -o /dev/null -w '%{http_code}\n' -s) = 503 ]; then
+            echo "Vault is sealed"
+            curl --request POST -d "{\"key\":\"$VAULT_UNSEAL_1\"}" $VAULT_ADDR/v1/sys/unseal
+            curl --request POST -d "{\"key\":\"$VAULT_UNSEAL_2\"}" $VAULT_ADDR/v1/sys/unseal
+            curl --request POST -d "{\"key\":\"$VAULT_UNSEAL_3\"}" $VAULT_ADDR/v1/sys/unseal
+            if [ $(curl -LI $VAULT_ADDR/v1/sys/sealed -o /dev/null -w '%{http_code}\n' -s) == 503 ]; then
+              echo "Failed to unseal"
+            else
+              echo "Unsealed"
+            fi
+          fi
         }
   script:
     - echo "$values" > values.yaml
@@ -482,6 +501,7 @@ API:main:machines: *api_test_template
 API:main:networks: *api_test_template
 API:main:schedules: *api_test_template
 API:main:scripts: *api_test_template
+API:main:secrets: *api_test_template
 API:main:teams: *api_test_template
 API:main:ip_whitelisting: *api_test_template
 API:main:volumes: *api_test_template
@@ -503,7 +523,7 @@ API:main:v2:test_zones_controller: *api_test_template
 API:main:v2:test_snapshots_controller: *api_test_template
 API:main:v2:test_machines_controller: *api_test_template
 
-.API:plugin:orchestration: *api_test_template
+API:plugin:orchestration: *api_test_template
 .API:plugin:tunnels: *api_test_template
 
 
@@ -560,7 +580,7 @@ UI:ip-whitelisting:
 .UI:rbac-2/4: *ui_test_template
 .UI:rbac-3/4: *ui_test_template
 .UI:rbac-4/4: *ui_test_template
-.UI:orchestration: *ui_test_template
+UI:orchestration: *ui_test_template
 .UI:insights:
   <<: *ui_test_template
   retry: 1

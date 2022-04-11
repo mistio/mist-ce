@@ -1,0 +1,3 @@
+PLUGINS = [
+    'orchestration',
+]
