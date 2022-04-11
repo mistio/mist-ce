@@ -216,7 +216,8 @@ services:
     image: $IMG_REGISTRY/sheller:$IMG_TAG
     command: /app --listen 0.0.0.0:8086
     environment:
-      MONGO_URI: mongodb://mongodb:27017
+      # MONGO_URI: mongodb://mongodb:27017
+      - VAULT_ADDR=http://vault:8200
     expose:
       - 8086
 
