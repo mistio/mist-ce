@@ -13,7 +13,7 @@ services:
       - mongodb:/data/db:rw
 
   rabbitmq:
-    image: rabbitmq:3.8.16-management
+    image: mist/rabbitmq
     restart: on-failure:5
 
   memcached:
