@@ -1,0 +1,40 @@
+{{- if .Values.docker.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-dockerhost
+  labels:
+    app: dockerhost
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: dockerhost
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: dockerhost
+        image: docker:20.10.14-dind
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""
+        ports:
+        - containerPort: 2375
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 100m
+          limits:
+            memory: 1000Mi
+            cpu: 1000m
+        securityContext:
+          privileged: true
+{{ end }}

@@ -1,0 +1,18 @@
+{{- if .Values.docker.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chart.fullname" . }}-dockerhost
+  labels:
+    app: dockerhost
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+  - name: docker-port
+    port: 2375
+  selector:
+    app: dockerhost
+    release: {{ .Release.Name }}
+{{- end }}
