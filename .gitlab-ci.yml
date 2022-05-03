@@ -346,11 +346,7 @@ compose:
             --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
-            --set docker.host="$DOCKER_HOST" \
-            --set docker.port="$DOCKER_PORT" \
-            --set docker.key="$DOCKER_KEY" \
-            --set docker.cert="$DOCKER_CERT" \
-            --set docker.ca="$DOCKER_CA" \
+            --set docker.deploy=true \
             --set awsAccessKey="$AWS_ACCESS_KEY" \
             --set awsSecretKey="$AWS_SECRET_KEY" \
             --set victoriametrics.vminsert.fullnameOverride="$release-vminsert" \
