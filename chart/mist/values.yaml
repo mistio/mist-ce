@@ -160,14 +160,21 @@ mongodb:
 memcached:
   host: ''
 
-# Docker settings (used by orchestration plugin). This has to be configured for
-# orchestration to work.
+# Docker settings (used by orchestration plugin).
+# Either an external dockerhost or the deploy option must be set
+# for orchestration to work.
 docker:
-  host: api
+  # Deploy an insecure dockerhost pod in-cluster. This option will deploy a privileged
+  # pod, make sure your cluster's podsecuritypolicies allow running privileged pods.
+  # deploy will only be evaluated if docker.host is not configured.
+  deploy: false
+  # External dockerhost settings
+  host: ''
   port: 2375
   key: ''
   cert: ''
   ca: ''
+
 
 # Monitoring settings.
 monitoring:

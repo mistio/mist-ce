@@ -100,8 +100,17 @@ data:
     MEMCACHED_HOST = ["{{ include "chart.fullname" . }}-memcached:11211"]
     {{- end }}
 
+    {{- if .Values.docker.host }}
     DOCKER_IP = "{{ .Values.docker.host }}"
     DOCKER_PORT = "{{ .Values.docker.port }}"
+    {{ else if .Values.docker.deploy }}
+    DOCKER_IP = "{{ include "chart.fullname" . }}-dockerhost"
+    DOCKER_PORT = "2375"  
+    {{- else }}
+    DOCKER_IP = ""
+    DOCKER_PORT = ""
+    {{- end }}
+
     DOCKER_TLS_KEY = """
 {{ .Values.docker.key | indent 4 }}
     """.strip()
