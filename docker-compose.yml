@@ -93,7 +93,7 @@ services:
   hubshell:
     <<: *backend
     command: bin/wait-all bin/hubshell
-  
+
   api:
     <<: *backend
     command: bin/wait-all bin/uwsgi
@@ -239,17 +239,19 @@ services:
 
   vault-init:
     depends_on:
-    - vault
+      - vault
     image: $IMG_REGISTRY/vault:$IMG_TAG
     volumes:
       - vault-config:/vault/config:rw
       - vault-policies:/vault/policies:rw
       - approle:/approle
-    entrypoint: /init/vault-init.sh
-
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        /bin/wait-for vault:8200
+        /init/vault-init.sh sh /etc/init.d/vault-play.sh
     environment:
       - VAULT_ADDR=http://vault:8200
-    command: sh /etc/init.d/vault-play.sh
 
 volumes:
   elasticsearch: {}
