@@ -1,10 +1,10 @@
-{{- if .Values.userAdminCreation.enabled }}
+{{- if .Values.portalAdmin.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "chart.fullname" . }}-user-creation
+  name: {{ include "chart.fullname" . }}-portal-admin-init
   labels:
-    app: user-creation
+    app: portal-admin-init
     chart: {{ include "chart.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -17,34 +17,40 @@ spec:
   template:
     metadata:
       labels:
-        app: user-creation
+        app: portal-admin-init
         release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
 {{ toYaml .Values.image.secrets | indent 8 }}
       containers:
-      - name: user-creation
+      - name: portal-admin-init
         args:
-        - bin/autocreateuser
+        - bin/init-portal-admin
         image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-          - name: USER_MAIL
+          - name: PORTAL_ADMIN_EMAIL
             valueFrom:
               secretKeyRef:
-                name: {{ .Release.Name }}-user-creation-secret
+                name: {{ .Release.Name }}-portal-admin-credentials
                 key: mail
                 optional: false
-          - name: USER_PASSWORD
+          - name: PORTAL_ADMIN_ORGANIZATION
             valueFrom:
               secretKeyRef:
-                name: {{ .Release.Name }}-user-creation-secret
+                name: {{ .Release.Name }}-portal-admin-credentials
+                key: organization
+                optional: false
+          - name: PORTAL_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-portal-admin-credentials
                 key: password
                 optional: false
-          - name: USER_TOKEN
+          - name: PORTAL_ADMIN_API_TOKEN
             valueFrom:
               secretKeyRef:
-                name: {{ .Release.Name }}-user-creation-secret
+                name: {{ .Release.Name }}-portal-admin-credentials
                 key: apiToken
                 optional: true
         resources: {}

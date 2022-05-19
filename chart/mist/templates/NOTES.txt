@@ -4,9 +4,9 @@ You successfully installed Mist!
 Check it out at: http{{ if .Values.http.tlsSecret }}s{{ end }}://{{ .Values.http.host }}
 
 
-{{ if and .Values.userAdminCreation.enabled .Release.IsInstall }}
-Get your newly created mail, password and API token by running the following command:
+{{ if and .Values.portalAdmin.enabled .Release.IsInstall }}
+Get your portal admin credentials by running the following command:
 
-kubectl get secret/{{ .Release.Name }}-user-creation-secret -n {{ .Release.Namespace }} --template={{`'{{ range $key, $value := .data }}{{ printf "%s: %s\n" $key ($value | base64decode) }}{{ end }}'`}}
+kubectl get secret/{{ .Release.Name }}-portal-admin-credentials -n {{ .Release.Namespace }} --template={{`'{{ range $key, $value := .data }}{{ printf "%s: %s\n" $key ($value | base64decode) }}{{ end }}'`}}
 
 {{ end }}
