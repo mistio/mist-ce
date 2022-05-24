@@ -1,4 +1,4 @@
-You successfully installed Mist!
+You successfully installed {{ .Chart.Name }}!
 
 
 Check it out at: http{{ if .Values.http.tlsSecret }}s{{ end }}://{{ .Values.http.host }}
