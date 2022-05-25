@@ -52,6 +52,24 @@ spec:
           value: {{ $settings.processes | default "2" | quote}}
         - name: DRAMATIQ_THREADS
           value: {{ $settings.threads | default "8" | quote}}
+        - name: INTERNAL_KEYS_CILIA
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" $ }}-internal-keys-secret
+              key: cilia
+              optional: false
+        - name: INTERNAL_KEYS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" $ }}-internal-keys-secret
+              key: secret
+              optional: false
+        - name: INTERNAL_KEYS_SIGN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" $ }}-internal-keys-secret
+              key: sign
+              optional: false
         livenessProbe:
           initialDelaySeconds: 300
           periodSeconds: 60
