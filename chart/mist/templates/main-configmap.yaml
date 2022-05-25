@@ -131,10 +131,6 @@ data:
 
     GITHUB_BOT_TOKEN = "{{ .Values.githubBotToken }}"
 
-    SIGN_KEY = "{{ .Values.internalKeys.sign }}"
-    SECRET = "{{ .Values.internalKeys.secret }}"
-    CILIA_SECRET_KEY = "{{ .Values.internalKeys.cilia }}"
-
     SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "{{ .Values.auth.google.key }}"
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "{{ .Values.auth.google.secret }}"
     SOCIAL_AUTH_GITHUB_KEY = "{{ .Values.auth.github.key }}"

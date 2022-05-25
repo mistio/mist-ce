@@ -36,6 +36,24 @@ spec:
         env:
         - name: SCHEDULES
           value: "{{ range $i, $q := $settings.schedules }}{{ if gt $i 0 }},{{ end }}{{ $q }}{{ end }}"
+        - name: INTERNAL_KEYS_CILIA
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" $ }}-internal-keys-secret
+              key: cilia
+              optional: false
+        - name: INTERNAL_KEYS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" $ }}-internal-keys-secret
+              key: secret
+              optional: false
+        - name: INTERNAL_KEYS_SIGN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" $ }}-internal-keys-secret
+              key: sign
+              optional: false
         resources:
           requests:
             memory: {{ $settings.resources.requests.memory | default "100Mi" }}

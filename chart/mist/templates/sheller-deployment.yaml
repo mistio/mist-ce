@@ -34,7 +34,11 @@ spec:
           value: {{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
         {{- end }}
         - name: SECRET
-          value: {{ .Values.internalKeys.secret }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "chart.fullname" . }}-internal-keys-secret
+              key: secret
+              optional: false
         - name: INTERNAL_API_URL
           value: "http://{{ include "chart.fullname" . }}-api"
         image: {{ .Values.image.registry }}/sheller:{{ .Values.image.tag }}
