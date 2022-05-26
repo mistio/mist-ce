@@ -155,7 +155,26 @@ If you want to issue a new certificate, also configure the cluster issuer that w
 helm install mist-ce mist/mist-ce --set http.host=foo.bar.com  --http.tlsClusterIssuer=letsencrypt-prod --set http.tlsSecret=secretName
 ```
 
+## Dockerhost settings
+
+In order for orchestration to work Mist needs to deploy Docker containers.
+There are two available options:
+
+- An external dockerhost
+- An in-cluster dockerhost that will run as a pod in privileged mode
+
+See the table below to set either option.
+
+## Automatic User Creation
+
+Create an admin user on Helm installation and generate an API Token for the user:
+
+```
+helm install mist-ce mist/mist-ce --set portalAdmin.enabled=true --set portalAdmin.createApiToken=true
+```
+
 ## Customizing
+
 In order to easily customize all available options:
 1. Export default chart values
 ```
