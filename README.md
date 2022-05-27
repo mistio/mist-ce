@@ -146,10 +146,13 @@ helm repo add mist https://dl.mist.io/charts
 helm repo update
 ```
 
-To install Mist you need to configure the hostname
+For Mist to function correctly, you should set the `http.host` parameter to specify the FQDN of the installation.
+
 ```
-helm install mist-ce mist/mist-ce --set http.host=foo.bar.com --set portalAdmin.organization=example.com --set portalAdmin.mail=admin@example.com
+helm install mist-ce mist/mist-ce --set http.host=foo.bar.com,portalAdmin.organization=example.com,portalAdmin.mail=admin@example.com
 ```
+
+The above command set the FQDN to `foo.bar.com` and additionaly creates an administrator account with email address `admin@example.com` and Organization name `example.com`.
 
 ## Configuration
 
@@ -183,7 +186,7 @@ By default an in-cluster dockerhost pod in privileged mode is deployed.
 To use an external dockerhost set the following values:
 
 ```shell
-helm install mist-ce mist/mist-ce --set docker.host=<dockerIP> --set docker.port=<dockerPort> --set docker.key=<TLSKey> --set docker.cert=<TLSCert> --set docker.ca=<TLSCACert>
+helm install mist-ce mist/mist-ce --set docker.host=<dockerIP>,docker.port=<dockerPort>,docker.key=<TLSKey>,docker.cert=<TLSCert>,docker.ca=<TLSCACert>
 ```
 
 The following table lists the configurable parameters of the Mist chart and their default values.
