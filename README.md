@@ -138,7 +138,6 @@ tasks are triggered by the scheduler service. Whenever a shell connection is
 required (e.g. SSH or Docker Shell), Sheller establishes the connection and
 makes it available through the WebSocket API.
 
-
 # Kubernetes cluster
 
 Add the mist chart repository and fetch available charts
@@ -149,37 +148,10 @@ helm repo update
 
 To install Mist you need to configure the hostname
 ```
-helm install mist-ce mist/mist-ce --set http.host=foo.bar.com
-```
-## TLS configuration
-If you have configured a TLS certificate for this hostname as a k8s secret you can configure it using the http.tlsSecret option
-```
-helm install mist-ce mist/mist-ce --set http.host=foo.bar.com --set http.tlsSecret=secretName
-```
-If you want to issue a new certificate, also configure the cluster issuer that will be used
-```
-helm install mist-ce mist/mist-ce --set http.host=foo.bar.com  --http.tlsClusterIssuer=letsencrypt-prod --set http.tlsSecret=secretName
+helm install mist-ce mist/mist-ce --set http.host=foo.bar.com --set portalAdmin.organization=example.com --set portalAdmin.mail=admin@example.com
 ```
 
-## Dockerhost settings
-
-In order for orchestration to work Mist needs to deploy Docker containers.
-There are two available options:
-
-- An external dockerhost
-- An in-cluster dockerhost that will run as a pod in privileged mode
-
-See the table below to set either option.
-
-## Automatic User Creation
-
-Create an admin user on Helm installation and generate an API Token for the user:
-
-```
-helm install mist-ce mist/mist-ce --set portalAdmin.enabled=true --set portalAdmin.createApiToken=true
-```
-
-## Customizing
+## Configuration
 
 In order to easily customize all available options:
 1. Export default chart values
@@ -190,6 +162,28 @@ helm show values mist/mist-ce > values.yaml
 3. Install or upgrade release
 ```
 helm upgrade --install mist-ce mist/mist-ce -f values.yaml
+```
+
+### TLS
+
+If you have configured a TLS certificate for this hostname as a k8s secret you can configure it using the http.tlsSecret option
+```
+helm install mist-ce mist/mist-ce --set http.host=foo.bar.com --set http.tlsSecret=secretName
+```
+If you want to issue a new certificate, also configure the cluster issuer that will be used
+```
+helm install mist-ce mist/mist-ce --set http.host=foo.bar.com  --set http.tlsClusterIssuer=letsencrypt-prod --set http.tlsSecret=secretName
+```
+
+### External dockerhost
+
+In order for orchestration plugin to work Mist needs to deploy Docker containers.  
+By default an in-cluster dockerhost pod in privileged mode is deployed.
+
+To use an external dockerhost set the following values:
+
+```shell
+helm install mist-ce mist/mist-ce --set docker.host=<dockerIP> --set docker.port=<dockerPort> --set docker.key=<TLSKey> --set docker.cert=<TLSCert> --set docker.ca=<TLSCACert>
 ```
 
 The following table lists the configurable parameters of the Mist chart and their default values.
