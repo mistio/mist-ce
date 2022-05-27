@@ -14,6 +14,17 @@ plans are available for any edition.
 
 <a href="https://www.youtube.com/watch?v=7oYyC-FIaAM" source="_blank"><img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768"></a>
 
+# Table of Contents
+
+- [Who needs Mist?](#who-needs-mist)
+- [Features](#features)
+- [Terminology](#terminology)
+- [Architecture](#architecture)
+- [Installation](#installation)
+  - [Kubernetes cluster with helm](#kubernetes-cluster)
+  - [Single host with docker-compose](#single-host)
+  - [Dev environment with docker-compose](#development-deployment)
+
 # Who needs Mist?
 
 1. Organizations that depend on hybrid or multi-cloud infrastructure
@@ -127,11 +138,6 @@ tasks are triggered by the scheduler service. Whenever a shell connection is
 required (e.g. SSH or Docker Shell), Sheller establishes the connection and
 makes it available through the WebSocket API.
 
-# Installation Methods
-
-1. [Kubernetes cluster (helm)](#kubernetes-cluster)
-2. [Single host (docker-compose)](#single-host)
-3. [Dev environment (docker-compose)](#development-deployment)
 
 # Kubernetes cluster
 
