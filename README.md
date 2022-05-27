@@ -202,7 +202,7 @@ The following table lists the configurable parameters of the Mist chart and thei
 | `smtp.password`                            | SMTP password                                                                      | `''`                              |
 | `smtp.tls`                                 | Use TLS with SMTP                                                                  | `false`                           |
 | `smtp.starttls`                            | If true, will send the starttls command (typically not used with smtp.tls=true)    | `false`                           |
-| `portalAdmin.enabled`                      | Whether to create a new admin user on first Chart installation                     | `false`                           |
+| `portalAdmin.enabled`                      | Whether to create a new admin user on first Chart installation                     | `true`                            |
 | `portalAdmin.organization`                 | The organization name                                                              | `example.com`                     |
 | `portalAdmin.mail`                         | The admin's email address                                                          | `admin@example.com`               |
 | `portalAdmin.password`                     | The admin's password                                                               | `example.com`                     |
@@ -249,7 +249,7 @@ The following table lists the configurable parameters of the Mist chart and thei
 | `mongodb.port`                             | External MongoDB port                                                              | `27017`                           |
 | `memcached.host`                           | Memcached host in the format: {host}:{port}                                        | `''`                              |
 | `monitoring.defaultMethod`                 | Available options: "telegraf-victoriametrics", "telegraf-influxdb"                 | `telegraf-influxdb`               |
-| `auth.email.signup`                        | Allow signups with email/password                                                  | `true`                            |
+| `auth.email.signup`                        | Allow signups with email/password                                                  | `false`                           |
 | `auth.email.signin`                        | Allow signins with email/password                                                  | `true`                            |
 | `auth.google.signup`                       | Allow signups with Google oAuth                                                    | `false`                           |
 | `auth.google.signin`                       | Allow signins with Google oAuth                                                    | `false`                           |

@@ -345,7 +345,8 @@ compose:
             --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
-            --set docker.deploy=true \
+            --set portalAdmin.enabled=false \
+            --set auth.email.signup=true \
             --set awsAccessKey="$AWS_ACCESS_KEY" \
             --set awsSecretKey="$AWS_SECRET_KEY" \
             --set victoriametrics.vminsert.fullnameOverride="$release-vminsert" \
