@@ -26,22 +26,7 @@ spec:
         - /app
         - --listen
         - 0.0.0.0:8086
-        env:
-        - name: MONGO_URI
-        {{- if .Values.mongodb.deploy }}
-          value: {{ .Release.Name }}-mongodb:27017
-        {{- else }}
-          value: {{ .Values.mongodb.host }}{{ if .Values.mongodb.port }}:{{ .Values.mongodb.port }}{{ end }}
-        {{- end }}
-        - name: SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "chart.fullname" . }}-internal-keys-secret
-              key: secret
-              optional: false
-        - name: INTERNAL_API_URL
-          value: "http://{{ include "chart.fullname" . }}-api"
-        image: {{ .Values.image.registry }}/sheller:{{ .Values.image.tag }}
+        image: {{ .Values.image.registry }}/sheller:{{.Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           limits:
@@ -50,6 +35,19 @@ spec:
           requests:
             memory: 20Mi
             cpu: 1m
+        env:
+          - name: INTERNAL_KEYS_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "chart.fullname" . }}-internal-keys-secret
+                key: secret
+                optional: false
+          - name: INTERNAL_KEYS_SIGN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "chart.fullname" . }}-internal-keys-secret
+                key: sign
+                optional: false
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
