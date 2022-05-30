@@ -260,6 +260,7 @@ compose:
           fi
           export CHART_VERSION
           sed -i "s/0.0.0/$CHART_VERSION/g" ./chart/mist/Chart.yaml
+          sed -i "s/tag:\ master/tag:\ $CHART_VERSION/g" ./chart/mist/values.yaml
         }
 
         function set_if_not_empty() {
@@ -702,6 +703,7 @@ helm_chart_release:
         export CHART_VERSION=${CI_COMMIT_TAG:1}
         echo "CHART_VERSION=$CHART_VERSION"
         sed -i "s/0.0.0/$CHART_VERSION/g" ./chart/mist/Chart.yaml
+        sed -i "s/tag:\ master/tag:\ $CHART_VERSION/g" ./chart/mist/values.yaml
 
         gcloud auth activate-service-account --key-file=$GCLOUD_SERVICE_KEY
         set -o errexit
