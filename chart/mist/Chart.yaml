@@ -9,12 +9,14 @@ dependencies:
     condition: rabbitmq.deploy
     repository: https://charts.bitnami.com/bitnami
     name: rabbitmq
-    version: 8.15.0
+    version: 9.1.4
+    # RabbitMQ version: 3.9.18
   - alias: mongodb
     condition: mongodb.deploy
     repository: https://charts.bitnami.com/bitnami
     name: mongodb
-    version: 10.0.5
+    version: 10.31.5
+    # MongoDB version: 4.4.11
   - alias: victoriametrics
     name: victoria-metrics-cluster
     condition: victoriametrics.deploy

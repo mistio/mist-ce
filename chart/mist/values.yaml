@@ -128,7 +128,8 @@ rabbitmq:
   service:
     clusterIP: ''
   nodeSelector: {}
-  updateStrategy: RollingUpdate
+  updateStrategy:
+    type: RollingUpdate
   extraConfiguration: |-
     tcp_listen_options.keepalive = true
     cluster_formation.node_cleanup.only_log_warning = true
