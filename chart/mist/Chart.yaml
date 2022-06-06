@@ -22,3 +22,9 @@ dependencies:
     condition: victoriametrics.deploy
     repository: https://victoriametrics.github.io/helm-charts/
     version: 0.8.24
+  - alias: vault
+    name: vault
+    condition: vault.deploy
+    repository: https://helm.releases.hashicorp.com
+    version: 0.20.1
+    # Vault version: 1.10.3

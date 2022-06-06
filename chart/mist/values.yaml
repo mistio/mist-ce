@@ -31,6 +31,7 @@ smtp:
 
 # Vault settings. Change this to use a remote Vault server.
 vault:
+  deploy: true
   address: 'http://vault:8200'
   token: ''
   roleId: ''
