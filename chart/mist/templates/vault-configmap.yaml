@@ -1,0 +1,16 @@
+{{- if .Values.vault.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+  labels:
+    app: vault
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  vault-mist.hcl: |-
+    path "+/*" {
+        capabilities = [ "create", "update", "read", "delete", "list" ]
+    }
+{{- end }}

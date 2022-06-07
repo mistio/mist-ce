@@ -32,6 +32,45 @@ smtp:
 # Vault settings. Change this to use a remote Vault server.
 vault:
   deploy: true
+  injector:
+    enabled: false
+  server:
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 250m
+      limits:
+        memory: 256Mi
+        cpu: 250m
+    readinessProbe:
+      path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+    standalone:
+      config: |
+        ui = true
+        default_lease_ttl= "168h"
+        max_lease_ttl = "0h"
+        disable_mlock = true
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+        storage "file" {
+          path = "/vault/data"
+        }
+    # postStart:
+    #   -
+    volumes:
+      - name: vault-config
+        configMap:
+          name: vault-config
+          items:
+            - key: vault-mist.hcl
+              path: vault-mist.hcl 
+    volumeMounts:
+      - name: vault-config
+        mountPath: /vault/userconfig        
+        readOnly: true
   address: 'http://vault:8200'
   token: ''
   roleId: ''
