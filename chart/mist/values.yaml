@@ -66,10 +66,16 @@ vault:
           name: vault-config
           items:
             - key: vault-mist.hcl
-              path: vault-mist.hcl 
+              path: vault-mist.hcl
+      - name: vault-approle-secret
+        secret:
+          secretName: vault-approle-secret
     volumeMounts:
       - name: vault-config
         mountPath: /vault/userconfig        
+        readOnly: true
+      - name: vault-approle-secret
+        mountPath: /vault/approle
         readOnly: true
   address: 'http://vault:8200'
   token: ''
