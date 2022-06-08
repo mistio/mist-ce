@@ -64,15 +64,18 @@ vault:
       - name: vault-config
         configMap:
           name: vault-config
+          defaultMode: 511
           items:
             - key: vault-mist.hcl
               path: vault-mist.hcl
+            - key: init.sh
+              path: init.sh
       - name: vault-approle-secret
         secret:
           secretName: vault-approle-secret
     volumeMounts:
       - name: vault-config
-        mountPath: /vault/userconfig        
+        mountPath: /vault/userconfig
         readOnly: true
       - name: vault-approle-secret
         mountPath: /vault/approle
