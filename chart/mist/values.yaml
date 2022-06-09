@@ -32,8 +32,8 @@ smtp:
 # Vault settings. Change this to use a remote Vault server.
 vault:
   deploy: true
-  mistConfigMapName: &mistConfigMapName "vault-config"
-  mistSecretName: &mistSecretName "vault-approle-secret"
+  mistConfigMapName: &mistVaultConfigMapName "vault-config"
+  mistSecretName: &mistVaultSecretName "vault-approle-secret"
   injector:
     enabled: false
   server:
@@ -65,7 +65,7 @@ vault:
     volumes:
       - name: vault-config
         configMap:
-          name: *mistConfigMapName
+          name: *mistVaultConfigMapName
           defaultMode: 511
           items:
             - key: vault-mist.hcl
@@ -74,7 +74,7 @@ vault:
               path: init.sh
       - name: vault-approle-secret
         secret:
-          secretName: *mistSecretName
+          secretName: *mistVaultSecretName
     volumeMounts:
       - name: vault-config
         mountPath: /vault/userconfig
