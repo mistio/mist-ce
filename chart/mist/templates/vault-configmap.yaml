@@ -23,6 +23,8 @@ data:
     STATUS=/tmp/status.txt
     ROLE_ID=/vault/approle/roleId
     SECRET_ID=/vault/approle/secretId
+    UNSEAL_PATH=/vault/root-credentials/unseal
+    ROOT_TOKEN_PATH=/vault/root-credentials/root
 
     vault status -format yaml > ${STATUS}
 
@@ -35,6 +37,9 @@ data:
 
       unseal=$(cat ${OUTPUT} | grep "Unseal Key 1:" | sed -e "s/Unseal Key 1: //g")
       root=$(cat ${OUTPUT} | grep "Initial Root Token:" | sed -e "s/Initial Root Token: //g")
+
+      echo "$unseal" > "$UNSEAL_PATH"
+      echo "$root" > "$ROOT_TOKEN_PATH"
 
       echo "Unsealing Vault"
       vault operator unseal ${unseal}
