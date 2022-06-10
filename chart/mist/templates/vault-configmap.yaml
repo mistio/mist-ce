@@ -60,6 +60,17 @@ data:
     else
       echo "Vault is already initialized"
 
-      sealed=$(cat ${STATUS?} | grep "sealed" | sed -e "s/sealed: //g")
+      if [ -f "$ROOT_TOKEN_PATH" ]; then
+        echo "Logging in"
+        vault login -no-print $(cat $ROOT_TOKEN_PATH)
+        if [ -f "$UNSEAL_PATH" ]; then
+          echo "Unsealing Vault"
+          vault operator unseal $(cat $UNSEAL_PATH)
+        else
+          echo "File containing unseal key does not exist"
+        fi;
+      else
+        echo "File containing root token does not exist"
+      fi;
     fi;
 {{- end }}
