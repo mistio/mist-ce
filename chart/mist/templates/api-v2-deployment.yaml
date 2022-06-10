@@ -50,9 +50,11 @@ spec:
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
           subPath: settings.py
         {{- if .Values.vault.deploy }}
-        - name: {{ .Values.vault.mistSecretName }}
+        {{- with (index .Values.vault.server.volumes 1) }}
+        - name: {{ .secret.secretName }}
           mountPath: /approle
-        {{- end}}
+        {{- end }}
+        {{- end }}
         env:
           - name: INTERNAL_KEYS_CILIA
             valueFrom:
@@ -77,15 +79,17 @@ spec:
         configMap:
           name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
       {{- if .Values.vault.deploy }}
-      - name: {{ .Values.vault.mistSecretName }}
+      {{- with (index .Values.vault.server.volumes 1) }}
+      - name: {{ .secret.secretName }}
         secret:
-          secretName: {{ .Values.vault.mistSecretName }}
+          secretName: {{ .secret.secretName }}
           items:
             - key: roleId
               path: role_id
             - key: secretId
               path: secret_id
-      {{- end}}
+      {{- end }}
+      {{- end }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
