@@ -75,12 +75,19 @@ data:
       {{- end }}
     }
 
+    {{ if .Values.vault.deploy -}}
+    VAULT_ADDR = "http://{{ include "chart.fullname" . }}-vault:8200"
+    VAULT_TOKEN = ""
+    VAULT_ROLE_ID = ""
+    VAULT_SECRET_ID = ""
+    {{- else -}}
     VAULT_ADDR = "{{ .Values.vault.address }}"
     {{ if .Values.vault.roleId -}}
     VAULT_ROLE_ID = "{{ .Values.vault.roleId}}"
     VAULT_SECRET_ID = "{{ .Values.vault.secretId}}"
     {{- else -}}
     VAULT_TOKEN = "{{ .Values.vault.token }}"
+    {{- end }}
     {{- end }}
 
     STRIPE_SECRET_APIKEY = "{{ .Values.stripe.secretApiKey }}"

@@ -249,7 +249,7 @@ services:
     command:
       - |
         /bin/wait-for vault:8200
-        /init/vault-init.sh sh /etc/init.d/vault-play.sh
+        /init/vault-init.sh
     environment:
       - VAULT_ADDR=http://vault:8200
 

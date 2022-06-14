@@ -341,8 +341,6 @@ compose:
             --set image.registry="$REGISTRY_IMAGE" \
             --set image.secrets[0].name="$image_secret_name" \
             --set http.host="$host" \
-            --set vault.address="$VAULT_ADDR" \
-            --set vault.token="$VAULT_TOKEN" \
             --set stripe.publicApiKey="$STRIPE_PUBLIC_APIKEY" \
             --set stripe.secretApiKey="$STRIPE_SECRET_APIKEY" \
             --set portalAdmin.enabled=false \
@@ -352,6 +350,13 @@ compose:
             --set victoriametrics.vminsert.fullnameOverride="$release-vminsert" \
             --set victoriametrics.vmstorage.fullnameOverride="$release-vmstorage" \
             --set victoriametrics.vmselect.fullnameOverride="$release-vmselect" \
+            --set vault.server.volumes[0].configMap.name="$release-vaultcfg" \
+            --set vault.server.volumes[0].configMap.defaultMode=511 \
+            --set vault.server.volumes[0].name="vault-config" \
+            --set vault.server.volumes[1].secret.secretName="$release-vaultsecret" \
+            --set vault.server.volumes[1].name="vault-approle-secret" \
+            --set vault.server.volumes[2].persistentVolumeClaim.claimName="$release-vaultroot" \
+            --set vault.server.volumes[2].name="vault-root-creds-pvc" \
             $tls_settings \
             $(elasticsearch_params) \
             $release ./chart/mist/

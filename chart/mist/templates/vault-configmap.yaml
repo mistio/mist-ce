@@ -1,0 +1,78 @@
+{{- if .Values.vault.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+{{- with (index .Values.vault.server.volumes 0) }}
+  name: {{ .configMap.name }}
+{{- end }}
+  labels:
+    app: vault
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  vault-mist.hcl: |-
+    path "+/*" {
+        capabilities = [ "create", "update", "read", "delete", "list" ]
+    }
+  init.sh: |-
+    #!/bin/sh
+
+    export VAULT_ADDR=http://127.0.0.1:8200
+    export VAULT_SKIP_VERIFY=true
+
+    OUTPUT=/tmp/output.txt
+    STATUS=/tmp/status.txt
+    ROLE_ID=/vault/approle/roleId
+    SECRET_ID=/vault/approle/secretId
+    UNSEAL_PATH=/vault/root-credentials/unseal
+    ROOT_TOKEN_PATH=/vault/root-credentials/root
+
+    vault status -format yaml > ${STATUS}
+
+    initialized=$(cat ${STATUS} | grep "initialized" | sed -e "s/initialized: //g")
+
+    if [ "$initialized" = "false" ]; then
+      echo "Initializing Vault"
+
+      vault operator init -n 1 -t 1 > ${OUTPUT}
+
+      unseal=$(cat ${OUTPUT} | grep "Unseal Key 1:" | sed -e "s/Unseal Key 1: //g")
+      root=$(cat ${OUTPUT} | grep "Initial Root Token:" | sed -e "s/Initial Root Token: //g")
+
+      echo "$unseal" > "$UNSEAL_PATH"
+      echo "$root" > "$ROOT_TOKEN_PATH"
+
+      echo "Unsealing Vault"
+      vault operator unseal ${unseal}
+
+      vault login -no-print ${root}
+
+      vault secrets enable -path="kv1" kv
+
+      vault policy write mist /vault/userconfig/vault-mist.hcl
+      vault auth enable approle
+
+      # Create a Role then change its ID to the one generated in Kubernetes secret
+      vault write auth/approle/role/mist token_num_uses=0 token_policies=mist
+      vault write -f auth/approle/role/mist/role-id role_id=$(cat $ROLE_ID)
+
+      # Create a Secret ID from the Kubernetes secret
+      vault write -f /auth/approle/role/mist/custom-secret-id secret_id=$(cat $SECRET_ID)
+    else
+      echo "Vault is already initialized"
+
+      if [ -f "$ROOT_TOKEN_PATH" ]; then
+        echo "Logging in"
+        vault login -no-print $(cat $ROOT_TOKEN_PATH)
+        if [ -f "$UNSEAL_PATH" ]; then
+          echo "Unsealing Vault"
+          vault operator unseal $(cat $UNSEAL_PATH)
+        else
+          echo "File containing unseal key does not exist"
+        fi;
+      else
+        echo "File containing root token does not exist"
+      fi;
+    fi;
+{{- end }}
