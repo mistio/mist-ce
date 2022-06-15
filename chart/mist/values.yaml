@@ -101,10 +101,6 @@ vault:
   token: ''
   roleId: ''
   secretId: ''
-  secret_engine_paths: {}
-  kv_version: 2
-  clouds_path: 'mist/clouds/'
-  keys_path: 'mist/keys'
 
 # Elasticsearch settings. Change this to use a remote elasticsearch cluster.
 elasticsearch:

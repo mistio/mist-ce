@@ -58,9 +58,27 @@ spec:
         - name: {{ .Values.productShortName }}-config
           mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
           subPath: settings.py
+        {{- if .Values.vault.deploy }}
+        {{- with (index .Values.vault.server.volumes 1) }}
+        - name: {{ .secret.secretName }}
+          mountPath: /approle
+        {{- end}}
+        {{- end}}
       volumes:
       - name: {{ .Values.productShortName }}-config
         configMap:
           name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
+      {{- if .Values.vault.deploy }}
+      {{- with (index .Values.vault.server.volumes 1) }}
+      - name: {{ .secret.secretName }}
+        secret:
+          secretName: {{ .secret.secretName }}
+          items:
+            - key: roleId
+              path: role_id
+            - key: secretId
+              path: secret_id
+      {{- end }}
+      {{- end }}
       restartPolicy: Never
 {{- end }}
