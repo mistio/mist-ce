@@ -415,7 +415,7 @@ deployment:
         - dramatiq_zones
         - dramatiq_volumes
         - dramatiq_buckets
-
+        - dramatiq_tags
     # Queue-specific runners. Off by default.
     default:
       enabled: false
@@ -652,7 +652,21 @@ deployment:
       threads: "8"
       queues:
         - dramatiq_schedules
-
+    tags:
+      enabled: false
+      replicas: 1
+      autoscaling: *autoscaling
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 20m
+        limits:
+          memory: 800Mi
+          cpu: 1000m
+      processes: "2"
+      threads: "8"
+      queues:
+        - dramatiq_tags
   # Sockjs deployment settings.
   sockjs:
     replicas: 1
