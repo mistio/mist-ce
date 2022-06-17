@@ -344,6 +344,10 @@ compose:
             --set victoriametrics.vminsert.fullnameOverride="$release-vminsert" \
             --set victoriametrics.vmstorage.fullnameOverride="$release-vmstorage" \
             --set victoriametrics.vmselect.fullnameOverride="$release-vmselect" \
+            --set ingress-nginx.deploy=false \
+            --set prometheus.enabled=true \
+            --set deployment.api.replicas=2 \
+            --set deployment.dramatiq.dramatiq.replicas=2 \
             $tls_settings \
             $(elasticsearch_params) \
             $release ./chart/mist/

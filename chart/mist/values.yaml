@@ -303,7 +303,7 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 2
+    replicas: 1
     autoscaling: *autoscaling
     resources:
       requests:
@@ -317,7 +317,7 @@ deployment:
   dramatiq:
     dramatiq:
       enabled: true
-      replicas: 2
+      replicas: 1
       autoscaling: *autoscaling
       resources:
         requests:
