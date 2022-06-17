@@ -76,7 +76,7 @@ data:
     }
 
     {{ if .Values.vault.deploy -}}
-    VAULT_ADDR = "http://{{ include "chart.fullname" . }}-vault:8200"
+    VAULT_ADDR = "http://{{ .Release.Name }}-vault:8200"
     VAULT_TOKEN = ""
     VAULT_ROLE_ID = ""
     VAULT_SECRET_ID = ""
