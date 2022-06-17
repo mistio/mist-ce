@@ -10,6 +10,9 @@ image: &image-properties
   secrets:
     - name: registry
 
+ingress-nginx:
+  deploy: true
+
 # HTTP settings for the deployed application.
 http:
   host: localhost

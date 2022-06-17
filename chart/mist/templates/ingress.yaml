@@ -34,6 +34,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
+  {{- if ne "localhost" .Values.http.host }}
   - host: {{ .Values.http.host }}
     http:
       paths:
@@ -43,3 +44,14 @@ spec:
             port:
               number: 80
         pathType: ImplementationSpecific
+  {{- else }}
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "chart.fullname" . }}-nginx
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+  {{ end }}
+

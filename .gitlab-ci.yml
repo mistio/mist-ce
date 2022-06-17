@@ -357,6 +357,7 @@ compose:
             --set vault.server.volumes[1].name="vault-approle-secret" \
             --set vault.server.volumes[2].persistentVolumeClaim.claimName="$release-vaultroot" \
             --set vault.server.volumes[2].name="vault-root-creds-pvc" \
+            --set ingress-nginx.deploy=false \
             $tls_settings \
             $(elasticsearch_params) \
             $release ./chart/mist/
