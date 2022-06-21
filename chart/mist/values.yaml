@@ -5,7 +5,7 @@ productShortName: mist
 # Settings for docker images used in the chart.
 image: &image-properties
   registry: mistce
-  tag: master
+  tag: 4-7-x
   pullPolicy: Always
   secrets:
     - name: registry
