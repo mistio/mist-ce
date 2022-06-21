@@ -10,6 +10,9 @@ image: &image-properties
   secrets:
     - name: registry
 
+ingress-nginx:
+  deploy: true
+
 # HTTP settings for the deployed application.
 http:
   host: localhost
@@ -334,7 +337,7 @@ preemptible:
 
 # Configure prometheus exporters. Subcharts may require separate configuration.
 prometheus:
-  enabled: true
+  enabled: false
   operator:
     enabled: true
     serviceMonitor:
@@ -373,7 +376,7 @@ deployment:
 
   # Api deployment settings.
   api:
-    replicas: 2
+    replicas: 1
     autoscaling: *autoscaling
     resources:
       requests:
@@ -387,7 +390,7 @@ deployment:
   dramatiq:
     dramatiq:
       enabled: true
-      replicas: 2
+      replicas: 1
       autoscaling: *autoscaling
       resources:
         requests:
