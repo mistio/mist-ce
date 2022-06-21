@@ -1,0 +1,66 @@
+{{- if .Values.portalAdmin.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "chart.fullname" . }}-portal-admin-init
+  labels:
+    app: portal-admin-init
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-4"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app: portal-admin-init
+        release: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: portal-admin-init
+        args:
+        - bin/init-portal-admin
+        image: {{ .Values.image.registry }}/api:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: PORTAL_ADMIN_EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-portal-admin-credentials
+                key: mail
+                optional: false
+          - name: PORTAL_ADMIN_ORGANIZATION
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-portal-admin-credentials
+                key: organization
+                optional: false
+          - name: PORTAL_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-portal-admin-credentials
+                key: password
+                optional: false
+          - name: PORTAL_ADMIN_API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-portal-admin-credentials
+                key: apiToken
+                optional: true
+        resources: {}
+        volumeMounts:
+        - name: {{ .Values.productShortName }}-config
+          mountPath: /etc/{{ .Values.productShortName }}/settings/settings.py
+          subPath: settings.py
+      volumes:
+      - name: {{ .Values.productShortName }}-config
+        configMap:
+          name: {{ include "chart.fullname" . }}-{{ .Values.productShortName }}
+      restartPolicy: Never
+{{- end }}
