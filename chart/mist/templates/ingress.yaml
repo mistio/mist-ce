@@ -34,7 +34,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- if ne "localhost" .Values.http.host }}
+  {{- if and (ne "localhost" .Values.http.host) (not (include "check.isIpAddress" .Values.http.host)) }}
   - host: {{ .Values.http.host }}
     http:
       paths:
