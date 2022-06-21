@@ -30,3 +30,21 @@ Create chart name and version as used by the chart label.
 {{- define "chart.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Test if the given value is an IP address
+*/}}
+{{- define "check.isIpAddress" -}}
+{{- $rc := . -}}
+{{- $parts := splitList "." . -}}
+{{- if eq (len $parts) 4 -}}
+    {{- range $parts -}}
+        {{- if and (not (atoi .)) (ne . "0") -}}
+            {{- $rc = "" -}}
+        {{- end -}}
+    {{- end -}}
+{{- else -}}
+    {{- $rc = "" -}}
+{{- end -}}
+{{- print $rc }}
+{{- end -}}
