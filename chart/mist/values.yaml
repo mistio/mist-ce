@@ -113,6 +113,7 @@ elasticsearch:
   password: ''
   tls: false
   verifyCerts: false
+  storageSize: 1024Mi
 
 # InfluxDB settings. Change this to use a remote InfluxDB cluster.
 influxdb:
@@ -120,6 +121,7 @@ influxdb:
   port: 8086
   db: telegraf
   monitoring: true
+  storageSize: 1024Mi
 
 # Victoria Metrics settings.
 victoriametrics:
