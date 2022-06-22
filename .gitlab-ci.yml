@@ -615,7 +615,7 @@ MP:gce-machine-create: *multiprovisioning_test_template
 MP:kubevirt-machine-create: *multiprovisioning_test_template
 MP:kvm-machine-create: *multiprovisioning_test_template
 MP:linode-machine-create: *multiprovisioning_test_template
-MP:lxd-machine-create: *multiprovisioning_test_template
+MP:lxd-provisioning: *multiprovisioning_test_template
 # MP:openstack-machine-create: *multiprovisioning_test_template
 MP:equinix-metal-machine-create: *multiprovisioning_test_template
 MP:rackspace-machine-create: *multiprovisioning_test_template
