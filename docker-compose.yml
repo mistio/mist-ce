@@ -74,6 +74,7 @@ services:
       - elasticsearch
       - rabbitmq
       - vault-init
+      - init-secrets
     volumes:
       - ./settings:$CONF_DIR/settings
       - approle:/approle
@@ -88,6 +89,8 @@ services:
     <<: *boot
     depends_on:
       - apply-migrations
+    volumes:
+      - secrets:/secrets
     command: bin/wait-all bin/scheduler
 
   hubshell:
@@ -213,8 +216,12 @@ services:
       - 8041:8080
 
   sheller:
+    depends_on:
+      - init-secrets
     image: $IMG_REGISTRY/sheller:$IMG_TAG
     command: /app --listen 0.0.0.0:8086
+    volumes:
+     - secrets:/secrets
     environment:
       MONGO_URI: mongodb://mongodb:27017
     expose:
@@ -253,6 +260,19 @@ services:
     environment:
       - VAULT_ADDR=http://vault:8200
 
+  init-secrets:
+    <<: *backend
+    depends_on:
+      - mongodb
+      - elasticsearch
+      - rabbitmq
+      - vault-init
+    volumes:
+      - secrets:/secrets:rw
+    entrypoint: [ "/bin/sh", "-c"]
+    command:
+      - ./bin/init-secrets
+
 volumes:
   elasticsearch: {}
   influxdb: {}
@@ -262,3 +282,4 @@ volumes:
   vault-config: {}
   vault-policies: {}
   approle: {}
+  secrets: {}

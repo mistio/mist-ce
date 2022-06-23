@@ -47,6 +47,7 @@ services:
   api-v2: *backend
   sockjs: *backend
   apply-migrations: *backend
+  init-secrets: *backend
   dramatiq: *backend
 
   ui:
