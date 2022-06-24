@@ -67,7 +67,7 @@ services:
       API_URL: /api/v1/spec
     restart: on-failure:5
 
-  apply-migrations: &boot
+  apply-migrations: &boot   
     image: $IMG_REGISTRY/api:$IMG_TAG
     depends_on:
       - mongodb
@@ -78,6 +78,7 @@ services:
     volumes:
       - ./settings:$CONF_DIR/settings
       - approle:/approle
+      - secrets:/secrets
     environment:
       SETTINGS_FILE: $CONF_DIR/settings/settings.py
     stdin_open: true
@@ -89,8 +90,6 @@ services:
     <<: *boot
     depends_on:
       - apply-migrations
-    volumes:
-      - secrets:/secrets
     command: bin/wait-all bin/scheduler
 
   hubshell:
@@ -221,7 +220,7 @@ services:
     image: $IMG_REGISTRY/sheller:$IMG_TAG
     command: /app --listen 0.0.0.0:8086
     volumes:
-     - secrets:/secrets
+      - secrets:/secrets
     environment:
       MONGO_URI: mongodb://mongodb:27017
     expose:
