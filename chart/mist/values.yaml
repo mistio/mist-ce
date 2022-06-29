@@ -170,7 +170,7 @@ victoriametrics:
         memory: 256Mi
     persistentVolume:
       size: 8Gi
-      storageClass: standard
+      storageClass: ""
 
 # Options for rabbitmq subchart.
 rabbitmq:
