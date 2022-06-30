@@ -1,0 +1,23 @@
+dependencies:
+  - alias: rabbitmq
+    condition: rabbitmq.deploy
+    repository: https://charts.bitnami.com/bitnami
+    name: rabbitmq
+    version: 9.1.4
+    # RabbitMQ version: 3.9.18
+  - alias: mongodb
+    condition: mongodb.deploy
+    repository: https://charts.bitnami.com/bitnami
+    name: mongodb
+    version: 10.31.5
+    # MongoDB version: 4.4.11
+  - alias: victoriametrics
+    name: victoria-metrics-cluster
+    condition: victoriametrics.deploy
+    repository: https://victoriametrics.github.io/helm-charts/
+    version: 0.8.24
+  - alias: ingress-nginx
+    name: ingress-nginx
+    condition: ingress-nginx.deploy
+    repository: https://kubernetes.github.io/ingress-nginx
+    version: 4.1.4
