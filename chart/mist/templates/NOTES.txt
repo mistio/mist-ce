@@ -1,21 +1,18 @@
 You successfully installed {{ .Chart.Name }}!
 
+{{ if and .Values.portalAdmin.enabled .Release.IsInstall }}
+Run the following command, to get your Mist credentials:
+
+kubectl get secret/{{ .Release.Name }}-portal-admin-credentials -n {{ .Release.Namespace }} --template={{`'{{ range $key, $value := .data }}{{ printf "%s: %s\n" $key ($value | base64decode) }}{{ end }}'`}}
+{{ end }}
 
 {{- if ne "localhost" .Values.http.host }}
-1. Check it out at: http{{ if .Values.http.tlsSecret }}s{{ end }}://{{ .Values.http.host }}
+Check it out at: http{{ if .Values.http.tlsSecret }}s{{ end }}://{{ .Values.http.host }}
 {{- else }}
-1. Get the installation URL:
-
-NOTE: It may take a few minutes for the Ingress IP to be available.
+To check out Mist, get its ingress IP with the following commands:
 
 export INGRESS_IP=$(kubectl get ingress {{ include "chart.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo http://$INGRESS_IP
 
-{{ end }}
-
-{{ if and .Values.portalAdmin.enabled .Release.IsInstall }}
-2. Get your portal admin credentials by running the following command:
-
-kubectl get secret/{{ .Release.Name }}-portal-admin-credentials -n {{ .Release.Namespace }} --template={{`'{{ range $key, $value := .data }}{{ printf "%s: %s\n" $key ($value | base64decode) }}{{ end }}'`}}
-
+NOTE: It may take a few minutes for the IP to become available.
 {{ end }}
