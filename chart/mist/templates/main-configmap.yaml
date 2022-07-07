@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   settings.py: |
-    CORE_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"
+    PORTAL_URI = "http{{ if .Values.http.tlsSecret }}s{{end}}://{{ .Values.http.host }}"
 
     MAILER_SETTINGS = {
       {{- if .Values.smtp.host }}
