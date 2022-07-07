@@ -377,12 +377,12 @@ docker-compose restart
 
 ##### URL
 
-If running on anything other than `localhost`, you will need to set the `CORE_URI` setting in `./settings/settings.py`.
+If running on anything other than `localhost`, you will need to set the `PORTAL_URI` setting in `./settings/settings.py`.
 
 For example:
 
 ```
-CORE_URI = "http://198.51.100.12"
+PORTAL_URI = "http://198.51.100.12"
 ```
 
 ##### Email
@@ -424,7 +424,7 @@ Then, create a `nginx-listen.conf` in the directory of `docker-compose.yml`, wit
     }
 ```
 
-Finally, update `CORE_URI` in Mist's settings and restart it.
+Finally, update `PORTAL_URI` in Mist's settings and restart it.
 
 ##### Monitoring methods
 
