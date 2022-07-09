@@ -50,6 +50,9 @@ services:
   init-secrets: *backend
   dramatiq: *backend
 
+  portal:
+    volumes:
+      - ./portal:/portal:rw
   ui:
     volumes:
       - ./ui:/ui:rw

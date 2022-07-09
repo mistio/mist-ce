@@ -222,6 +222,7 @@ build vault: *docker_build_template
 
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
+retag portal: *docker_retag_template
 
 
 compose:

@@ -118,6 +118,14 @@ services:
   dramatiq:
     <<: *backend
     command: bin/wait-all bin/dramatiq
+  portal:
+    image: $IMG_REGISTRY/portal:$IMG_TAG
+    command: sh /entry.sh
+    stdin_open: true
+    tty: true
+    restart: on-failure:5
+    expose:
+      - 80
 
   ui:
     image: $IMG_REGISTRY/ui:$IMG_TAG
