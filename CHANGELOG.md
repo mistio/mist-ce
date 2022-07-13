@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.7.0 (19 Jul 2022)
+
+- Feature: Support for GKE & EKS managed clusters. Inventory, pricing, provisioning (APIv2 only), edit nodepools (APIv2 only).
+- Feature: Price catalog for block storage volumes (EE / HS only).
+- Change: Improve installation process. Helm chart as the recommended method.
+- Change: Refactor object storage support to improve performance.
+- Change: Reduce amount of metadata about locations, images & sizes fetched by the UI to improve performance.
+- Change: Rename CORE_URI to PORTAL_URI in settings.
+- Change: Improve EC2 & GCP instance pricing.
+- Change: Update paramiko, libcloud & RabbitMQ dependencies.
+- Bugfix: Fix metering of block storage volumes.
+- Bugfix: Fix Openstack issue when auth url contains a path.
+- Bugfix: Fix execution of Ansible playbooks.
+- Bugfix: Fix LXD shell support
+- Bugfix: Fix execution of orchestration template workflows (EE/HS only)
+
+
 ## v4.6.2 (20 Dec 2021)
 
  - Change: Upgrade Elasticsearch & logstash, mitigates potential security issue
