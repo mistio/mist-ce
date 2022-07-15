@@ -497,6 +497,7 @@ deploy master:
   when: manual
 
 API:main:api_token: *api_test_template
+API:main:buckets: *api_test_template
 API:main:clouds: *api_test_template
 API:main:dns: *api_test_template
 API:main:keys: *api_test_template
