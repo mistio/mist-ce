@@ -457,6 +457,7 @@ deploy master:
     - echo "Image used is $TESTS_IMAGE"
     - echo $TEST_SETTINGS | base64 -d > test_settings.py
   dependencies: []
+  timeout: 15 minutes
 
 # API Integration tests #
 
