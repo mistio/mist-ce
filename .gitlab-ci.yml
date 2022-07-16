@@ -527,7 +527,9 @@ API:main:v2:test_users_controller: *api_test_template
 API:main:v2:test_volumes_controller: *api_test_template
 API:main:v2:test_zones_controller: *api_test_template
 API:main:v2:test_snapshots_controller: *api_test_template
-API:main:v2:test_machines_controller: *api_test_template
+API:main:v2:test_machines_controller_1: *api_test_template
+API:main:v2:test_machines_controller_2: *api_test_template
+API:main:v2:test_machines_controller_3: *api_test_template
 API:main:v2:test_search_tags: *api_test_template
 API:plugin:orchestration: *api_test_template_manual
 .API:plugin:tunnels: *api_test_template
