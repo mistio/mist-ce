@@ -488,12 +488,12 @@ deploy master:
 .api_test_template: &api_test_template
   <<: *test_template
   script:
-    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
+    - /mist.tests/prepare_env.py --api -s -x /mist.tests/misttests/integration/api/$TEST.py
 
 .api_test_template_manual: &api_test_template_manual
   <<: *test_template
   script:
-    - /mist.tests/prepare_env.py --api -s /mist.tests/misttests/integration/api/$TEST.py
+    - /mist.tests/prepare_env.py --api -s -x /mist.tests/misttests/integration/api/$TEST.py
   when: manual
 
 API:main:api_token: *api_test_template
