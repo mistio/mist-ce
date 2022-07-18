@@ -3,6 +3,7 @@
 ## v4.7.0 (19 Jul 2022)
 
 - Feature: Support for GKE & EKS managed clusters. Inventory, pricing, provisioning (APIv2 only), edit nodepools (APIv2 only).
+- Feature: Serial console support for KVM machines
 - Feature: Price catalog for block storage volumes (EE / HS only).
 - Change: Improve installation process. Helm chart as the recommended method.
 - Change: Refactor object storage support to improve performance.
