@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.7.0 (19 Jul 2022)
+## v4.7.0 (24 Jul 2022)
 
 - Feature: Support for GKE & EKS managed clusters. Inventory, pricing, provisioning (APIv2 only), edit nodepools (APIv2 only).
 - Feature: Serial console support for KVM machines
@@ -10,6 +10,7 @@
 - Change: Reduce amount of metadata about locations, images & sizes fetched by the UI to improve performance.
 - Change: Rename CORE_URI to PORTAL_URI in settings.
 - Change: Improve EC2 & GCP instance pricing.
+- Change: Fetch KVM guest ifaces & IP addresses from Libvirt instead of parsing arp tables
 - Change: Update paramiko, libcloud & RabbitMQ dependencies.
 - Bugfix: Fix metering of block storage volumes.
 - Bugfix: Fix Openstack issue when auth url contains a path.
