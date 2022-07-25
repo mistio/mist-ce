@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.7.0 (24 Jul 2022)
+## v4.7.0 (25 Jul 2022)
 
 - Feature: Support for GKE & EKS managed clusters. Inventory, pricing, provisioning (APIv2 only), edit nodepools (APIv2 only).
 - Feature: Serial console support for KVM machines
