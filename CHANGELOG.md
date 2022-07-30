@@ -1,5 +1,14 @@
 # Changelog
 
+
+## v4.7.1 (30 Jul 2022)
+
+- Change: Add feature flag for parsing arp tables in Libvirt hosts
+- Change: Regularly probe hosts with associated keys to determine cpu & ram
+- Bugfix: Fix tree view issue
+- Bugfix: Fix LXD shell issue
+
+
 ## v4.7.0 (25 Jul 2022)
 
 - Feature: Support for GKE & EKS managed clusters. Inventory, pricing, provisioning (APIv2 only), edit nodepools (APIv2 only).
