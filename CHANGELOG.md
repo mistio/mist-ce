@@ -1,10 +1,11 @@
 # Changelog
 
 
-## v4.7.1 (30 Jul 2022)
+## v4.7.1 (31 Jul 2022)
 
 - Change: Add feature flag for parsing arp tables in Libvirt hosts
 - Change: Regularly probe hosts with associated keys to determine cpu & ram
+- Bugfix: Update UI when adding Libvirt hosts
 - Bugfix: Fix tree view issue
 - Bugfix: Fix LXD shell issue
 
