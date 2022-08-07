@@ -194,6 +194,10 @@ rabbitmq:
       cpu: 2000m
   service:
     clusterIP: ''
+    extraPorts:
+    - name: streams
+      port: 5552
+      targetPort: 5552
   nodeSelector: {}
   updateStrategy:
     type: RollingUpdate
@@ -207,6 +211,10 @@ rabbitmq:
     enabled: true
     existingSecret: |-
       {{ .Release.Name }}-rabbitmq-definition
+  extraPlugins: rabbitmq_stream rabbitmq_stream_management
+  extraEnvVars:
+  - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
+    value: -rabbitmq_stream advertised_host '{{ .Release.Name }}-rabbitmq' -rabbitmq_stream advertised_port 5552 -rabbitmq_stream -rabbit loopback_users "none"
 
 # Use an external rabbitmq. This will only be used
 # if `rabbitmq.deploy` is false.

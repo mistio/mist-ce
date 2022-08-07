@@ -48,6 +48,12 @@ spec:
                 name: {{ include "chart.fullname" . }}-internal-keys-secret
                 key: sign
                 optional: false
+          - name: RABBITMQ_HOST
+            value: {{ .Release.Name }}-rabbitmq
+          - name: RABBITMQ_USERNAME
+            value: {{ .Values.rabbitmq.auth.username }}
+          - name: RABBITMQ_PASSWORD
+            value: {{ .Values.rabbitmq.auth.password }}
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
