@@ -1,1 +1,1 @@
-FROM mist/sheller:db330ae1df317a5e6d75b814b26c6b1db581fe21
+FROM mist/sheller:v0-6-2
