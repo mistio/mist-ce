@@ -541,7 +541,7 @@ API:plugin:orchestration: *api_test_template_manual
 .ui_test_template: &ui_test_template
   <<: *test_template
   script:
-    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/core/pr/features
+    - /mist.tests/prepare_env.py -k --stop --tags=$TEST /mist.tests/misttests/integration/gui/v1/pr/features
   artifacts:
     paths:
       - js_console.log
