@@ -44,17 +44,17 @@ discover submodules:
 
 .dind_template: &docker_template
   stage: build
-  image: docker:18.09.7-git
+  image: docker:19.03-git
   services:
-    - docker:18.09.7-dind
+    - docker:19.03-dind
   variables: &docker_variables
     DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://localhost:2375/
-    DOCKER_TLS_CERTDIR: ''
+    DOCKER_TLS_CERTDIR: "/certs"
   retry: 2
   tags:
-    - cpu
+    - builder
   before_script:
+    - docker info
     # Configure registries.
     - |
         export REGISTRIES=""
@@ -165,7 +165,7 @@ build api:
           git submodule sync $submodule
           git submodule update --init $submodule
         done
-    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/mist:$(get_submodule_sha api)"
+    - SRC_IMG="${SUBMODULES_IMAGE:-mist}/api:$(get_submodule_sha api)"
     - docker_pull $SRC_IMG
     - |
         docker build \
@@ -219,6 +219,8 @@ build vault: *docker_build_template
     - export submodule="${arg2:-$arg1}"
     - echo "Will retag image $img from submodule $submodule."
     - docker_retag_submodule $submodule $img
+  tags:
+  - builder
 
 retag landing: *docker_retag_template
 retag ui: *docker_retag_template
