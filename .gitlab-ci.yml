@@ -5,7 +5,7 @@ variables:
 
   # Possible values are CI_REGISTRY, EXT_REGISTRY, DOCKERHUB
   COMPOSE_REGISTRY: DOCKERHUB
-  DEPLOY_REGISTRY: EXT_REGISTRY
+  DEPLOY_REGISTRY: CI_REGISTRY
   # Set to empty string '' to disable.
   DEPLOY_REGISTRY_AUTH: '1'
   # API & UI tests image
