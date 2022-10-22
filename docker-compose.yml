@@ -93,10 +93,6 @@ services:
       - apply-migrations
     command: bin/wait-all bin/scheduler
 
-  hubshell:
-    <<: *backend
-    command: bin/wait-all bin/hubshell
-
   api:
     <<: *backend
     command: bin/wait-all bin/uwsgi
