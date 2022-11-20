@@ -58,6 +58,8 @@ victoriametrics:
   # Use existing Victoria Metrics cluster
   readEndpoint: ''
   writeEndpoint: ''
+  rbac:
+    pspEnabled: false
   vmselect:
     replicaCount: 1
     extraArgs:
