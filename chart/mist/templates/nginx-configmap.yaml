@@ -241,6 +241,11 @@ data:
                 proxy_set_header Connection "upgrade";
             }
 
+            location ~ ^/ssh/jobs/ {
+                proxy_pass http://{{ include "chart.fullname" . }}-sheller:8086;
+                proxy_http_version 1.1;
+            }
+            
             location /wsproxy {
                 proxy_pass http://{{ include "chart.fullname" . }}-wsproxy:8764;
                 proxy_http_version 1.1;

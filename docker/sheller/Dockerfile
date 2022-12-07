@@ -1,1 +1,1 @@
-FROM mist/sheller:v0-6-2
+FROM mist/sheller:v0-7-0
