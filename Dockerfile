@@ -1,5 +1,5 @@
 # Inherit the mist.api image.
-ARG FROM_IMAGE=mist/api:scripts_with_post_request
+ARG FROM_IMAGE=mist/api:auth-spec
 FROM $FROM_IMAGE
 
 # Install orchestration plugin
