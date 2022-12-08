@@ -54,11 +54,11 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           requests:
-            memory: 500Mi
+            memory: 800Mi
             cpu: 100m
           limits:
-            memory: 700Mi
-            cpu: 1000m
+            memory: 1800Mi
+            cpu: 1600m
 {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

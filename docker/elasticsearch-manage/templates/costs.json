@@ -1,86 +1,77 @@
 {
-  "template": "machines_inventory-*",
-    "settings": {
-      "index": {
-        "refresh_interval": "60s",
-        "number_of_shards": "1",
-        "number_of_replicas": "1",
-        "routing": {
-          "allocation": {
-            "total_shards_per_node": "1"
-          }
-        },
-        "merge": {
-          "policy": {
-            "floor_segment": "2mb",
-            "segments_per_tier": "8",
-            "max_merge_at_once": "4",
-            "max_merged_segment": "512mb"
-          }
-        },
-        "translog": {
-          "durability": "async"
+  "index_patterns": "machines_inventory-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "60s",
+      "number_of_shards": "1",
+      "number_of_replicas": "1",
+      "routing": {
+        "allocation": {
+          "total_shards_per_node": "1"
         }
+      },
+      "merge": {
+        "policy": {
+          "floor_segment": "2mb",
+          "segments_per_tier": "8",
+          "max_merge_at_once": "4",
+          "max_merged_segment": "512mb"
+        }
+      },
+      "translog": {
+        "durability": "async"
       }
-    },
-    "mappings": {
-      "_default_": {
-        "dynamic_templates": [
-          {
-            "strings": {
-              "match_mapping_type": "string",
-              "match": "*",
-              "mapping": {
-                "index": true,
-                "type": "keyword"
-              }
-            }
-          },
-          {
-            "integers": {
-              "match_mapping_type": "*",
-              "match": "*",
-              "mapping": {
-                "index": true,
-                "type": "{dynamic_type}"
-              }
-            }
-          }
-        ],
-        "_source": {
-          "enabled": true
-        },
-        "_all": {
-          "enabled": false
-        },
-        "properties": {
-          "@version": {
-            "index": false,
-            "type": "keyword"
-          },
-          "@timestamp": {
-            "format": "strict_date_optional_time||epoch_millis",
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [{
+        "strings": {
+          "match_mapping_type": "string",
+          "match": "*",
+          "mapping": {
             "index": true,
-            "type": "date"
-          },
-          "owner_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "machine_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "cost_per_month": {
-            "index": true,
-            "type": "float"
-          },
-          "tags": {
-            "index": false,
             "type": "keyword"
           }
         }
+      },
+      {
+        "integers": {
+          "match_mapping_type": "*",
+          "match": "*",
+          "mapping": {
+            "index": true,
+            "type": "{dynamic_type}"
+          }
+        }
       }
-    },
-    "aliases": {}
+    ],
+    "properties": {
+      "@version": {
+        "index": false,
+        "type": "keyword"
+      },
+      "@timestamp": {
+        "format": "strict_date_optional_time||epoch_millis",
+        "index": true,
+        "type": "date"
+      },
+      "owner_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "machine_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "cost_per_month": {
+        "index": true,
+        "type": "float"
+      },
+      "tags": {
+        "index": false,
+        "type": "keyword"
+      }
+    }
+  },
+  "aliases": {}
 }

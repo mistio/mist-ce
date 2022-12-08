@@ -1,152 +1,143 @@
 {
-  "template": "exceptions-*",
-    "settings": {
-      "index": {
-        "refresh_interval": "30s",
-        "number_of_shards": "1",
-        "number_of_replicas": "1",
-        "routing": {
-          "allocation": {
-            "total_shards_per_node": "1"
-          }
-        },
-        "merge": {
-          "policy": {
-            "floor_segment": "2mb",
-            "segments_per_tier": "8",
-            "max_merge_at_once": "4",
-            "max_merged_segment": "512mb"
-          }
-        },
-        "translog": {
-          "durability": "async"
+  "index_patterns": "exceptions-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "30s",
+      "number_of_shards": "1",
+      "number_of_replicas": "1",
+      "routing": {
+        "allocation": {
+          "total_shards_per_node": "1"
         }
+      },
+      "merge": {
+        "policy": {
+          "floor_segment": "2mb",
+          "segments_per_tier": "8",
+          "max_merge_at_once": "4",
+          "max_merged_segment": "512mb"
+        }
+      },
+      "translog": {
+        "durability": "async"
       }
-    },
-    "mappings": {
-      "_default_": {
-        "dynamic_templates": [
-          {
-            "objects": {
-              "match_mapping_type": "object",
-              "match": "*",
-              "mapping": {
-                "enabled": false,
-                "type": "object"
-              }
-            }
-          },
-          {
-            "strings": {
-              "match_mapping_type": "string",
-              "match": "*",
-              "mapping": {
-                "index": false,
-                "type": "keyword"
-              }
-            }
-          },
-          {
-            "remaining": {
-              "match_mapping_type": "*",
-              "match": "*",
-              "mapping": {
-                "index": false,
-                "type": "keyword"
-              }
-            }
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [{
+        "objects": {
+          "match_mapping_type": "object",
+          "match": "*",
+          "mapping": {
+            "enabled": false,
+            "type": "object"
           }
-        ],
-        "_source": {
-          "enabled": true
-        },
-        "_all": {
-          "enabled": false
-        },
-        "properties": {
-          "@version": {
+        }
+      },
+      {
+        "strings": {
+          "match_mapping_type": "string",
+          "match": "*",
+          "mapping": {
             "index": false,
             "type": "keyword"
-          },
-          "@timestamp": {
-            "format": "strict_date_optional_time||epoch_millis",
-            "index": true,
-            "type": "date"
-          },
-          "time": {
-            "index": false,
-            "type": "float"
-          },
-          "type": {
-            "index": false,
-            "type": "keyword"
-          },
-          "event_type": {
-            "index": true,
-            "type": "keyword"
-          },
-          "action": {
-            "index": true,
-            "type": "keyword"
-          },
-          "owner_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "user_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "email": {
-            "index": true,
-            "type": "keyword"
-          },
-          "traceback": {
-            "index": true,
-            "type": "text"
-          },
-          "exception": {
-            "index": true,
-            "type": "text"
-          },
-          "cloud_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "machine_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "key_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "script_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "template_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "stack_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "tunnel_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "schedule_id": {
-            "index": true,
-            "type": "keyword"
-          },
-          "tags": {
+          }
+        }
+      },
+      {
+        "remaining": {
+          "match_mapping_type": "*",
+          "match": "*",
+          "mapping": {
             "index": false,
             "type": "keyword"
           }
         }
       }
-    },
-    "aliases": {}
+    ],
+    "properties": {
+      "@version": {
+        "index": false,
+        "type": "keyword"
+      },
+      "@timestamp": {
+        "format": "strict_date_optional_time||epoch_millis",
+        "index": true,
+        "type": "date"
+      },
+      "time": {
+        "index": false,
+        "type": "float"
+      },
+      "type": {
+        "index": false,
+        "type": "keyword"
+      },
+      "event_type": {
+        "index": true,
+        "type": "keyword"
+      },
+      "action": {
+        "index": true,
+        "type": "keyword"
+      },
+      "owner_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "user_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "email": {
+        "index": true,
+        "type": "keyword"
+      },
+      "traceback": {
+        "index": true,
+        "type": "text"
+      },
+      "exception": {
+        "index": true,
+        "type": "text"
+      },
+      "cloud_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "machine_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "key_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "script_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "template_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "stack_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "tunnel_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "schedule_id": {
+        "index": true,
+        "type": "keyword"
+      },
+      "tags": {
+        "index": false,
+        "type": "keyword"
+      }
+    }
+  },
+  "aliases": {}
 }

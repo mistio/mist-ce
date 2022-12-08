@@ -23,14 +23,16 @@ spec:
     spec:
       containers:
       - name: elasticsearch
-        image: elasticsearch:5.6.16
+        image: elasticsearch:7.10.1
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
           - name: ES_JAVA_OPTS
-            value: "-Dlog4j2.formatMsgNoLookups=true"
+            value: "-Xms256M -Xmx256M"
+          - name: discovery.type
+            value: single-node
         resources:
           requests:
-            memory: 2500Mi
+            memory: 3000Mi
             cpu: 50m
           limits:
             memory: 4000Mi

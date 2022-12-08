@@ -1,5 +1,5 @@
 # Inherit the mist.api image.
-ARG FROM_IMAGE=mist/mist:staging
+ARG FROM_IMAGE=mist/api:staging
 FROM $FROM_IMAGE
 
 # Install orchestration plugin

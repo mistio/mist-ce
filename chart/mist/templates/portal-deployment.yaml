@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-portal
+  labels:
+    app: portal
+    chart: {{ include "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.portal.replicas | default "1" }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: portal
+        release: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      containers:
+      - name: portal
+        args:
+        - sh
+        - /entry.sh
+        image: {{ .Values.image.registry }}/portal:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.deployment.portal.resources.requests.memory | default "50Mi" }}
+            cpu: {{ .Values.deployment.portal.resources.requests.cpu | default "1m" }}
+          limits:
+            memory: {{ .Values.deployment.portal.resources.limits.memory | default "250Mi" }}
+            cpu: {{ .Values.deployment.portal.resources.limits.cpu | default "500m" }}
+        lifecycle:
+          preStop:
+            exec:
+              # SIGTERM triggers a quick exit; gracefully terminate instead
+              command: ["/usr/sbin/nginx","-s","quit"]
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}

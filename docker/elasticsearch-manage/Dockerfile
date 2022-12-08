@@ -1,6 +1,6 @@
 FROM mist/python3:latest
 
-RUN pip install --no-cache-dir elasticsearch==6.8.0 certifi
+RUN pip install --no-cache-dir elasticsearch==7.10.1 certifi ipdb
 
 COPY . /opt/elasticsearch-manage
 

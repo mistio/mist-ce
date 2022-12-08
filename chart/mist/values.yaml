@@ -131,6 +131,8 @@ victoriametrics:
   # Use existing Victoria Metrics cluster
   readEndpoint: ''
   writeEndpoint: ''
+  rbac:
+    pspEnabled: false
   vmselect:
     replicaCount: 1
     extraArgs:
@@ -728,6 +730,17 @@ deployment:
         memory: 250Mi
         cpu: 200m
 
+  # Portal deployment settings.
+  portal:
+    replicas: 1
+    autoscaling: *autoscaling
+    resources:
+      requests:
+        memory: 50Mi
+        cpu: 10m
+      limits:
+        memory: 250Mi
+        cpu: 200m
   # APScheduler deployment settings
   scheduler:
     scheduler:

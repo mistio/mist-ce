@@ -16,3 +16,6 @@
 [submodule "orchestration"]
 	path = orchestration
 	url = ../mist.orchestration.git
+[submodule "portal"]
+	path = portal
+	url = ../mist-portal
