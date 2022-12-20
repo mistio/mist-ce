@@ -80,7 +80,7 @@ The most notable components are the following:
 - Gocky as the relay to receive and pre-process monitoring metrics.
 - InfluxDB or VictoriaMetrics as a time series database.
 
-![Architecture.svg](Architecture.svg)
+![Architecture.png](Architecture.png)
 
 The user interacts with the RESTful Mist API through client apps like the Mist UI in the browser or command line tools (e.g. cURL, Mist CLI, etc.).
 
