@@ -1,4 +1,4 @@
-FROM mist/gocky:v0-9-0
+FROM mist/gocky:v0-9-1
 
 COPY ./config.toml /etc/gocky/config.toml
 
