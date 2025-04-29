@@ -270,7 +270,7 @@ preemptible:
 prometheus:
   enabled: false
   operator:
-    enabled: true
+    enabled: false
     serviceMonitor:
       interval: 20s
       namespace: monitoring

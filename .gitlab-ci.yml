@@ -5,7 +5,7 @@ variables:
 
   # Possible values are CI_REGISTRY, EXT_REGISTRY, DOCKERHUB
   COMPOSE_REGISTRY: DOCKERHUB
-  DEPLOY_REGISTRY: EXT_REGISTRY
+  DEPLOY_REGISTRY: CI_REGISTRY
   # Set to empty string '' to disable.
   DEPLOY_REGISTRY_AUTH: '1'
   # API & UI tests image
@@ -345,7 +345,7 @@ compose:
             --set victoriametrics.vmstorage.fullnameOverride="$release-vmstorage" \
             --set victoriametrics.vmselect.fullnameOverride="$release-vmselect" \
             --set ingress-nginx.deploy=false \
-            --set prometheus.enabled=true \
+            --set prometheus.enabled=false \
             --set deployment.api.replicas=2 \
             --set deployment.dramatiq.dramatiq.replicas=2 \
             $tls_settings \
@@ -377,13 +377,11 @@ deploy test:
     release: test-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |-
       http:
-        tlsSecret: tls-wildcard-test-mist-io
+        tlsSecret: tls-wildcard-test-cloudmeld-io
         tlsHosts:
-          - '*.test.mist.io'
+          - '*.test.cloudmeld.io'
         tlsAnnotations:
           certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-          certmanager.k8s.io/acme-challenge-type: dns01
-          certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: true
       sentry:
         api: $SENTRY_API
@@ -399,13 +397,11 @@ deploy test:
     release: $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
     values: |
       http:
-        tlsSecret: tls-wildcard-review-mist-io
+        tlsSecret: tls-wildcard-review-cloudmeld-io
         tlsHosts:
-          - '*.review.mist.io'
+          - '*.review.cloudmeld.io'
         tlsAnnotations:
           certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-          certmanager.k8s.io/acme-challenge-type: dns01
-          certmanager.k8s.io/acme-dns01-provider: mist-dns
       enableDevUsers: false
       smtp:
         host: smtp.sendgrid.net
