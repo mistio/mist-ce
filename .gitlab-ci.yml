@@ -1,7 +1,7 @@
 variables:
   GET_SOURCES_ATTEMPTS: 3
-  DEPLOY_DOMAIN_SUFFIX: -ce.review.mist.io
-  TEST_DEPLOY_DOMAIN_SUFFIX: -ce.test.mist.io
+  DEPLOY_DOMAIN_SUFFIX: -ce.review.cloudmeld.io
+  TEST_DEPLOY_DOMAIN_SUFFIX: -ce.test.cloudmeld.io
 
   # Possible values are CI_REGISTRY, EXT_REGISTRY, DOCKERHUB
   COMPOSE_REGISTRY: DOCKERHUB
@@ -323,7 +323,7 @@ compose:
           set_chart_version
 
           helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add mist-charts https://mist-charts.storage.googleapis.com/
+          # helm repo add mist-charts https://mist-charts.storage.googleapis.com/
           helm repo add vm https://victoriametrics.github.io/helm-charts/
           helm repo update
           helm dependency update ./chart/mist/
@@ -696,8 +696,8 @@ helm_chart_release:
         set -o errexit
         set -o nounset
         set -o pipefail
-        readonly REPO_URL=https://mist-charts.storage.googleapis.com/
-        readonly GCS_BUCKET=gs://mist-charts
+        # readonly REPO_URL=https://mist-charts.storage.googleapis.com/
+        # readonly GCS_BUCKET=gs://mist-charts
 
         main() {
           if ! sync_repo chart "$GCS_BUCKET" "$REPO_URL"; then
