@@ -8,11 +8,13 @@ It comes with a [RESTful API](https://mist.io/api/v2) and a [CLI](https://github
 
 Mist users include organizations like Juniper Networks, SevOne, Windstream, National Bank of Greece, Shoprite and more. They all report faster roll-outs while reducing their bills and management overheads by 40%-60%.
 
+> **NOTE:** In December 2023, Mist.io Inc was [acquired by Dell Technologies](https://mist.io/blog/2023-12-18-mist-joins-dell-isg-edge). Since then, the Enterprise Edition (EE) and Hosted Service (HS) are no longer available, while the Community Edition (CE) has not been maintained besides some security fixes contributed by the community.
+
 Mist Community Edition (CE) is licensed under the Apache License v2. It is ideal for teams with a DIY approach.
 
-Mist Enterprise Edition (EE) and Hosted Service (HS) are commercial editions which offer additional plugins for governance, role-based access control & cost insights. You can check them out on our [website](https://mist.io).
+~~Mist Enterprise Edition (EE) and Hosted Service (HS) are commercial editions which offer additional plugins for governance, role-based access control & cost insights. You can check them out on our [website](https://mist.io).~~
 
-The easiest way to try Mist is to sign up for a 14-day free trial at https://mist.io/sign-up.
+~~The easiest way to try Mist is to sign up for a 14-day free trial at https://mist.io/sign-up.~~
 
 <a href="https://www.youtube.com/watch?v=7oYyC-FIaAM" source="_blank"><img src="https://mist.io/landing/images/frontpage/home-dashboard.png" width="768"></a>
 
@@ -33,7 +35,7 @@ Mist's features include:
 - Support for more than 20 infrastructure technologies.
 - Instant visibility of all the available resources across clouds, grouped by tags.
 - Instant reporting/estimation of the current infrastructure costs.
-- Compare current & past costs, correlate with usage, provide right-sizing recommendations (EE & HS only).
+- ~~Compare current & past costs, correlate with usage, provide right-sizing recommendations (EE & HS only).~~ (No longer available)
 - Provision new resources on any cloud including machines, clusters, volumes, networks, zones and DNS records.
 - Deploy and scale Kubernetes clusters on any supported cloud.
 - Perform lifecycle actions on existing resources, e.g. stop, start, reboot, resize, destroy, etc.
@@ -43,9 +45,9 @@ Mist's features include:
 - Monitor machines, display real time system & custom metrics and store them for long term access.
 - Set rules on metrics or logs that trigger notifications, webhooks, scripts or lifecycle actions.
 - Set schedules that trigger scripts or machine lifecycle actions.
-- Set fine-grained access control policies per team, tag, resource and/or action (EE & HS only).
-- Set governance constraints: e.g. quotas on cost per user/team, required expiration dates (EE & HS only).
-- Upload infrastructure templates that may describe complex deployments and workflows (EE & HS only).
+- ~~Set fine-grained access control policies per team, tag, resource and/or action (EE & HS only).~~ (No longer available)
+- ~~Set governance constraints: e.g. quotas on cost per user/team, required expiration dates (EE & HS only).~~ (No longer available)
+- ~~Upload infrastructure templates that may describe complex deployments and workflows (EE & HS only).~~ (No longer available)
 
 ## Terminology
 

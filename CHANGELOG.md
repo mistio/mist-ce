@@ -1,5 +1,8 @@
 # Changelog
 
+## v4.7.2 (18 May 2025)
+
+- Bugfix: Critical security fixes contributed by Alex Perrakis (stolichnayer) and Efthymis Chatzoglou (efchatz)
 
 ## v4.7.1 (31 Jul 2022)
 
